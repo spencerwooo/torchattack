@@ -1,8 +1,9 @@
 # Dataset files
 data/
 
-# PDM toml
+# PDM files
 .pdm.toml
+pdm.lock
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
