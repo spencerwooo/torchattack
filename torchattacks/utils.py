@@ -1,4 +1,4 @@
-def run_attack(attack, kwargs: dict = {}) -> None:
+def run_attack(attack, kwargs: dict) -> None:
     """Helper function to run attacks in `__main__`.
 
     Args:
@@ -9,7 +9,7 @@ def run_attack(attack, kwargs: dict = {}) -> None:
     import torch
     from torchvision.models import ResNet50_Weights, resnet50
 
-    from torchattacks.dataset import NIPSLoader, IMAGENET_TRANSFORM
+    from torchattacks.dataset import IMAGENET_TRANSFORM, NIPSLoader
 
     try:
         from rich import print
