@@ -2,7 +2,7 @@ from typing import Callable
 
 import torch
 
-from torchattacks.base import Attack
+from torchattack.base import Attack
 
 
 class PGD(Attack):

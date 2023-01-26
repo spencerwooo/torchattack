@@ -3,7 +3,7 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
-from torchattacks.base import Attack
+from torchattack.base import Attack
 
 
 class FGSM(Attack):
@@ -78,7 +78,7 @@ class FGSM(Attack):
 
 
 if __name__ == "__main__":
-    from torchattacks.utils import run_attack
+    from torchattack.utils import run_attack
 
     cfg = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
     run_attack(attack=FGSM, kwargs=cfg)

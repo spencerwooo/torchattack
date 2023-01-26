@@ -3,7 +3,7 @@
 dev = ["black>=22.12.0", "ruff>=0.0.235", "mypy>=0.991", "pre-commit>=3.0.0"]
 
 [project]
-name = "torchattacks"
+name = "torchattack"
 version = "0.1.0"
 description = "A set of adversarial attacks implemented in PyTorch"
 authors = [{ name = "spencerwooo", email = "spencer.woo@outlook.com" }]

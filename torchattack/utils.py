@@ -9,7 +9,7 @@ def run_attack(attack, kwargs: dict) -> None:
     import torch
     from torchvision.models import ResNet50_Weights, resnet50
 
-    from torchattacks.dataset import IMAGENET_TRANSFORM, NIPSLoader
+    from torchattack.dataset import IMAGENET_TRANSFORM, NIPSLoader
 
     try:
         from rich import print
