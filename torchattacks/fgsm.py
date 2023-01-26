@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Callable
 
 import torch
 import torch.nn as nn
@@ -10,11 +10,12 @@ class FGSM(Attack):
     def __init__(
         self,
         model: nn.Module,
+        transform: Callable,
         eps: float = 8 / 255,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
         targeted: bool = False,
-        device: Optional[torch.device] = None,
+        device: torch.device | None = None,
     ) -> None:
         """Fast Gradient Sign Method (FGSM)
 
@@ -23,14 +24,15 @@ class FGSM(Attack):
 
         Args:
             model: A torch.nn.Module network model.
+            transform: A transform to normalize images.
             eps: Maximum perturbation measured by Linf. Defaults to 8/255.
             clip_min: Minimum value for clipping. Defaults to 0.0.
             clip_max: Maximum value for clipping. Defaults to 1.0.
             targeted: Targeted attack if True. Defaults to False.
-            device: Device to use for tensors. Defaults to 'cuda' if available.
+            device: Device to use for tensors. Defaults to cuda if available.
         """
 
-        super().__init__(device=device)
+        super().__init__(transform, device)
 
         self.model = model
         self.eps = eps
@@ -54,7 +56,7 @@ class FGSM(Attack):
         # The original implementation of FGSM is not written in this way.
         delta = torch.zeros_like(x, requires_grad=True)
 
-        outs = self.model(x + delta)
+        outs = self.model(self.transform(x + delta))
         loss = self.lossfn(outs, y)
 
         if self.targeted:
@@ -73,3 +75,10 @@ class FGSM(Attack):
         delta.data = torch.clamp(x + delta.data, self.clip_min, self.clip_max) - x
 
         return x + delta
+
+
+if __name__ == "__main__":
+    from torchattacks.utils import run_attack
+
+    cfg = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
+    run_attack(attack=FGSM, kwargs=cfg)
