@@ -1,27 +1,17 @@
 [tool.pdm]
 [tool.pdm.dev-dependencies]
-dev = [
-    "black>=22.12.0",
-    "ruff>=0.0.235",
-    "mypy>=0.991",
-    "pre-commit>=3.0.0",
-]
+dev = ["black>=22.12.0", "ruff>=0.0.235", "mypy>=0.991", "pre-commit>=3.0.0"]
 
 [project]
 name = "torchattacks"
 version = "0.1.0"
 description = "A set of adversarial attacks implemented in PyTorch"
-authors = [
-    {name = "spencerwooo", email = "spencer.woo@outlook.com"},
-]
-dependencies = [
-    "torch>=1.13.1",
-    "torchvision>=0.14.1",
-    "numpy>=1.24.1",
-]
+authors = [{ name = "spencerwooo", email = "spencer.woo@outlook.com" }]
+dependencies = ["torch>=1.13.1", "torchvision>=0.14.1", "numpy>=1.24.1"]
+# 3.11 and above is not supported until PyTorch officially releases 2.0
 requires-python = ">=3.10,<3.11"
 readme = "README.md"
-license = {text = "MIT"}
+license = { text = "MIT" }
 
 [build-system]
 requires = ["pdm-pep517>=1.0"]
@@ -35,5 +25,6 @@ select = ["E", "F", "I", "N", "B", "SIM"]
 disallow_any_unimported = true
 no_implicit_optional = true
 check_untyped_defs = true
+ignore_missing_imports = true  # Used as torchvision does not ship type hints
 # disallow_untyped_defs = true
 # warn_return_any = true
