@@ -15,8 +15,8 @@ def run_attack(attack, kwargs: dict) -> None:
     from contextlib import suppress
 
     import torch
-    from torchvision.models import ResNet50_Weights, resnet50
     from torchvision.io import write_png
+    from torchvision.models import ResNet50_Weights, resnet50
     from torchvision.utils import make_grid
 
     from torchattack.dataset import IMAGENET_TRANSFORM, NIPSLoader
