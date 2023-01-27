@@ -16,6 +16,8 @@ def run_attack(attack, kwargs: dict) -> None:
 
     import torch
     from torchvision.models import ResNet50_Weights, resnet50
+    from torchvision.io import write_png
+    from torchvision.utils import make_grid
 
     from torchattack.dataset import IMAGENET_TRANSFORM, NIPSLoader
 
@@ -39,7 +41,7 @@ def run_attack(attack, kwargs: dict) -> None:
     except NameError:
         print("Running attack ... (install `rich` for progress bar)")
 
-    for _, images, labels in dataloader:
+    for i, (_, images, labels) in enumerate(dataloader):
         images, labels = images.to(device), labels.to(device)
 
         adv_images = attacker(images, labels)
@@ -49,5 +51,10 @@ def run_attack(attack, kwargs: dict) -> None:
 
         acc_clean += (clean_outs == labels).sum().item()
         acc_adv += (adv_outs == labels).sum().item()
+
+        if i == 12:
+            saved_imgs = adv_images.detach().cpu().mul(255).to(torch.uint8)
+            img_grid = make_grid(saved_imgs, nrow=8)
+            write_png(img_grid, "adv_batch_12.png")
 
     print(f"Accuracy (clean vs adversarial): {acc_clean / total} vs {acc_adv / total}")
