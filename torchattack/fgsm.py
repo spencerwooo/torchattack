@@ -7,6 +7,12 @@ from torchattack.base import Attack
 
 
 class FGSM(Attack):
+    """Fast Gradient Sign Method (FGSM)
+
+    From the paper 'Explaining and Harnessing Adversarial Examples'
+    https://arxiv.org/abs/1412.6572
+    """
+
     def __init__(
         self,
         model: nn.Module,
@@ -17,10 +23,7 @@ class FGSM(Attack):
         targeted: bool = False,
         device: torch.device | None = None,
     ) -> None:
-        """Fast Gradient Sign Method (FGSM)
-
-        From the paper 'Explaining and Harnessing Adversarial Examples'
-        https://arxiv.org/abs/1412.6572
+        """Initialize the FGSM attack.
 
         Args:
             model: A torch.nn.Module network model.

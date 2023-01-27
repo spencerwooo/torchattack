@@ -1,21 +1,27 @@
 def run_attack(attack, kwargs: dict) -> None:
     """Helper function to run attacks in `__main__`.
 
+    Example:
+
+        >>> from torchattack import FGSM
+        >>> cfg = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
+        >>> run_attack(attack=FGSM, kwargs=cfg)
+
     Args:
-        attack: The attack class.
-        kwargs: Keyword arguments. Defaults to {}.
+        attack: The attack class to initialize.
+        kwargs: A dict of keyword arguments passed to the attack class.
     """
+
+    from contextlib import suppress
 
     import torch
     from torchvision.models import ResNet50_Weights, resnet50
 
     from torchattack.dataset import IMAGENET_TRANSFORM, NIPSLoader
 
-    try:
+    with suppress(ImportError):
         from rich import print
         from rich.progress import track
-    except ImportError:
-        pass
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = resnet50(weights=ResNet50_Weights.DEFAULT).eval().to(device)

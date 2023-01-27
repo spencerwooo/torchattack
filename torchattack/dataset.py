@@ -20,22 +20,25 @@ IMAGENET_TRANSFORM = nn.Sequential(
 
 
 class NIPSDataset(Dataset):
+    """The NIPS 2017 Adversarial Learning Challenge dataset (derived from ImageNet).
+
+    https://www.kaggle.com/datasets/google-brain/nips-2017-adversarial-learning-development-set
+    """
+
     def __init__(
         self,
         image_root: str,
         pairs_path: str,
     ) -> None:
-        """The NIPS 2017 Adversarial Learning Challenge dataset (derived from ImageNet).
-
-        https://www.kaggle.com/datasets/google-brain/nips-2017-adversarial-learning-development-set
+        """Initialize the NIPS 2017 Adversarial Learning Challenge dataset.
 
         Dataset folder should contain the images in the following format:
 
         ```
         data/nips2017/
-        |-- images/            <-- image_root
-        |-- images.csv         <-- pairs_path
-        `-- categories.csv
+        ├── images/            <-- image_root
+        ├── images.csv         <-- pairs_path
+        └── categories.csv
         ```
 
         Images from the dataset are loaded into `torch.Tensor` within the range [0, 1].
