@@ -1,21 +1,28 @@
 import csv
+from typing import Callable
 
 import numpy as np
 import torch
-import torch.nn as nn
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import transforms
 
-__all__ = ["NIPSLoader", "IMAGENET_TRANSFORM"]
+__all__ = [
+    "NIPSLoader",
+    "T_RESIZE_224",
+    "T_NORMALIZE",
+    "T_DENORMALIZE",
+]
 
-IMAGENET_TRANSFORM = nn.Sequential(
-    transforms.Resize([256]),
-    transforms.CenterCrop(224),
-    transforms.Normalize(
-        mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225],
-    ),
+# A few transforms for the NIPS dataset (applicable to ImageNet as well)
+T_RESIZE_224 = transforms.Resize([224])
+T_NORMALIZE = transforms.Normalize(
+    mean=[0.485, 0.456, 0.406],
+    std=[0.229, 0.224, 0.225],
+)
+T_DENORMALIZE = transforms.Normalize(
+    mean=[-0.485 / 0.229, -0.456 / 0.224, -0.406 / 0.225],
+    std=[1 / 0.229, 1 / 0.224, 1 / 0.225],
 )
 
 
@@ -29,6 +36,7 @@ class NIPSDataset(Dataset):
         self,
         image_root: str,
         pairs_path: str,
+        transform: Callable[[torch.Tensor], torch.Tensor] | None = None,
     ) -> None:
         """Initialize the NIPS 2017 Adversarial Learning Challenge dataset.
 
@@ -54,6 +62,7 @@ class NIPSDataset(Dataset):
 
         self.image_root = image_root
         self.pairs_path = pairs_path
+        self.transform = transform
 
         image_name, image_label = [], []
 
@@ -80,7 +89,7 @@ class NIPSDataset(Dataset):
         image = Image.open(f"{self.image_root}/{name}.png").convert("RGB")
         image = np.array(image, dtype=np.uint8)
         image = torch.from_numpy(image).permute((2, 0, 1)).contiguous().float().div(255)
-        # image = self.transforms(image) if self.transforms else image
+        image = self.transform(image) if self.transform else image
         return name, image, label
 
 
@@ -93,6 +102,7 @@ class NIPSLoader(DataLoader):
         batch_size: int = 1,
         shuffle: bool = False,
         num_workers: int = 0,
+        transform: Callable[[torch.Tensor], torch.Tensor] | None = None,
     ):
         # Specifing a custom image root directory is useful when evaluating
         # transferability on a generated adversarial examples folder
@@ -101,6 +111,7 @@ class NIPSLoader(DataLoader):
         self.dataset = NIPSDataset(
             image_root=self.image_root,
             pairs_path=self.pairs_path,
+            transform=transform,
         )
 
         super().__init__(

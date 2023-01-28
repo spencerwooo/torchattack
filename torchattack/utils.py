@@ -19,7 +19,7 @@ def run_attack(attack, kwargs: dict) -> None:
     from torchvision.models import ResNet50_Weights, resnet50
     from torchvision.utils import make_grid
 
-    from torchattack.dataset import IMAGENET_TRANSFORM, NIPSLoader
+    from torchattack.dataset import T_NORMALIZE, T_RESIZE_224, NIPSLoader
 
     with suppress(ImportError):
         from rich import print
@@ -27,9 +27,9 @@ def run_attack(attack, kwargs: dict) -> None:
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = resnet50(weights=ResNet50_Weights.DEFAULT).eval().to(device)
-    dataloader = NIPSLoader(path="data/nips2017", batch_size=16)
+    dataloader = NIPSLoader(path="data/nips2017", batch_size=16, transform=T_RESIZE_224)
 
-    transform = IMAGENET_TRANSFORM
+    transform = T_NORMALIZE
 
     total, acc_clean, acc_adv = len(dataloader.dataset), 0, 0  # type: ignore
     attacker = attack(model=model, transform=transform, device=device, **kwargs)
