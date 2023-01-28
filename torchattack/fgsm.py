@@ -16,7 +16,7 @@ class FGSM(Attack):
     def __init__(
         self,
         model: nn.Module,
-        transform: Callable,
+        transform: Callable[[torch.Tensor], torch.Tensor],
         eps: float = 8 / 255,
         clip_min: float = 0.0,
         clip_max: float = 1.0,

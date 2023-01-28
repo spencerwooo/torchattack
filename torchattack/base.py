@@ -7,7 +7,11 @@ import torch
 class Attack(ABC):
     """The base class for all attacks."""
 
-    def __init__(self, transform: Callable, device: torch.device | None) -> None:
+    def __init__(
+        self,
+        transform: Callable[[torch.Tensor], torch.Tensor],
+        device: torch.device | None,
+    ) -> None:
         super().__init__()
         self.transform = transform
 

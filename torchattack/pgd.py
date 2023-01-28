@@ -16,7 +16,7 @@ class PGD(Attack):
     def __init__(
         self,
         model: nn.Module,
-        transform: Callable,
+        transform: Callable[[torch.Tensor], torch.Tensor],
         eps: float = 8 / 255,
         steps: int = 10,
         alpha: float | None = None,
