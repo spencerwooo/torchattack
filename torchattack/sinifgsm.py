@@ -6,12 +6,8 @@ import torch.nn as nn
 from torchattack.base import Attack
 
 
-class NIFGSM(Attack):
-    """The NI-FGSM (Nesterov-accelerated Iterative FGSM) attack.
-
-    Note:
-        This attack does not apply the scale-invariant method. For the original attack
-        proposed in the paper (SI-NI-FGSM), see `torchattack.sinifgsm.SINIFGSM`.
+class SINIFGSM(Attack):
+    """The SI-NI-FGSM (Scale-invariant Nesterov-accelerated Iterative FGSM) attack.
 
     From the paper 'Nesterov Accelerated Gradient and Scale Invariance for Adversarial
     Attacks' https://arxiv.org/abs/1908.06281
@@ -25,12 +21,13 @@ class NIFGSM(Attack):
         steps: int = 10,
         alpha: float | None = None,
         decay_factor: float = 1.0,
+        m: int = 3,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
         targeted: bool = False,
         device: torch.device | None = None,
     ) -> None:
-        """Initialize the NI-FGSM attack.
+        """Initialize the SI-NI-FGSM attack.
 
         Args:
             model: The model to attack.
@@ -39,6 +36,7 @@ class NIFGSM(Attack):
             steps: Number of steps. Defaults to 10.
             alpha: Step size, `eps / (steps / 2)` if None. Defaults to None.
             decay_factor: Decay factor for the momentum term. Defaults to 1.0.
+            m: Number of scaled copies of the image. Defaults to 3.
             clip_min: Minimum value for clipping. Defaults to 0.0.
             clip_max: Maximum value for clipping. Defaults to 1.0.
             targeted: Targeted attack if True. Defaults to False.
@@ -52,13 +50,14 @@ class NIFGSM(Attack):
         self.steps = steps
         self.alpha = alpha
         self.decay_factor = decay_factor
+        self.m = m
         self.clip_min = clip_min
         self.clip_max = clip_max
         self.targeted = targeted
         self.lossfn = nn.CrossEntropyLoss()
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        """Perform NI-FGSM on a batch of images.
+        """Perform SI-NI-FGSM on a batch of images.
 
         Args:
             x: A batch of images. Shape: (N, C, H, W).
@@ -75,28 +74,40 @@ class NIFGSM(Attack):
         if self.alpha is None:
             self.alpha = self.eps / (self.steps / 2)
 
-        # Perform NI-FGSM
+        # Perform SI-NI-FGSM
         for _ in range(self.steps):
             # Nesterov gradient component
             nes = self.alpha * self.decay_factor * g
             x_nes = x + delta + nes
 
-            # Compute loss
-            outs = self.model(self.transform(x_nes))
-            loss = self.lossfn(outs, y)
+            # Gradient is computed over scaled copies
+            grad = torch.zeros_like(x)
 
-            if self.targeted:
-                loss = -loss
+            # Obtain scaled copies of the images
+            for i in torch.arange(self.m):
+                x_ness = x_nes / torch.pow(2, i)
 
-            # Compute gradient
-            loss.backward()
+                # Compute loss
+                outs = self.model(self.transform(x_ness))
+                loss = self.lossfn(outs, y)
 
-            if delta.grad is None:
-                continue
+                if self.targeted:
+                    loss = -loss
+
+                # Compute gradient
+                loss.backward()
+
+                if delta.grad is None:
+                    continue
+
+                grad += delta.grad
+
+            # Average gradient over scaled copies
+            grad /= self.m
 
             # Apply momentum term
-            g = self.decay_factor * delta.grad + delta.grad / torch.mean(
-                torch.abs(delta.grad), dim=(1, 2, 3), keepdim=True
+            g = self.decay_factor * grad + grad / torch.mean(
+                torch.abs(grad), dim=(1, 2, 3), keepdim=True
             )
 
             # Update delta
@@ -105,7 +116,8 @@ class NIFGSM(Attack):
             delta.data = torch.clamp(x + delta.data, self.clip_min, self.clip_max) - x
 
             # Zero out gradient
-            delta.grad.data.zero_()
+            if delta.grad is not None:
+                delta.grad.data.zero_()
 
         return x + delta
 
@@ -113,4 +125,4 @@ class NIFGSM(Attack):
 if __name__ == "__main__":
     from torchattack.utils import run_attack
 
-    run_attack(NIFGSM, {"eps": 8 / 255, "steps": 10})
+    run_attack(SINIFGSM, {"eps": 8 / 255, "steps": 10, "m": 3})
