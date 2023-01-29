@@ -100,7 +100,8 @@ class PGD(Attack):
             delta.data = torch.clamp(x + delta.data, self.clip_min, self.clip_max) - x
 
             # Zero out gradient
-            delta.grad.data.zero_()
+            delta.grad.detach_()
+            delta.grad.zero_()
 
         return x + delta
 

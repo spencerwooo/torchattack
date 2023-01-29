@@ -117,7 +117,8 @@ class SINIFGSM(Attack):
 
             # Zero out gradient
             if delta.grad is not None:
-                delta.grad.data.zero_()
+                delta.grad.detach_()
+                delta.grad.zero_()
 
         return x + delta
 
