@@ -7,19 +7,13 @@ name = "torchattack"
 version = "0.1.0"
 description = "A set of adversarial attacks implemented in PyTorch"
 authors = [{ name = "spencerwooo", email = "spencer.woo@outlook.com" }]
-dependencies = [
-    "torch>=1.13.1",
-    "torchvision>=0.14.1",
-    "numpy>=1.24.1",
-]
+dependencies = ["torch>=1.13.1", "torchvision>=0.14.1", "numpy>=1.24.1"]
 # 3.11 and above is not supported until PyTorch officially releases 2.0
 requires-python = ">=3.10,<3.11"
 readme = "README.md"
 license = { text = "MIT" }
 [project.optional-dependencies]
-optional = [
-    "rich>=13.2.0",
-]
+optional = ["rich>=13.2.0"]
 
 [build-system]
 requires = ["pdm-pep517>=1.0"]
@@ -36,3 +30,6 @@ check_untyped_defs = true
 ignore_missing_imports = true  # Used as torchvision does not ship type hints
 # disallow_untyped_defs = true
 # warn_return_any = true
+
+[tool.pdm.scripts]
+lint = "pre-commit run --all-files"
