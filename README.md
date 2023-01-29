@@ -2,6 +2,7 @@
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
 [![pdm-managed](https://img.shields.io/badge/pdm-managed-blueviolet)](https://pdm.fming.dev)
+[![lint](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml/badge.svg)](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 A set of adversarial attacks implemented in PyTorch. _For internal use._
@@ -25,7 +26,7 @@ attack = MIFGSM(model, eps=0.03, steps=10, decay=1.0)
 ## Attacks
 
 | Name       | Paper                                                                                                                      | `torchattack` class    |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| :--------- | :------------------------------------------------------------------------------------------------------------------------- | :--------------------- |
 | FGSM       | [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572)                                          | `torchattack.FGSM`     |
 | PGD        | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                          | `torchattack.PGD`      |
 | MI-FGSM    | [Boosting Adversarial Attacks with Momentum](https://arxiv.org/abs/1710.06081)                                             | `torchattack.MIFGSM`   |
