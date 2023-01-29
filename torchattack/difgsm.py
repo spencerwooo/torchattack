@@ -31,6 +31,12 @@ class DIFGSM(Attack):
     ) -> None:
         """Initialize the DI-FGSM attack.
 
+        Note:
+            Key parameters include `resize_rate` and `diversity_prob`, which defines the
+            scale size of the resized image and the probability of applying input
+            diversity. The default values are set to 0.9 and 1.0 respectively (implying
+            that input diversity is always applied).
+
         Args:
             model: The model to attack.
             transform: A transform to normalize images.

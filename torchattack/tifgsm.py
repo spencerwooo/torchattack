@@ -33,6 +33,11 @@ class TIFGSM(Attack):
     ) -> None:
         """Initialize the TI-FGSM attack.
 
+        Note:
+            Key parameters include `kernel_len` and `n_sig`, which defines the size and
+            the radius of the gaussian kernel. The default values are set to 15 and 3
+            respectively, which are best according to the paper.
+
         Args:
             model: The model to attack.
             transform: A transform to normalize images.
