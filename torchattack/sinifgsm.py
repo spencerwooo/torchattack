@@ -20,7 +20,7 @@ class SINIFGSM(Attack):
         eps: float = 8 / 255,
         steps: int = 10,
         alpha: float | None = None,
-        decay_factor: float = 1.0,
+        decay: float = 1.0,
         m: int = 3,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
@@ -35,7 +35,7 @@ class SINIFGSM(Attack):
             eps: The maximum perturbation. Defaults to 8/255.
             steps: Number of steps. Defaults to 10.
             alpha: Step size, `eps / (steps / 2)` if None. Defaults to None.
-            decay_factor: Decay factor for the momentum term. Defaults to 1.0.
+            decay: Decay factor for the momentum term. Defaults to 1.0.
             m: Number of scaled copies of the image. Defaults to 3.
             clip_min: Minimum value for clipping. Defaults to 0.0.
             clip_max: Maximum value for clipping. Defaults to 1.0.
@@ -49,7 +49,7 @@ class SINIFGSM(Attack):
         self.eps = eps
         self.steps = steps
         self.alpha = alpha
-        self.decay_factor = decay_factor
+        self.decay = decay
         self.m = m
         self.clip_min = clip_min
         self.clip_max = clip_max
@@ -77,7 +77,7 @@ class SINIFGSM(Attack):
         # Perform SI-NI-FGSM
         for _ in range(self.steps):
             # Nesterov gradient component
-            nes = self.alpha * self.decay_factor * g
+            nes = self.alpha * self.decay * g
             x_nes = x + delta + nes
 
             # Gradient is computed over scaled copies
@@ -106,7 +106,7 @@ class SINIFGSM(Attack):
             grad /= self.m
 
             # Apply momentum term
-            g = self.decay_factor * grad + grad / torch.mean(
+            g = self.decay * grad + grad / torch.mean(
                 torch.abs(grad), dim=(1, 2, 3), keepdim=True
             )
 
