@@ -6,11 +6,11 @@ import torch.nn as nn
 from torchattack.base import Attack
 
 
-class MIFGSM(Attack):
-    """The MI-FGSM (Momentum Iterative FGSM) attack.
+class NIFGSM(Attack):
+    """The NI-FGSM (Nesterov-accelerated Iterative FGSM) attack.
 
-    From the paper 'Boosting Adversarial Attacks with Momentum'
-    https://arxiv.org/abs/1710.06081
+    From the paper 'Nesterov Accelerated Gradient and Scale Invariance for Adversarial
+    Attacks' https://arxiv.org/abs/1908.06281
     """
 
     def __init__(
@@ -26,7 +26,7 @@ class MIFGSM(Attack):
         targeted: bool = False,
         device: torch.device | None = None,
     ) -> None:
-        """Initialize the MI-FGSM attack.
+        """Initialize the NI-FGSM attack.
 
         Args:
             model: The model to attack.
@@ -54,7 +54,7 @@ class MIFGSM(Attack):
         self.lossfn = nn.CrossEntropyLoss()
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        """Perform MI-FGSM on a batch of images.
+        """Perform NI-FGSM on a batch of images.
 
         Args:
             x: A batch of images. Shape: (N, C, H, W).
@@ -71,10 +71,14 @@ class MIFGSM(Attack):
         if self.alpha is None:
             self.alpha = self.eps / (self.steps / 2)
 
-        # Perform MI-FGSM
+        # Perform NI-FGSM
         for _ in range(self.steps):
+            # Nesterov gradient component
+            nes = self.alpha * self.decay_factor * g
+            x_nes = x + delta + nes
+
             # Compute loss
-            outs = self.model(self.transform(x + delta))
+            outs = self.model(self.transform(x_nes))
             loss = self.lossfn(outs, y)
 
             if self.targeted:
@@ -87,7 +91,7 @@ class MIFGSM(Attack):
                 continue
 
             # Apply momentum term
-            g = self.decay_factor * g + delta.grad / torch.mean(
+            g = self.decay_factor * delta.grad + delta.grad / torch.mean(
                 torch.abs(delta.grad), dim=(1, 2, 3), keepdim=True
             )
 
@@ -105,4 +109,4 @@ class MIFGSM(Attack):
 if __name__ == "__main__":
     from torchattack.utils import run_attack
 
-    run_attack(MIFGSM, {"eps": 8 / 255, "steps": 10})
+    run_attack(NIFGSM, {"eps": 8 / 255, "steps": 10})

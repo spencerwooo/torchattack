@@ -18,7 +18,7 @@ class Attack(ABC):
         # Set device to given or defaults to cuda if available.
         self.device = (
             device
-            if device is not None
+            if device
             else torch.device("cuda" if torch.cuda.is_available() else "cpu")
         )
 
