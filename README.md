@@ -2,8 +2,9 @@
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
 [![pdm-managed](https://img.shields.io/badge/pdm-managed-blueviolet)](https://pdm.fming.dev)
-[![lint](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml/badge.svg)](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![lint](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml/badge.svg)](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/daisylab-bit/torchattack)
 
 A set of adversarial attacks implemented in PyTorch. _For internal use._
 
@@ -14,13 +15,22 @@ pip install git+https://github.com/daisylab-bit/torchattack
 ## Usage
 
 ```python
+from torchvision.models import ResNet50_Weights, resnet50
+from torchvision.transforms import transforms
+
 from torchattack import FGSM, MIFGSM
 
+# Load a model
+model = resnet50(weights=ResNet50_Weights.DEFAULT)
+
+# Define transforms (you are responsible for normalizing the data if needed)
+transform = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
 # Initialize an attack
-attack = FGSM(model, eps=0.03)
+attack = FGSM(model, transform, eps=0.03)
 
 # Initialize an attack with extra params
-attack = MIFGSM(model, eps=0.03, steps=10, decay=1.0)
+attack = MIFGSM(model, transform, eps=0.03, steps=10, decay=1.0)
 ```
 
 ## Attacks

@@ -9,18 +9,16 @@ class Attack(ABC):
 
     def __init__(
         self,
-        transform: Callable[[torch.Tensor], torch.Tensor],
+        transform: Callable[[torch.Tensor], torch.Tensor] | None,
         device: torch.device | None,
     ) -> None:
         super().__init__()
-        self.transform = transform
+        # If transform is None, use identity transform.
+        self.transform = transform if transform else lambda x: x
 
         # Set device to given or defaults to cuda if available.
-        self.device = (
-            device
-            if device
-            else torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        )
+        is_cuda = torch.cuda.is_available()
+        self.device = device if device else torch.device("cuda" if is_cuda else "cpu")
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         return self.forward(*args, **kwds)

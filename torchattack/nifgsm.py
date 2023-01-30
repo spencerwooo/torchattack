@@ -20,7 +20,7 @@ class NIFGSM(Attack):
     def __init__(
         self,
         model: nn.Module,
-        transform: Callable[[torch.Tensor], torch.Tensor],
+        transform: Callable[[torch.Tensor], torch.Tensor] | None,
         eps: float = 8 / 255,
         steps: int = 10,
         alpha: float | None = None,
