@@ -3,6 +3,7 @@ from torchattack.fgsm import FGSM
 from torchattack.mifgsm import MIFGSM
 from torchattack.nifgsm import NIFGSM
 from torchattack.pgd import PGD
+from torchattack.pgdl2 import PGDL2
 from torchattack.sinifgsm import SINIFGSM
 from torchattack.tifgsm import TIFGSM
 from torchattack.vmifgsm import VMIFGSM
@@ -14,6 +15,7 @@ __all__ = [
     "MIFGSM",
     "NIFGSM",
     "PGD",
+    "PGDL2",
     "SINIFGSM",
     "TIFGSM",
     "VMIFGSM",
