@@ -126,8 +126,6 @@ class VNIFGSM(Attack):
 
                 gv_grad += neighbors.grad
 
-                gv_grad += neighbors.grad
-
             # Accumulate gradient variance into v
             v = gv_grad / self.n - delta_grad
 
