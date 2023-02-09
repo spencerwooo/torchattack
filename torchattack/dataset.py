@@ -37,6 +37,7 @@ class NIPSDataset(Dataset):
         image_root: str,
         pairs_path: str,
         transform: Callable[[torch.Tensor], torch.Tensor] | None = None,
+        max_samples: int | None = None,
     ) -> None:
         """Initialize the NIPS 2017 Adversarial Learning Challenge dataset.
 
@@ -56,6 +57,8 @@ class NIPSDataset(Dataset):
         Args:
             image_root: Path to the folder containing the images.
             pairs_path: Path to the csv file containing the image names and labels.
+            transform: An optional transform to apply to the images. Defaults to None.
+            max_samples: Maximum number of samples to load. Defaults to None.
         """
 
         super().__init__()
@@ -75,6 +78,10 @@ class NIPSDataset(Dataset):
             for r in reader:
                 image_name.append(r[0])
                 image_label.append(r[6])
+
+        if max_samples is not None:
+            image_name = image_name[:max_samples]
+            image_label = image_label[:max_samples]
 
         self.names = image_name
         self.labels = image_label
@@ -96,13 +103,14 @@ class NIPSDataset(Dataset):
 class NIPSLoader(DataLoader):
     def __init__(
         self,
-        path: str | None = "data/nips2017",
+        path: str | None,
         image_root: str | None = None,
         pairs_path: str | None = None,
         batch_size: int = 1,
         shuffle: bool = False,
         num_workers: int = 0,
         transform: Callable[[torch.Tensor], torch.Tensor] | None = None,
+        max_samples: int | None = None,
     ):
         # Specifing a custom image root directory is useful when evaluating
         # transferability on a generated adversarial examples folder
@@ -112,6 +120,7 @@ class NIPSLoader(DataLoader):
             image_root=self.image_root,
             pairs_path=self.pairs_path,
             transform=transform,
+            max_samples=max_samples,
         )
 
         super().__init__(
