@@ -33,3 +33,4 @@ ignore_missing_imports = true  # Used as torchvision does not ship type hints
 
 [tool.pdm.scripts]
 lint = "pre-commit run --all-files"
+type-check = "mypy torchattack"

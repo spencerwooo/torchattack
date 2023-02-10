@@ -89,7 +89,7 @@ class NIPSDataset(Dataset):
     def __len__(self) -> int:
         return len(self.labels)
 
-    def __getitem__(self, index: int) -> tuple[str, torch.Tensor, int]:
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, int, str]:
         name = self.names[index]
         label = int(self.labels[index]) - 1
 
@@ -97,7 +97,7 @@ class NIPSDataset(Dataset):
         image = np.array(image, dtype=np.uint8)
         image = torch.from_numpy(image).permute((2, 0, 1)).contiguous().float().div(255)
         image = self.transform(image) if self.transform else image
-        return name, image, label
+        return image, label, name
 
 
 class NIPSLoader(DataLoader):
@@ -114,17 +114,14 @@ class NIPSLoader(DataLoader):
     ):
         # Specifing a custom image root directory is useful when evaluating
         # transferability on a generated adversarial examples folder
-        self.image_root = f"{path}/images" if image_root is None else image_root
-        self.pairs_path = f"{path}/images.csv" if pairs_path is None else pairs_path
-        self.dataset = NIPSDataset(
-            image_root=self.image_root,
-            pairs_path=self.pairs_path,
-            transform=transform,
-            max_samples=max_samples,
-        )
 
         super().__init__(
-            dataset=self.dataset,
+            dataset=NIPSDataset(
+                image_root=image_root if image_root else f"{path}/images",
+                pairs_path=pairs_path if pairs_path else f"{path}/images.csv",
+                transform=transform,
+                max_samples=max_samples,
+            ),
             batch_size=batch_size,
             shuffle=shuffle,
             num_workers=num_workers,

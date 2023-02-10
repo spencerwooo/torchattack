@@ -46,7 +46,7 @@ def run_attack(attack, kwargs: dict) -> None:
         print("Running attack ... (install `rich` for progress bar)")
 
     # Run attack over the dataset (100 images by default)
-    for i, (_, images, labels) in enumerate(dataloader):
+    for i, (images, labels, _) in enumerate(dataloader):
         images, labels = images.to(device), labels.to(device)
 
         # Adversarial images are created here
@@ -59,10 +59,10 @@ def run_attack(attack, kwargs: dict) -> None:
         acc_clean += (clean_outs == labels).sum().item()
         acc_adv += (adv_outs == labels).sum().item()
 
-        # Save the 12th batch of adversarial images
-        if i == 12:
+        # Save the 4th batch of adversarial images
+        if i == 4:
             saved_imgs = adv_images.detach().cpu().mul(255).to(torch.uint8)
-            img_grid = make_grid(saved_imgs, nrow=8)
-            write_png(img_grid, "adv_batch_12.png")
+            img_grid = make_grid(saved_imgs, nrow=4)
+            write_png(img_grid, "adv_batch_4.png")
 
     print(f"Accuracy (clean vs adversarial): {acc_clean / total} vs {acc_adv / total}")
