@@ -1,16 +1,12 @@
 from typing import Callable
 
 import numpy as np
+import scipy.stats as st
 import torch
 import torch.nn as nn
 import torch.nn.functional as f
 
 from torchattack.base import Attack
-
-try:
-    import scipy.stats as st
-except ImportError:
-    raise Exception("Please install `scipy` to use this attack.") from ImportError
 
 
 class TIFGSM(Attack):
