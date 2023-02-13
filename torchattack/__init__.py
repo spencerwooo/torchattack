@@ -1,3 +1,5 @@
+from torchattack.base import Attack
+from torchattack.dataset import NIPSDataset, NIPSLoader
 from torchattack.difgsm import DIFGSM
 from torchattack.fgsm import FGSM
 from torchattack.mifgsm import MIFGSM
@@ -10,6 +12,9 @@ from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
 __all__ = [
+    "Attack",
+    "NIPSDataset",
+    "NIPSLoader",
     "DIFGSM",
     "FGSM",
     "MIFGSM",

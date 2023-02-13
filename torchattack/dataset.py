@@ -101,6 +101,22 @@ class NIPSDataset(Dataset):
 
 
 class NIPSLoader(DataLoader):
+    """A custom dataloader for the NIPS 2017 dataset.
+
+    Example:
+        The dataloader reads image and label pairs (CSV file) from `{path}/images.csv`
+        by default, and loads the images from `{path}/images/`.
+
+        >>> from torchattack.dataset import T_RESIZE_224, NIPSLoader
+        >>> dataloader = NIPSLoader(
+        >>>     path="data/nips2017", batch_size=16, transform=T_RESIZE_224
+        >>> )
+
+        You can specify a custom image root directory and CSV file location by
+        specifying `image_root` and `pairs_path`, which is usually used for evaluating
+        models on a generated adversarial examples directory.
+    """
+
     def __init__(
         self,
         path: str | None,
