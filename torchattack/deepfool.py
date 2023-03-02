@@ -181,4 +181,4 @@ class DeepFool(Attack):
 if __name__ == "__main__":
     from torchattack.utils import run_attack
 
-    run_attack(DeepFool, {"steps": 50, "overshoot": 0.02})
+    run_attack(DeepFool, attack_cfg={"steps": 50, "overshoot": 0.02}, model="resnet152")

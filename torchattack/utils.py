@@ -1,22 +1,24 @@
-def run_attack(attack, kwargs: dict) -> None:
+def run_attack(attack, attack_cfg, model="resnet50", samples=100) -> None:
     """Helper function to run attacks in `__main__`.
 
     Example:
 
         >>> from torchattack import FGSM
         >>> cfg = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
-        >>> run_attack(attack=FGSM, kwargs=cfg)
+        >>> run_attack(attack=FGSM, attack_cfg=cfg)
 
     Args:
         attack: The attack class to initialize.
-        kwargs: A dict of keyword arguments passed to the attack class.
+        attack_cfg: A dict of keyword arguments passed to the attack class.
+        model: The model to attack. Defaults to "resnet50".
+        samples: Max number of samples to attack. Defaults to 100.
     """
 
     from contextlib import suppress
 
     import torch
     from torchvision.io import write_png
-    from torchvision.models import ResNet50_Weights, resnet50
+    from torchvision.models import get_model
     from torchvision.utils import make_grid
 
     from torchattack.dataset import NIPSLoader, t_normalize, t_resize_224
@@ -28,14 +30,14 @@ def run_attack(attack, kwargs: dict) -> None:
 
     # Set up model and dataloader
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = resnet50(weights=ResNet50_Weights.DEFAULT).eval().to(device)
+    model = get_model(name=model, weights="DEFAULT").to(device).eval()
     dataloader = NIPSLoader(
-        path="data/nips2017", batch_size=8, transform=t_resize_224, max_samples=100
+        path="data/nips2017", batch_size=8, transform=t_resize_224, max_samples=samples
     )
 
     # Set up attack and trackers
     total, acc_clean, acc_adv = len(dataloader.dataset), 0, 0  # type: ignore
-    attacker = attack(model=model, transform=t_normalize, device=device, **kwargs)
+    attacker = attack(model=model, transform=t_normalize, device=device, **attack_cfg)
     print(attacker)
 
     # Wrap dataloader with rich.progress.track if available
