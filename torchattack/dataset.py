@@ -107,9 +107,11 @@ class NIPSLoader(DataLoader):
         The dataloader reads image and label pairs (CSV file) from `{path}/images.csv`
         by default, and loads the images from `{path}/images/`.
 
-        >>> from torchattack.dataset import T_RESIZE_224, NIPSLoader
+        >>> from torchvision.transforms import transforms
+        >>> from torchattack.dataset import NIPSLoader
+        >>> transform = transforms.Resize([224])
         >>> dataloader = NIPSLoader(
-        >>>     path="data/nips2017", batch_size=16, transform=T_RESIZE_224
+        >>>     path="data/nips2017", batch_size=16, transform=transform
         >>> )
 
         You can specify a custom image root directory and CSV file location by
@@ -124,7 +126,7 @@ class NIPSLoader(DataLoader):
         pairs_path: str | None = None,
         batch_size: int = 1,
         shuffle: bool = False,
-        num_workers: int = 0,
+        num_workers: int = 4,
         transform: Callable[[torch.Tensor], torch.Tensor] | None = None,
         max_samples: int | None = None,
     ):
