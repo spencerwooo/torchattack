@@ -2,7 +2,7 @@
 data/
 
 # PDM files
-.pdm.toml
+.pdm-python
 pdm.lock
 
 # Byte-compiled / optimized / DLL files
