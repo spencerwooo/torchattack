@@ -84,6 +84,10 @@ class SubNoise(nn.Module):
 class GeoDA(Attack):
     """The Geometric Decision-based Attack (GeoDA).
 
+    Note:
+        This attack does not fully support batch inputs. Batch size of more than 1 will
+        generate adversarial perturbations with incorrect magnitude.
+
     From the paper 'GeoDA: a geometric framework for black-box adversarial attacks'
     https://arxiv.org/abs/2003.06468
     """
@@ -298,8 +302,10 @@ class GeoDA(Attack):
 
             x_b = x_adv
 
-            norm = self.distance(x_adv, x_0)
-            if norm < self.epsilon or q_num > self.max_queries:
+            # norm = self.distance(x_adv, x_0)
+            # if norm < self.epsilon or q_num > self.max_queries:
+            #     break
+            if q_num > self.max_queries:
                 break
 
         x_adv = torch.clamp(x_adv, 0, 1).detach()
@@ -361,4 +367,4 @@ class GeoDA(Attack):
 if __name__ == "__main__":
     from torchattack.utils import run_attack
 
-    run_attack(GeoDA, {"epsilon": 4, "p": "l2", "max_queries": 4000}, batch_size=16)
+    run_attack(GeoDA, {"epsilon": 4, "p": "l2", "max_queries": 4000}, batch_size=2)
