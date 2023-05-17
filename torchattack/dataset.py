@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 # A few transforms for the NIPS dataset (applicable to ImageNet as well)
-t_resize_224 = transforms.Resize([224])
+t_resize_224 = transforms.Resize(size=224, antialias=True)
 t_normalize = transforms.Normalize(
     mean=[0.485, 0.456, 0.406],
     std=[0.229, 0.224, 0.225],

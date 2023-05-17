@@ -31,6 +31,8 @@ class Attack(ABC):
                 return f"{k}={v:.3f}"
             if k in ["model", "transform"]:
                 return f"{k}={v.__class__.__name__}"
+            if isinstance(v, torch.Tensor):
+                return f"{k}={v.shape}"
             return f"{k}={v}"
 
         args = ", ".join(repr_map(k, v) for k, v in self.__dict__.items())

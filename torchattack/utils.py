@@ -1,4 +1,4 @@
-def run_attack(attack, attack_cfg, model="resnet50", samples=100) -> None:
+def run_attack(attack, attack_cfg, model="resnet50", samples=100, batch_size=8) -> None:
     """Helper function to run attacks in `__main__`.
 
     Example:
@@ -32,7 +32,10 @@ def run_attack(attack, attack_cfg, model="resnet50", samples=100) -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = get_model(name=model, weights="DEFAULT").to(device).eval()
     dataloader = NIPSLoader(
-        path="data/nips2017", batch_size=8, transform=t_resize_224, max_samples=samples
+        path="data/nips2017",
+        batch_size=batch_size,
+        transform=t_resize_224,
+        max_samples=samples,
     )
 
     # Set up attack and trackers
