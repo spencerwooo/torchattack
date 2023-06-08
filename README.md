@@ -9,7 +9,11 @@
 A set of adversarial attacks implemented in PyTorch. _For internal use._
 
 ```shell
+# install from github source
 python -m pip install git+https://github.com/daisylab-bit/torchattack
+
+# install from gitee mirror
+python -m pip install git+https://gitee.com/daisylab-bit/torchattack
 ```
 
 ## Usage
