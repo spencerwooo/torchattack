@@ -1,7 +1,6 @@
 from typing import Callable
 
 import numpy as np
-import scipy.stats as st
 import torch
 import torch.nn as nn
 import torch.nn.functional as f
@@ -133,6 +132,8 @@ class TIFGSM(Attack):
     @staticmethod
     def gkern(kern_len: int = 15, n_sig: int = 3) -> np.ndarray:
         """Return a 2D Gaussian kernel array."""
+
+        import scipy.stats as st
 
         interval = (2 * n_sig + 1.0) / kern_len
         x = np.linspace(-n_sig - interval / 2.0, n_sig + interval / 2.0, kern_len + 1)
