@@ -1,35 +1,16 @@
-[tool.pdm]
-[tool.pdm.dev-dependencies]
-dev = [
-    "black>=23.3.0",
-    "ruff>=0.0.272",
-    "mypy>=1.3.0",
-    "pre-commit>=3.3.2",
-]
-
 [project]
 name = "torchattack"
-version = "0.1.5"
+version = "0.2.0"
 description = "A set of adversarial attacks implemented in PyTorch"
 authors = [{ name = "spencerwooo", email = "spencer.woo@outlook.com" }]
-dependencies = [
-    "torch>=1.13.1",
-    "torchvision>=0.14.1",
-    "numpy>=1.24.2",
-]
-# 3.11 and above is not supported until PyTorch officially releases 2.0
-requires-python = ">=3.10,<3.11"
+requires-python = ">=3.10"
 readme = "README.md"
 license = { text = "MIT" }
-[project.optional-dependencies]
-optional = [
-    "rich>=13.3.5",
-    "scipy>=1.10.1",
-]
+dependencies = ["torch", "torchvision", "numpy", "scipy", "rich"]
 
 [build-system]
-requires = ["pdm-pep517>=1.0"]
-build-backend = "pdm.pep517.api"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 line-length = 88
@@ -42,7 +23,3 @@ check_untyped_defs = true
 ignore_missing_imports = true  # Used as torchvision does not ship type hints
 # disallow_untyped_defs = true
 # warn_return_any = true
-
-[tool.pdm.scripts]
-lint = "pre-commit run --all-files"
-type-check = "mypy torchattack"
