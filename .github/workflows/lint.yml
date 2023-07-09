@@ -20,4 +20,4 @@ jobs:
       - name: Mypy
         run: |
           pip install mypy
-          mypy torchattack
+          mypy src/
