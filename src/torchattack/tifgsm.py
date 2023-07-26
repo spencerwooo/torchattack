@@ -42,7 +42,7 @@ class TIFGSM(Attack):
             transform: A transform to normalize images.
             eps: The maximum perturbation. Defaults to 8/255.
             steps: Number of steps. Defaults to 10.
-            alpha: Step size, `eps / (steps / 2)` if None. Defaults to None.
+            alpha: Step size, `eps / steps` if None. Defaults to None.
             decay: Decay factor for the momentum term. Defaults to 1.0.
             kern_len: Length of the kernel (should be an odd number). Defaults to 15.
             n_sig: Radius of the gaussian kernel. Defaults to 3.
@@ -83,9 +83,9 @@ class TIFGSM(Attack):
         # Get kernel
         kernel = self.get_kernel()
 
-        # If alpha is not given, set to eps / (steps / 2)
+        # If alpha is not given, set to eps / steps
         if self.alpha is None:
-            self.alpha = self.eps / (self.steps / 2)
+            self.alpha = self.eps / self.steps
 
         # Perform TI-FGSM
         for _ in range(self.steps):

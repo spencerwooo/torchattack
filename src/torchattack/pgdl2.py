@@ -35,7 +35,7 @@ class PGDL2(Attack):
             transform: A transform to normalize images.
             eps: The maximum perturbation, measured in L2. Defaults to 1.0.
             steps: Number of steps. Defaults to 10.
-            alpha: Step size, `eps / (steps / 2)` if None. Defaults to None.
+            alpha: Step size, `eps / steps` if None. Defaults to None.
             random_start: Start from random uniform perturbation. Defaults to True.
             clip_min: Minimum value for clipping. Defaults to 0.0.
             clip_max: Maximum value for clipping. Defaults to 1.0.
@@ -81,9 +81,9 @@ class PGDL2(Attack):
         else:
             delta = torch.zeros_like(x, requires_grad=True)
 
-        # If alpha is not given, set to eps / (steps / 2)
+        # If alpha is not given, set to eps / steps
         if self.alpha is None:
-            self.alpha = self.eps / (self.steps / 2)
+            self.alpha = self.eps / self.steps
 
         # Perform PGD
         for _ in range(self.steps):

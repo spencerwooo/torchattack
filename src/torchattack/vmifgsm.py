@@ -40,7 +40,7 @@ class VMIFGSM(Attack):
             transform: A transform to normalize images.
             eps: The maximum perturbation. Defaults to 8/255.
             steps: Number of steps. Defaults to 10.
-            alpha: Step size, `eps / (steps / 2)` if None. Defaults to None.
+            alpha: Step size, `eps / steps` if None. Defaults to None.
             decay: Decay factor for the momentum term. Defaults to 1.0.
             n: Number of sampled examples for variance tuning. Defaults to 5.
             beta: The upper bound of the neighborhood. Defaults to 1.5.
@@ -79,9 +79,9 @@ class VMIFGSM(Attack):
         v = torch.zeros_like(x)  # Gradient variance
         delta = torch.zeros_like(x, requires_grad=True)
 
-        # If alpha is not given, set to eps / (steps / 2)
+        # If alpha is not given, set to eps / steps
         if self.alpha is None:
-            self.alpha = self.eps / (self.steps / 2)
+            self.alpha = self.eps / self.steps
 
         # Perform VMI-FGSM
         for _ in range(self.steps):

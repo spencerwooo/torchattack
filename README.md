@@ -38,12 +38,13 @@ attack = MIFGSM(model, transform, eps=0.03, steps=10, decay=1.0)
 
 ## Attacks
 
+Gradient-based attacks:
+
 | Name       | Paper                                                                                                                      | `torchattack` class    |
 | :--------- | :------------------------------------------------------------------------------------------------------------------------- | :--------------------- |
 | FGSM       | [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572)                                          | `torchattack.FGSM`     |
 | PGD        | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                          | `torchattack.PGD`      |
 | PGD (L2)   | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                          | `torchattack.PGDL2`    |
-| DeepFool   | [DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks](https://arxiv.org/abs/1511.04599)                    | `torchattack.DeepFool` |
 | MI-FGSM    | [Boosting Adversarial Attacks with Momentum](https://arxiv.org/abs/1710.06081)                                             | `torchattack.MIFGSM`   |
 | DI-FGSM    | [Improving Transferability of Adversarial Examples with Input Diversity](https://arxiv.org/abs/1803.06978)                 | `torchattack.DIFGSM`   |
 | TI-FGSM    | [Evading Defenses to Transferable Adversarial Examples by Translation-Invariant Attacks](https://arxiv.org/abs/1904.02884) | `torchattack.TIFGSM`   |
@@ -51,6 +52,13 @@ attack = MIFGSM(model, transform, eps=0.03, steps=10, decay=1.0)
 | SI-NI-FGSM | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)             | `torchattack.SINIFGSM` |
 | VMI-FGSM   | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)           | `torchattack.VMIFGSM`  |
 | VNI-FGSM   | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)           | `torchattack.VNIFGSM`  |
+
+Others:
+
+| Name       | Paper                                                                                                                      | `torchattack` class    |
+| :--------- | :------------------------------------------------------------------------------------------------------------------------- | :--------------------- |
+| DeepFool   | [DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks](https://arxiv.org/abs/1511.04599)                    | `torchattack.DeepFool` |
+| GeoDA      | [GeoDA: A Geometric Framework for Black-box Adversarial Attacks](https://arxiv.org/abs/2003.06468)                         | `torchattack.GeoDA`    |
 
 ## License
 
