@@ -5,25 +5,6 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
-from torchvision.transforms import transforms
-
-__all__ = [
-    "NIPSLoader",
-    "t_resize_224",
-    "t_normalize",
-    "t_denormalize",
-]
-
-# A few transforms for the NIPS dataset (applicable to ImageNet as well)
-t_resize_224 = transforms.Resize(size=224, antialias=True)
-t_normalize = transforms.Normalize(
-    mean=[0.485, 0.456, 0.406],
-    std=[0.229, 0.224, 0.225],
-)
-t_denormalize = transforms.Normalize(
-    mean=[-0.485 / 0.229, -0.456 / 0.224, -0.406 / 0.225],
-    std=[1 / 0.229, 1 / 0.224, 1 / 0.225],
-)
 
 
 class NIPSDataset(Dataset):

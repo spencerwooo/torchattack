@@ -18,13 +18,13 @@ python -m pip install git+https://gitee.com/daisylab-bit/torchattack
 ## Usage
 
 ```python
-from torchvision.models import ResNet50_Weights, resnet50
+from torchvision.models import resnet50
 from torchvision.transforms import transforms
 
 from torchattack import FGSM, MIFGSM
 
 # Load a model
-model = resnet50(weights=ResNet50_Weights.DEFAULT)
+model = resnet50(weights="DEFAULT")
 
 # Define transforms (you are responsible for normalizing the data if needed)
 transform = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
