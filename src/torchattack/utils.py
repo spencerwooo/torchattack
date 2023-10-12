@@ -19,9 +19,10 @@ def run_attack(attack, attack_cfg, model="resnet50", samples=100, batch_size=8) 
     import torch
     from torchvision.io import write_png
     from torchvision.models import get_model
+    from torchvision.transforms import transforms
     from torchvision.utils import make_grid
 
-    from torchattack.dataset import NIPSLoader, t_normalize, t_resize_224
+    from torchattack.dataset import NIPSLoader
 
     # Try to import rich for progress bar
     with suppress(ImportError):
@@ -34,13 +35,17 @@ def run_attack(attack, attack_cfg, model="resnet50", samples=100, batch_size=8) 
     dataloader = NIPSLoader(
         path="data/nips2017",
         batch_size=batch_size,
-        transform=t_resize_224,
+        transform=transforms.Resize(size=224, antialias=True),
         max_samples=samples,
     )
 
     # Set up attack and trackers
+    normalize = transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225],
+    )
     total, acc_clean, acc_adv = len(dataloader.dataset), 0, 0  # type: ignore
-    attacker = attack(model=model, transform=t_normalize, device=device, **attack_cfg)
+    attacker = attack(model=model, transform=normalize, device=device, **attack_cfg)
     print(attacker)
 
     # Wrap dataloader with rich.progress.track if available
@@ -57,8 +62,8 @@ def run_attack(attack, attack_cfg, model="resnet50", samples=100, batch_size=8) 
         adv_images = attacker(images, labels)
 
         # Track accuracy
-        clean_outs = model(t_normalize(images)).argmax(dim=1)
-        adv_outs = model(t_normalize(adv_images)).argmax(dim=1)
+        clean_outs = model(normalize(images)).argmax(dim=1)
+        adv_outs = model(normalize(adv_images)).argmax(dim=1)
 
         acc_clean += (clean_outs == labels).sum().item()
         acc_adv += (adv_outs == labels).sum().item()
