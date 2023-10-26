@@ -11,7 +11,7 @@ EPS_FOR_DIVISION = 1e-12
 class PGDL2(Attack):
     """The Projected Gradient Descent (PGD) attack, with L2 constraint.
 
-    From the paper 'Towards Deep Learning Models Resistant to Adversarial Attacks'
+    From the paper 'Towards Deep Learning Models Resistant to Adversarial Attacks',
     https://arxiv.org/abs/1706.06083
     """
 
