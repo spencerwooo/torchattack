@@ -7,7 +7,7 @@ from torchattack.base import Attack
 
 
 class FGSM(Attack):
-    """Fast Gradient Sign Method (FGSM)
+    """Fast Gradient Sign Method (FGSM).
 
     From the paper 'Explaining and Harnessing Adversarial Examples',
     https://arxiv.org/abs/1412.6572
