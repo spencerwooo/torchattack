@@ -167,5 +167,5 @@ def input_diversity(
 if __name__ == "__main__":
     from torchattack.utils import run_attack
 
-    cfgs = {"eps": 8 / 255, "steps": 10, "resize_rate": 0.9, "diversity_prob": 1.0}
+    cfgs = {"eps": 16 / 255, "steps": 10, "resize_rate": 0.9, "diversity_prob": 1.0}
     run_attack(DIFGSM, attack_cfg=cfgs)
