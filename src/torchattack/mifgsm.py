@@ -9,7 +9,7 @@ from torchattack.base import Attack
 class MIFGSM(Attack):
     """The MI-FGSM (Momentum Iterative FGSM) attack.
 
-    From the paper 'Boosting Adversarial Attacks with Momentum'
+    From the paper 'Boosting Adversarial Attacks with Momentum',
     https://arxiv.org/abs/1710.06081
     """
 
