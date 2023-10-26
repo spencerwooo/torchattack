@@ -14,9 +14,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
-      - uses: psf/black@stable
-      - uses: chartboost/ruff-action@v1
+          python-version: '3.10'
+      # - uses: psf/black@stable
+      - name: Ruff format
+        uses: chartboost/ruff-action@v1
+        with:
+          args: format --check
+      - name: Ruff lint
+        uses: chartboost/ruff-action@v1
       - name: Mypy
         run: |
           pip install -r requirements.txt
