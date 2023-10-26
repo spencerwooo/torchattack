@@ -1,4 +1,4 @@
-def run_attack(attack, attack_cfg, model="resnet50", samples=100, batch_size=8) -> None:
+def run_attack(attack, attack_cfg, model='resnet50', samples=100, batch_size=8) -> None:
     """Helper function to run attacks in `__main__`.
 
     Example:
@@ -30,10 +30,10 @@ def run_attack(attack, attack_cfg, model="resnet50", samples=100, batch_size=8) 
         from rich.progress import track
 
     # Set up model and dataloader
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = get_model(name=model, weights="DEFAULT").to(device).eval()
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = get_model(name=model, weights='DEFAULT').to(device).eval()
     dataloader = NIPSLoader(
-        path="data/nips2017",
+        path='data/nips2017',
         batch_size=batch_size,
         transform=transforms.Resize(size=224, antialias=True),
         max_samples=samples,
@@ -50,9 +50,9 @@ def run_attack(attack, attack_cfg, model="resnet50", samples=100, batch_size=8) 
 
     # Wrap dataloader with rich.progress.track if available
     try:
-        dataloader = track(dataloader, description="Attacking")  # type: ignore
+        dataloader = track(dataloader, description='Attacking')  # type: ignore
     except NameError:
-        print("Running attack ... (install `rich` for progress bar)")
+        print('Running attack ... (install `rich` for progress bar)')
 
     # Run attack over the dataset (100 images by default)
     for i, (images, labels, _) in enumerate(dataloader):
@@ -72,6 +72,6 @@ def run_attack(attack, attack_cfg, model="resnet50", samples=100, batch_size=8) 
         if i == 4:
             saved_imgs = adv_images.detach().cpu().mul(255).to(torch.uint8)
             img_grid = make_grid(saved_imgs, nrow=4)
-            write_png(img_grid, "adv_batch_4.png")
+            write_png(img_grid, 'adv_batch_4.png')
 
-    print(f"Accuracy (clean vs adversarial): {acc_clean / total} vs {acc_adv / total}")
+    print(f'Accuracy (clean vs adversarial): {acc_clean / total} vs {acc_adv / total}')

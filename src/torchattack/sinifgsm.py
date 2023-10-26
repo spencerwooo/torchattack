@@ -123,7 +123,7 @@ class SINIFGSM(Attack):
         return x + delta
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     from torchattack.utils import run_attack
 
-    run_attack(SINIFGSM, {"eps": 8 / 255, "steps": 10, "m": 3})
+    run_attack(SINIFGSM, {'eps': 8 / 255, 'steps': 10, 'm': 3})

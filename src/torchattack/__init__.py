@@ -12,16 +12,16 @@ from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
 __all__ = [
-    "DeepFool",
-    "DIFGSM",
-    "FGSM",
-    "GeoDA",
-    "MIFGSM",
-    "NIFGSM",
-    "PGD",
-    "PGDL2",
-    "SINIFGSM",
-    "TIFGSM",
-    "VMIFGSM",
-    "VNIFGSM",
+    'DeepFool',
+    'DIFGSM',
+    'FGSM',
+    'GeoDA',
+    'MIFGSM',
+    'NIFGSM',
+    'PGD',
+    'PGDL2',
+    'SINIFGSM',
+    'TIFGSM',
+    'VMIFGSM',
+    'VNIFGSM',
 ]

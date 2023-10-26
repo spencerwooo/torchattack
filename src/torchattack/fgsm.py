@@ -80,7 +80,7 @@ class FGSM(Attack):
         return x + delta
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     from torchattack.utils import run_attack
 
-    run_attack(FGSM, {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0})
+    run_attack(FGSM, {'eps': 8 / 255, 'clip_min': 0.0, 'clip_max': 1.0})

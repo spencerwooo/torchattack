@@ -41,10 +41,10 @@ def generate_2d_dct_basis(sub_dim: int, n: int, path: str) -> np.ndarray:
     dct_basis_list = []
 
     try:
-        u_range = track(range(0, max_u), "Generating DCT basis")
+        u_range = track(range(0, max_u), 'Generating DCT basis')
     except NameError:
         u_range = range(0, max_u)
-        print("Generating DCT basis...")
+        print('Generating DCT basis...')
 
     for u in u_range:
         for v in range(0, max_v):
@@ -98,7 +98,7 @@ class GeoDA(Attack):
         transform: Callable[[torch.Tensor], torch.Tensor] | None,
         input_shape: tuple = (3, 224, 224),
         epsilon: int = 5,
-        p: str = "l2",
+        p: str = 'l2',
         max_queries: int | float = 4e3,
         sub_dim: int = 75,
         tol: float = 1e-4,
@@ -124,14 +124,14 @@ class GeoDA(Attack):
         self.clip_max = clip_max
 
         x_size = input_shape[1]
-        path = f"2d_dct_basis_{self.sub_dim}_{x_size}.npy"
+        path = f'2d_dct_basis_{self.sub_dim}_{x_size}.npy'
 
         if os.path.exists(path):
             sub_basis = np.load(path).astype(np.float32)
         else:
             sub_basis = generate_2d_dct_basis(self.sub_dim, x_size, path)
             sub_basis = sub_basis.astype(np.float32)
-            print(f"Generated DCT sub-basis to [underline]`{path}`[/underline]")
+            print(f'Generated DCT sub-basis to [underline]`{path}`[/underline]')
 
         self.sub_basis = torch.from_numpy(sub_basis).to(self.device)
 
@@ -202,12 +202,12 @@ class GeoDA(Attack):
         nb_calls = 1
         perturbed = x
 
-        if self.p == "l2":
+        if self.p == 'l2':
             grads = grad
-        elif self.p == "linf":
+        elif self.p == 'linf':
             grads = torch.sign(grad) / torch.norm(grad)
         else:
-            raise ValueError(f"Unknown p-norm {self.p}")
+            raise ValueError(f'Unknown p-norm {self.p}')
 
         while not self.is_adv(perturbed, y).all():
             perturbed = x + (nb_calls * epsilon * grads[0].to(self.device))
@@ -216,7 +216,7 @@ class GeoDA(Attack):
             nb_calls += 1
 
             if nb_calls > 100:
-                print("Failed to project sample to boundary (too many iters)")
+                print('Failed to project sample to boundary (too many iters)')
                 break
 
         return perturbed, nb_calls
@@ -352,9 +352,9 @@ class GeoDA(Attack):
         else:
             diff = (x_adv - x).reshape(x.size(0), -1)
 
-        if self.p == "l2":
+        if self.p == 'l2':
             out = torch.sqrt(torch.sum(diff * diff)).item()
-        elif self.p == "linf":
+        elif self.p == 'linf':
             out = torch.sum(torch.max(torch.abs(diff), 1)[0]).item()
 
         return out
@@ -364,7 +364,7 @@ class GeoDA(Attack):
         return y_pred != y
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     from torchattack.utils import run_attack
 
-    run_attack(GeoDA, {"epsilon": 4, "p": "l2", "max_queries": 4000}, batch_size=2)
+    run_attack(GeoDA, {'epsilon': 4, 'p': 'l2', 'max_queries': 4000}, batch_size=2)

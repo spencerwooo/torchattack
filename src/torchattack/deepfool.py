@@ -76,7 +76,7 @@ class DeepFool(Attack):
             # let's first get the logits using k = 1 to see if we are done
             diffs = [self._get_grads(x, 1, classes)]
 
-            is_adv = self._is_adv(diffs[0]["logits"], y)
+            is_adv = self._is_adv(diffs[0]['logits'], y)
             if is_adv.all():
                 break
 
@@ -84,8 +84,8 @@ class DeepFool(Attack):
                 self._get_grads(x, k, classes) for k in range(2, self.num_classes)
             ]
 
-            deltas = torch.stack([d["deltas"] for d in diffs], dim=-1)
-            grads = torch.stack([d["grads"] for d in diffs], dim=1)
+            deltas = torch.stack([d['deltas'] for d in diffs], dim=-1)
+            grads = torch.stack([d['grads'] for d in diffs], dim=1)
             assert deltas.shape == (n, self.num_classes - 1)
             assert grads.shape == (n, self.num_classes - 1) + x0.shape[1:]
 
@@ -147,18 +147,18 @@ class DeepFool(Attack):
         delta_logits = lk - l0
 
         return {
-            "sum_deltas": delta_logits.sum(),
-            "deltas": delta_logits,
-            "logits": logits,
+            'sum_deltas': delta_logits.sum(),
+            'deltas': delta_logits,
+            'logits': logits,
         }
 
     def _get_grads(
         self, x: torch.Tensor, k: int, classes: torch.Tensor
     ) -> dict[str, torch.Tensor]:
         deltas_logits = self._get_deltas_logits(x, k, classes)
-        deltas_logits["sum_deltas"].backward()
+        deltas_logits['sum_deltas'].backward()
         if x.grad is not None:
-            deltas_logits["grads"] = x.grad.clone()
+            deltas_logits['grads'] = x.grad.clone()
             x.grad.data.zero_()
         return deltas_logits
 
@@ -178,7 +178,7 @@ class DeepFool(Attack):
         return x.reshape(shape)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     from torchattack.utils import run_attack
 
-    run_attack(DeepFool, attack_cfg={"steps": 50, "overshoot": 0.02}, model="resnet152")
+    run_attack(DeepFool, attack_cfg={'steps': 50, 'overshoot': 0.02}, model='resnet152')
