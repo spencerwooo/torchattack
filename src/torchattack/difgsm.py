@@ -148,7 +148,7 @@ def input_diversity(
         img_resize = x.shape[-1]
 
     rnd = torch.randint(low=img_size, high=img_resize, size=(1,), dtype=torch.int32)
-    rescaled = f.interpolate(x, size=[rnd, rnd], mode="nearest")
+    rescaled = f.interpolate(x, size=[rnd, rnd], mode='nearest')
 
     h_rem = img_resize - rnd
     w_rem = img_resize - rnd
@@ -159,13 +159,13 @@ def input_diversity(
     pad_right = w_rem - pad_left
 
     pad = [pad_left.item(), pad_right.item(), pad_top.item(), pad_bottom.item()]
-    padded = f.pad(rescaled, pad=pad, mode="constant", value=0)
+    padded = f.pad(rescaled, pad=pad, mode='constant', value=0)
 
     return padded
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     from torchattack.utils import run_attack
 
-    cfgs = {"eps": 16 / 255, "steps": 10, "resize_rate": 0.9, "diversity_prob": 1.0}
+    cfgs = {'eps': 16 / 255, 'steps': 10, 'resize_rate': 0.9, 'diversity_prob': 1.0}
     run_attack(DIFGSM, attack_cfg=cfgs)

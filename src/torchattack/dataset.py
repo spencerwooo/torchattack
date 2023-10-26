@@ -74,7 +74,7 @@ class NIPSDataset(Dataset):
         name = self.names[index]
         label = int(self.labels[index]) - 1
 
-        image = Image.open(f"{self.image_root}/{name}.png").convert("RGB")
+        image = Image.open(f'{self.image_root}/{name}.png').convert('RGB')
         image = np.array(image, dtype=np.uint8)
         image = torch.from_numpy(image).permute((2, 0, 1)).contiguous().float().div(255)
         image = self.transform(image) if self.transform else image
@@ -116,8 +116,8 @@ class NIPSLoader(DataLoader):
 
         super().__init__(
             dataset=NIPSDataset(
-                image_root=image_root if image_root else f"{path}/images",
-                pairs_path=pairs_path if pairs_path else f"{path}/images.csv",
+                image_root=image_root if image_root else f'{path}/images',
+                pairs_path=pairs_path if pairs_path else f'{path}/images.csv',
                 transform=transform,
                 max_samples=max_samples,
             ),

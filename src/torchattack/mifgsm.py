@@ -103,7 +103,7 @@ class MIFGSM(Attack):
         return x + delta
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     from torchattack.utils import run_attack
 
-    run_attack(MIFGSM, {"eps": 8 / 255, "steps": 10})
+    run_attack(MIFGSM, {'eps': 8 / 255, 'steps': 10})
