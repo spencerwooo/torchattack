@@ -1,6 +1,7 @@
 from torchattack.deepfool import DeepFool
 from torchattack.difgsm import DIFGSM
 from torchattack.fgsm import FGSM
+from torchattack.geoda import GeoDA
 from torchattack.mifgsm import MIFGSM
 from torchattack.nifgsm import NIFGSM
 from torchattack.pgd import PGD
@@ -9,12 +10,13 @@ from torchattack.sinifgsm import SINIFGSM
 from torchattack.tifgsm import TIFGSM
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
-from torchattack.geoda import GeoDA
+
 
 __all__ = [
     "DeepFool",
     "DIFGSM",
     "FGSM",
+    "GeoDA",
     "MIFGSM",
     "NIFGSM",
     "PGD",
@@ -23,5 +25,4 @@ __all__ = [
     "TIFGSM",
     "VMIFGSM",
     "VNIFGSM",
-    "GeoDA",
 ]
