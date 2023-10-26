@@ -9,6 +9,7 @@ from torchattack.sinifgsm import SINIFGSM
 from torchattack.tifgsm import TIFGSM
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
+from torchattack.geoda import GeoDA
 
 __all__ = [
     "DeepFool",
@@ -22,4 +23,5 @@ __all__ = [
     "TIFGSM",
     "VMIFGSM",
     "VNIFGSM",
+    "GeoDA",
 ]
