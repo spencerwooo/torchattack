@@ -71,10 +71,13 @@ class Admix(Attack):
         if self.alpha is None:
             self.alpha = self.eps / self.steps
 
-        # Perform Admix
+        # Admix + MI-FGSM
         for _ in range(self.steps):
+            # Scale and add delta to original image
+            x_admix = x + delta
+
             # Compute loss
-            outs = self.model(self.transform(x + delta))
+            outs = self.model(self.transform(x_admix))
             loss = self.lossfn(outs, y)
 
             if self.targeted:
