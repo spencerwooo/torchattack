@@ -1,3 +1,4 @@
+from torchattack.admix import Admix
 from torchattack.deepfool import DeepFool
 from torchattack.difgsm import DIFGSM
 from torchattack.fgsm import FGSM
@@ -12,6 +13,7 @@ from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
 __all__ = [
+    'Admix',
     'DeepFool',
     'DIFGSM',
     'FGSM',
