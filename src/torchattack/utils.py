@@ -17,10 +17,7 @@ def run_attack(attack, attack_cfg, model='resnet50', samples=100, batch_size=8) 
     from contextlib import suppress
 
     import torch
-    from torchvision.io import write_png
-    from torchvision.models import get_model
-    from torchvision.transforms import transforms
-    from torchvision.utils import make_grid
+    import torchvision as tv
 
     from torchattack.dataset import NIPSLoader
 
@@ -31,16 +28,16 @@ def run_attack(attack, attack_cfg, model='resnet50', samples=100, batch_size=8) 
 
     # Set up model and dataloader
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = get_model(name=model, weights='DEFAULT').to(device).eval()
+    model = tv.models.get_model(name=model, weights='DEFAULT').to(device).eval()
     dataloader = NIPSLoader(
         path='data/nips2017',
         batch_size=batch_size,
-        transform=transforms.Resize(size=224, antialias=True),
+        transform=tv.transforms.Resize(size=224, antialias=True),
         max_samples=samples,
     )
 
     # Set up attack and trackers
-    normalize = transforms.Normalize(
+    normalize = tv.transforms.Normalize(
         mean=[0.485, 0.456, 0.406],
         std=[0.229, 0.224, 0.225],
     )
@@ -71,7 +68,7 @@ def run_attack(attack, attack_cfg, model='resnet50', samples=100, batch_size=8) 
         # Save the 4th batch of adversarial images
         if i == 4:
             saved_imgs = adv_images.detach().cpu().mul(255).to(torch.uint8)
-            img_grid = make_grid(saved_imgs, nrow=4)
-            write_png(img_grid, 'adv_batch_4.png')
+            img_grid = tv.utils.make_grid(saved_imgs, nrow=4)
+            tv.io.write_png(img_grid, 'adv_batch_4.png')
 
     print(f'Accuracy (clean vs adversarial): {acc_clean / total} vs {acc_adv / total}')
