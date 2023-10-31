@@ -109,13 +109,17 @@ class Admix(Attack):
             #     continue
 
             # Gradients on Admix images
-            gr_splits = torch.tensor([1, 1 / 2, 1 / 4, 1 / 8, 1 / 16]).to(x.device)
+            gr_splits = [1, 1 / 2, 1 / 4, 1 / 8, 1 / 16]
             grad = torch.autograd.grad(loss, x_admixs)[0]
+            grad = torch.tensor_split(grad, 5, dim=0)
             grad = torch.mean(
-                torch.chunk(grad, 5, dim=0) * gr_splits[:, None, None, None, None],
+                torch.stack(
+                    [g * gr_split for g, gr_split in zip(grad, gr_splits, strict=True)]
+                ),
                 dim=0,
             )
-            grad = torch.sum(torch.chunk(grad, self.size, dim=0), dim=0)
+            grad = torch.tensor_split(grad, self.size)
+            grad = torch.sum(torch.stack(grad), dim=0)
 
             # Apply momentum term
             g = self.decay * g + grad / torch.mean(
