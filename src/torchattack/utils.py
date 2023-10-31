@@ -65,10 +65,10 @@ def run_attack(attack, attack_cfg, model='resnet50', samples=100, batch_size=8) 
         acc_clean += (clean_outs == labels).sum().item()
         acc_adv += (adv_outs == labels).sum().item()
 
-        # Save the 4th batch of adversarial images
-        if i == 4:
+        # Save one batch of adversarial images
+        if i == 1:
             saved_imgs = adv_images.detach().cpu().mul(255).to(torch.uint8)
             img_grid = tv.utils.make_grid(saved_imgs, nrow=4)
-            tv.io.write_png(img_grid, 'adv_batch_4.png')
+            tv.io.write_png(img_grid, 'adv_batch.png')
 
     print(f'Accuracy (clean vs adversarial): {acc_clean / total} vs {acc_adv / total}')
