@@ -24,6 +24,5 @@ jobs:
         uses: chartboost/ruff-action@v1
       - name: Mypy
         run: |
-          pip install -r requirements.txt
-          pip install mypy
+          python -m pip install -e '.[dev]'
           mypy src/
