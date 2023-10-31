@@ -106,13 +106,13 @@ class Admix(Attack):
             grad = torch.autograd.grad(loss, x_admixs)[0]
 
             # Split gradients and compute mean
-            grad = torch.tensor_split(grad, 5, dim=0)
-            grad = [g * scale for g, scale in zip(grad, scales, strict=True)]
-            grad = torch.mean(torch.stack(grad), dim=0)
+            grads = torch.tensor_split(grad, 5, dim=0)
+            grads = [g * s for g, s in zip(grads, scales, strict=True)]
+            grad = torch.mean(torch.stack(grads), dim=0)
 
             # Gather gradients
-            grad = torch.tensor_split(grad, self.size)
-            grad = torch.sum(torch.stack(grad), dim=0)
+            grads = torch.tensor_split(grad, self.size)
+            grad = torch.sum(torch.stack(grads), dim=0)
 
             # Apply momentum term
             g = self.decay * g + grad / torch.mean(
