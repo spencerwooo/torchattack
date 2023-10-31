@@ -1,9 +1,9 @@
 [project]
 name = "torchattack"
-version = "0.2.1"
+version = "0.2.2"
 description = "A set of adversarial attacks implemented in PyTorch"
 authors = [{ name = "spencerwooo", email = "spencer.woo@outlook.com" }]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.12"
 readme = "README.md"
 license = { text = "MIT" }
 dependencies = [
@@ -13,6 +13,9 @@ dependencies = [
     "scipy>=1.10.1",
     "rich>=13.3.5",
 ]
+
+[project.optional-dependencies]
+dev = ["mypy"]
 
 [build-system]
 requires = ["setuptools"]
