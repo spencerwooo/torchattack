@@ -73,9 +73,10 @@ class Admix(Attack):
             The perturbed images if successful. Shape: (N, C, H, W).
         """
 
-        # delta = torch.zeros_like(x, requires_grad=True)
         g = torch.zeros_like(x)
         x_adv = x.clone().detach()
+
+        scales = [1, 1 / 2, 1 / 4, 1 / 8, 1 / 16]
 
         # If alpha is not given, set to eps / steps
         if self.alpha is None:
@@ -87,8 +88,7 @@ class Admix(Attack):
 
             # Add delta to original image then admix
             x_admix = self.admix(x_adv)
-            x_admixs = [x_admix, x_admix / 2, x_admix / 4, x_admix / 8, x_admix / 16]
-            x_admixs = torch.cat(x_admixs)
+            x_admixs = torch.cat([x_admix * scale for scale in scales])
 
             # Compute loss
             outs = self.model(self.transform(x_admixs))
@@ -102,22 +102,15 @@ class Admix(Attack):
             if self.targeted:
                 loss = -loss
 
-            # # Compute gradient
-            # loss.backward()
-
-            # if x_adv.grad is None:
-            #     continue
-
-            # Gradients on Admix images
-            gr_splits = [1, 1 / 2, 1 / 4, 1 / 8, 1 / 16]
+            # Gradients
             grad = torch.autograd.grad(loss, x_admixs)[0]
+
+            # Split gradients and compute mean
             grad = torch.tensor_split(grad, 5, dim=0)
-            grad = torch.mean(
-                torch.stack(
-                    [g * gr_split for g, gr_split in zip(grad, gr_splits, strict=True)]
-                ),
-                dim=0,
-            )
+            grad = [g * scale for g, scale in zip(grad, scales, strict=True)]
+            grad = torch.mean(torch.stack(grad), dim=0)
+
+            # Gather gradients
             grad = torch.tensor_split(grad, self.size)
             grad = torch.sum(torch.stack(grad), dim=0)
 
@@ -126,14 +119,7 @@ class Admix(Attack):
                 torch.abs(grad), dim=(1, 2, 3), keepdim=True
             )
 
-            # # Update delta
-            # delta.data = delta.data + self.alpha * g.sign()
-            # delta.data = torch.clamp(delta.data, -self.eps, self.eps)
-            # delta.data = torch.clamp(x + delta.data, self.clip_min, self.clip_max) - x
-
-            # # Zero out gradient
-            # delta.grad.detach_()
-            # delta.grad.zero_()
+            # Update perturbed image
             x_adv = x_adv.detach() + self.alpha * g.sign()
             x_adv = x + torch.clamp(x_adv - x, -self.eps, self.eps)
             x_adv = torch.clamp(x_adv, self.clip_min, self.clip_max)
