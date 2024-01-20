@@ -32,7 +32,13 @@ def run_attack(attack, attack_cfg, model='resnet50', samples=100, batch_size=8) 
     dataloader = NIPSLoader(
         path='data/nips2017',
         batch_size=batch_size,
-        transform=tv.transforms.Resize(size=224, antialias=True),
+        transform=tv.transforms.Compose(
+            [
+                tv.transforms.Resize([232]),
+                tv.transforms.CenterCrop([224]),
+                tv.transforms.ToTensor(),
+            ]
+        ),
         max_samples=samples,
     )
 
@@ -42,7 +48,7 @@ def run_attack(attack, attack_cfg, model='resnet50', samples=100, batch_size=8) 
         std=[0.229, 0.224, 0.225],
     )
     total, acc_clean, acc_adv = len(dataloader.dataset), 0, 0  # type: ignore
-    attacker = attack(model=model, transform=normalize, device=device, **attack_cfg)
+    attacker = attack(model=model, normalize=normalize, device=device, **attack_cfg)
     print(attacker)
 
     # Wrap dataloader with rich.progress.track if available

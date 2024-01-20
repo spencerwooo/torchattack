@@ -107,7 +107,7 @@ class NIPSLoader(DataLoader):
         batch_size: int = 1,
         shuffle: bool = False,
         num_workers: int = 4,
-        normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
+        transform: Callable[[torch.Tensor], torch.Tensor] | None = None,
         max_samples: int | None = None,
     ):
         # Specifing a custom image root directory is useful when evaluating
@@ -117,7 +117,7 @@ class NIPSLoader(DataLoader):
             dataset=NIPSDataset(
                 image_root=image_root if image_root else f'{path}/images',
                 pairs_path=pairs_path if pairs_path else f'{path}/images.csv',
-                transform=normalize,
+                transform=transform,
                 max_samples=max_samples,
             ),
             batch_size=batch_size,
