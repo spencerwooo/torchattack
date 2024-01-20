@@ -17,27 +17,27 @@ class DeepFool(Attack):
         self,
         model: nn.Module,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
+        device: torch.device | None = None,
         steps: int = 100,
         overshoot: float = 0.02,
         num_classes: int = 10,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
-        device: torch.device | None = None,
     ) -> None:
         """Initialize the DeepFool attack.
 
         Args:
             model: The model to attack.
             normalize: A transform to normalize images.
+            device: Device to use for tensors. Defaults to cuda if available.
             steps: Number of steps. Defaults to 100.
             overshoot: Overshoot parameter for noise control. Defaults to 0.02.
             num_classes: Number of classes to consider. Defaults to 10.
             clip_min: Minimum value for clipping. Defaults to 0.0.
             clip_max: Maximum value for clipping. Defaults to 1.0.
-            device: Device to use for tensors. Defaults to cuda if available.
         """
 
-        super().__init__(device, normalize)
+        super().__init__(normalize, device)
 
         self.model = model
         self.steps = steps

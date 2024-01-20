@@ -96,6 +96,7 @@ class GeoDA(Attack):
         self,
         model: nn.Module,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
+        device: torch.device | None = None,
         input_shape: tuple = (3, 224, 224),
         epsilon: int = 5,
         p: str = 'l2',
@@ -107,9 +108,8 @@ class GeoDA(Attack):
         grad_estimator_batch_size: int = 40,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
-        device: torch.device | None = None,
     ):
-        super().__init__(device, normalize)
+        super().__init__(normalize, device)
         self.model = model
 
         self.epsilon = epsilon

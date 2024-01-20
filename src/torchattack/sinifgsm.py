@@ -17,6 +17,7 @@ class SINIFGSM(Attack):
         self,
         model: nn.Module,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
+        device: torch.device | None = None,
         eps: float = 8 / 255,
         steps: int = 10,
         alpha: float | None = None,
@@ -25,13 +26,13 @@ class SINIFGSM(Attack):
         clip_min: float = 0.0,
         clip_max: float = 1.0,
         targeted: bool = False,
-        device: torch.device | None = None,
     ) -> None:
         """Initialize the SI-NI-FGSM attack.
 
         Args:
             model: The model to attack.
             normalize: A transform to normalize images.
+            device: Device to use for tensors. Defaults to cuda if available.
             eps: The maximum perturbation. Defaults to 8/255.
             steps: Number of steps. Defaults to 10.
             alpha: Step size, `eps / steps` if None. Defaults to None.
@@ -40,10 +41,9 @@ class SINIFGSM(Attack):
             clip_min: Minimum value for clipping. Defaults to 0.0.
             clip_max: Maximum value for clipping. Defaults to 1.0.
             targeted: Targeted attack if True. Defaults to False.
-            device: Device to use for tensors. Defaults to cuda if available.
         """
 
-        super().__init__(device, normalize)
+        super().__init__(normalize, device)
 
         self.model = model
         self.eps = eps

@@ -9,8 +9,8 @@ class Attack(ABC):
 
     def __init__(
         self,
-        device: torch.device | None,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
+        device: torch.device | None,
     ) -> None:
         super().__init__()
 
