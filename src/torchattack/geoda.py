@@ -95,7 +95,7 @@ class GeoDA(Attack):
     def __init__(
         self,
         model: nn.Module,
-        transform: Callable[[torch.Tensor], torch.Tensor] | None,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         input_shape: tuple = (3, 224, 224),
         epsilon: int = 5,
         p: str = 'l2',
@@ -109,7 +109,7 @@ class GeoDA(Attack):
         clip_max: float = 1.0,
         device: torch.device | None = None,
     ):
-        super().__init__(transform, device)
+        super().__init__(device, normalize)
         self.model = model
 
         self.epsilon = epsilon
@@ -341,7 +341,7 @@ class GeoDA(Attack):
 
     def predict(self, xs: torch.Tensor) -> torch.Tensor:
         xs = xs.to(self.device)
-        out = self.model(self.transform(xs))
+        out = self.model(self.normalize(xs))
         return out.argmax(dim=1).detach()
 
     def distance(

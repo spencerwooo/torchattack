@@ -16,7 +16,7 @@ class Admix(Attack):
     def __init__(
         self,
         model: nn.Module,
-        transform: Callable[[torch.Tensor], torch.Tensor] | None,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         eps: float = 8 / 255,
         steps: int = 10,
         alpha: float | None = None,
@@ -33,7 +33,7 @@ class Admix(Attack):
 
         Args:
             model: The model to attack.
-            transform: A transform to normalize images.
+            normalize: A transform to normalize images.
             eps: The maximum perturbation. Defaults to 8/255.
             steps: Number of steps. Defaults to 10.
             alpha: Step size, `eps / steps` if None. Defaults to None.
@@ -47,7 +47,7 @@ class Admix(Attack):
             device: Device to use for tensors. Defaults to cuda if available.
         """
 
-        super().__init__(transform, device)
+        super().__init__(device, normalize)
 
         self.model = model
         self.eps = eps
@@ -91,7 +91,7 @@ class Admix(Attack):
             x_admixs = torch.cat([x_admix * scale for scale in scales])
 
             # Compute loss
-            outs = self.model(self.transform(x_admixs))
+            outs = self.model(self.normalize(x_admixs))
 
             # One-hot encode labels for all admixed images
             one_hot = nn.functional.one_hot(y, self.num_classes)

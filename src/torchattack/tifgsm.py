@@ -18,7 +18,7 @@ class TIFGSM(Attack):
     def __init__(
         self,
         model: nn.Module,
-        transform: Callable[[torch.Tensor], torch.Tensor] | None,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         eps: float = 8 / 255,
         steps: int = 10,
         alpha: float | None = None,
@@ -39,7 +39,7 @@ class TIFGSM(Attack):
 
         Args:
             model: The model to attack.
-            transform: A transform to normalize images.
+            normalize: A transform to normalize images.
             eps: The maximum perturbation. Defaults to 8/255.
             steps: Number of steps. Defaults to 10.
             alpha: Step size, `eps / steps` if None. Defaults to None.
@@ -52,7 +52,7 @@ class TIFGSM(Attack):
             device: Device to use for tensors. Defaults to cuda if available.
         """
 
-        super().__init__(transform, device)
+        super().__init__(device, normalize)
 
         self.model = model
         self.eps = eps
@@ -90,7 +90,7 @@ class TIFGSM(Attack):
         # Perform TI-FGSM
         for _ in range(self.steps):
             # Compute loss
-            outs = self.model(self.transform(x + delta))
+            outs = self.model(self.normalize(x + delta))
             loss = self.lossfn(outs, y)
 
             if self.targeted:

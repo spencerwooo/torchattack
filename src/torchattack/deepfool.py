@@ -16,7 +16,7 @@ class DeepFool(Attack):
     def __init__(
         self,
         model: nn.Module,
-        transform: Callable[[torch.Tensor], torch.Tensor] | None,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         steps: int = 100,
         overshoot: float = 0.02,
         num_classes: int = 10,
@@ -28,7 +28,7 @@ class DeepFool(Attack):
 
         Args:
             model: The model to attack.
-            transform: A transform to normalize images.
+            normalize: A transform to normalize images.
             steps: Number of steps. Defaults to 100.
             overshoot: Overshoot parameter for noise control. Defaults to 0.02.
             num_classes: Number of classes to consider. Defaults to 10.
@@ -37,7 +37,7 @@ class DeepFool(Attack):
             device: Device to use for tensors. Defaults to cuda if available.
         """
 
-        super().__init__(transform, device)
+        super().__init__(device, normalize)
 
         self.model = model
         self.steps = steps
@@ -58,7 +58,7 @@ class DeepFool(Attack):
         """
 
         x.requires_grad_()
-        logits = self.model(self.transform(x))
+        logits = self.model(self.normalize(x))
 
         # Get the classes
         classes = logits.argsort(axis=-1).flip(-1).detach()
@@ -140,7 +140,7 @@ class DeepFool(Attack):
         rows = range(n)
         i0 = classes[:, 0]
 
-        logits = self.model(self.transform(x))
+        logits = self.model(self.normalize(x))
         ik = classes[:, k]
         l0 = logits[rows, i0]
         lk = logits[rows, ik]

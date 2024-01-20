@@ -9,16 +9,17 @@ class Attack(ABC):
 
     def __init__(
         self,
-        transform: Callable[[torch.Tensor], torch.Tensor] | None,
         device: torch.device | None,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None,
     ) -> None:
         super().__init__()
-        # If transform is None, use identity transform.
-        self.transform = transform if transform else lambda x: x
 
-        # Set device to given or defaults to cuda if available.
+        # Set device to given or defaults to cuda if available
         is_cuda = torch.cuda.is_available()
         self.device = device if device else torch.device('cuda' if is_cuda else 'cpu')
+
+        # If normalize is None, use identity function
+        self.normalize = normalize if normalize else lambda x: x
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         return self.forward(*args, **kwds)
@@ -29,7 +30,7 @@ class Attack(ABC):
         def repr_map(k, v):
             if isinstance(v, float):
                 return f'{k}={v:.3f}'
-            if k in ['model', 'transform']:
+            if k in ['model', 'normalize']:
                 return f'{k}={v.__class__.__name__}'
             if isinstance(v, torch.Tensor):
                 return f'{k}={v.shape}'

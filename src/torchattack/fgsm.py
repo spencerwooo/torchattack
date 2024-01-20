@@ -16,7 +16,7 @@ class FGSM(Attack):
     def __init__(
         self,
         model: nn.Module,
-        transform: Callable[[torch.Tensor], torch.Tensor] | None,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         eps: float = 8 / 255,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
@@ -27,7 +27,7 @@ class FGSM(Attack):
 
         Args:
             model: A torch.nn.Module network model.
-            transform: A transform to normalize images.
+            normalize: A transform to normalize images.
             eps: Maximum perturbation measured by Linf. Defaults to 8/255.
             clip_min: Minimum value for clipping. Defaults to 0.0.
             clip_max: Maximum value for clipping. Defaults to 1.0.
@@ -35,7 +35,7 @@ class FGSM(Attack):
             device: Device to use for tensors. Defaults to cuda if available.
         """
 
-        super().__init__(transform, device)
+        super().__init__(device, normalize)
 
         self.model = model
         self.eps = eps
@@ -59,7 +59,7 @@ class FGSM(Attack):
         # The original implementation of FGSM is not written in this way.
         delta = torch.zeros_like(x, requires_grad=True)
 
-        outs = self.model(self.transform(x + delta))
+        outs = self.model(self.normalize(x + delta))
         loss = self.lossfn(outs, y)
 
         if self.targeted:

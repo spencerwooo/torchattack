@@ -1,7 +1,6 @@
 import csv
-from typing import Callable
+from typing import Any, Callable
 
-import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
@@ -38,7 +37,7 @@ class NIPSDataset(Dataset):
         Args:
             image_root: Path to the folder containing the images.
             pairs_path: Path to the csv file containing the image names and labels.
-            transform: An optional transform to apply to the images. Defaults to None.
+            normalize: An optional transform to apply to the images. Defaults to None.
             max_samples: Maximum number of samples to load. Defaults to None.
         """
 
@@ -70,13 +69,13 @@ class NIPSDataset(Dataset):
     def __len__(self) -> int:
         return len(self.labels)
 
-    def __getitem__(self, index: int) -> tuple[torch.Tensor, int, str]:
+    def __getitem__(self, index: int) -> tuple[Any, int, str]:
         name = self.names[index]
         label = int(self.labels[index]) - 1
 
         image = Image.open(f'{self.image_root}/{name}.png').convert('RGB')
-        image = np.array(image, dtype=np.uint8)
-        image = torch.from_numpy(image).permute((2, 0, 1)).contiguous().float().div(255)
+        # image = np.array(image, dtype=np.uint8)
+        # image = torch.from_numpy(image).permute((2, 0, 1)).contiguous().float().div(255)
         image = self.transform(image) if self.transform else image
         return image, label, name
 
@@ -108,7 +107,7 @@ class NIPSLoader(DataLoader):
         batch_size: int = 1,
         shuffle: bool = False,
         num_workers: int = 4,
-        transform: Callable[[torch.Tensor], torch.Tensor] | None = None,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
         max_samples: int | None = None,
     ):
         # Specifing a custom image root directory is useful when evaluating
@@ -118,7 +117,7 @@ class NIPSLoader(DataLoader):
             dataset=NIPSDataset(
                 image_root=image_root if image_root else f'{path}/images',
                 pairs_path=pairs_path if pairs_path else f'{path}/images.csv',
-                transform=transform,
+                transform=normalize,
                 max_samples=max_samples,
             ),
             batch_size=batch_size,
