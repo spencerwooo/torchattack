@@ -17,11 +17,11 @@ class FGSM(Attack):
         self,
         model: nn.Module,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
+        device: torch.device | None = None,
         eps: float = 8 / 255,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
         targeted: bool = False,
-        device: torch.device | None = None,
     ) -> None:
         """Initialize the FGSM attack.
 

@@ -5,7 +5,7 @@
 [![lint](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml/badge.svg)](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/daisylab-bit/torchattack)](https://github.com/daisylab-bit/torchattack/releases/latest)
 
-A set of adversarial attacks implemented in PyTorch. For internal use, no support guaranteed.
+A set of adversarial attacks in PyTorch.
 
 ```shell
 # Install from github source
@@ -80,3 +80,8 @@ python -m pip install -e '.[dev]'
 ## License
 
 [MIT](LICENSE)
+
+## Related
+
+- [Harry24k/adversarial-attacks-pytorch](https://github.com/Harry24k/adversarial-attacks-pytorch)
+- [Trusted-AI/adversarial-robustness-toolbox](https://github.com/Trusted-AI/adversarial-robustness-toolbox)
