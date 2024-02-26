@@ -27,7 +27,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Load a model
 model = resnet50(weights='DEFAULT')
-model = model.to(device)
+model = model.eval().to(device)
 
 # Define normalization (you are responsible for normalizing the data if needed)
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])

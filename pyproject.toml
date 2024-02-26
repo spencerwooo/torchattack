@@ -1,9 +1,8 @@
 [project]
 name = "torchattack"
-version = "0.3.0"
 description = "A set of adversarial attacks implemented in PyTorch"
 authors = [{ name = "spencerwooo", email = "spencer.woo@outlook.com" }]
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.10,<3.13"
 readme = "README.md"
 license = { text = "MIT" }
 dependencies = [
@@ -13,13 +12,15 @@ dependencies = [
     "scipy>=1.10.1",
     "rich>=13.3.5",
 ]
-
-[project.optional-dependencies]
-dev = ["mypy"]
+dynamic = ["version"]
+optional-dependencies = { dev = ["mypy"] }
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = { attr = "torchattack.__version__" }
 
 [tool.ruff]
 line-length = 88
