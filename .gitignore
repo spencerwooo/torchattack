@@ -1,5 +1,5 @@
 # Dataset files
-data/
+datasets/
 
 # PDM files
 .pdm-python

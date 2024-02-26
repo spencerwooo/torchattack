@@ -101,7 +101,7 @@ class NIPSLoader(DataLoader):
 
     def __init__(
         self,
-        path: str | None,
+        root: str | None,
         image_root: str | None = None,
         pairs_path: str | None = None,
         batch_size: int = 1,
@@ -115,8 +115,8 @@ class NIPSLoader(DataLoader):
 
         super().__init__(
             dataset=NIPSDataset(
-                image_root=image_root if image_root else f'{path}/images',
-                pairs_path=pairs_path if pairs_path else f'{path}/images.csv',
+                image_root=image_root if image_root else f'{root}/images',
+                pairs_path=pairs_path if pairs_path else f'{root}/images.csv',
                 transform=transform,
                 max_samples=max_samples,
             ),
