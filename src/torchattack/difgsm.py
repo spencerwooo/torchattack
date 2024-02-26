@@ -12,6 +12,26 @@ class DIFGSM(Attack):
 
     From the paper 'Improving Transferability of Adversarial Examples with Input
     Diversity' https://arxiv.org/abs/1803.06978
+
+    Note:
+        Key parameters include `resize_rate` and `diversity_prob`, which defines the
+        scale size of the resized image and the probability of applying input
+        diversity. The default values are set to 0.9 and 1.0 respectively (implying
+        that input diversity is always applied).
+
+    Args:
+        model: The model to attack.
+        normalize: A transform to normalize images.
+        device: Device to use for tensors. Defaults to cuda if available.
+        eps: The maximum perturbation. Defaults to 8/255.
+        steps: Number of steps. Defaults to 10.
+        alpha: Step size, `eps / steps` if None. Defaults to None.
+        decay: Decay factor for the momentum term. Defaults to 1.0.
+        resize_rate: The resize rate. Defaults to 0.9.
+        diversity_prob: Applying input diversity with probability. Defaults to 1.0.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
+        targeted: Targeted attack if True. Defaults to False.
     """
 
     def __init__(
@@ -29,29 +49,6 @@ class DIFGSM(Attack):
         clip_max: float = 1.0,
         targeted: bool = False,
     ) -> None:
-        """Initialize the DI-FGSM attack.
-
-        Note:
-            Key parameters include `resize_rate` and `diversity_prob`, which defines the
-            scale size of the resized image and the probability of applying input
-            diversity. The default values are set to 0.9 and 1.0 respectively (implying
-            that input diversity is always applied).
-
-        Args:
-            model: The model to attack.
-            normalize: A transform to normalize images.
-            device: Device to use for tensors. Defaults to cuda if available.
-            eps: The maximum perturbation. Defaults to 8/255.
-            steps: Number of steps. Defaults to 10.
-            alpha: Step size, `eps / steps` if None. Defaults to None.
-            decay: Decay factor for the momentum term. Defaults to 1.0.
-            resize_rate: The resize rate. Defaults to 0.9.
-            diversity_prob: Applying input diversity with probability. Defaults to 1.0.
-            clip_min: Minimum value for clipping. Defaults to 0.0.
-            clip_max: Maximum value for clipping. Defaults to 1.0.
-            targeted: Targeted attack if True. Defaults to False.
-        """
-
         super().__init__(normalize, device)
 
         self.model = model

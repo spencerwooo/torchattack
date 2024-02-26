@@ -11,6 +11,15 @@ class FGSM(Attack):
 
     From the paper 'Explaining and Harnessing Adversarial Examples',
     https://arxiv.org/abs/1412.6572
+
+    Args:
+        model: A torch.nn.Module network model.
+        normalize: A transform to normalize images.
+        device: Device to use for tensors. Defaults to cuda if available.
+        eps: Maximum perturbation measured by Linf. Defaults to 8/255.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
+        targeted: Targeted attack if True. Defaults to False.
     """
 
     def __init__(
@@ -23,18 +32,6 @@ class FGSM(Attack):
         clip_max: float = 1.0,
         targeted: bool = False,
     ) -> None:
-        """Initialize the FGSM attack.
-
-        Args:
-            model: A torch.nn.Module network model.
-            normalize: A transform to normalize images.
-            device: Device to use for tensors. Defaults to cuda if available.
-            eps: Maximum perturbation measured by Linf. Defaults to 8/255.
-            clip_min: Minimum value for clipping. Defaults to 0.0.
-            clip_max: Maximum value for clipping. Defaults to 1.0.
-            targeted: Targeted attack if True. Defaults to False.
-        """
-
         super().__init__(normalize, device)
 
         self.model = model

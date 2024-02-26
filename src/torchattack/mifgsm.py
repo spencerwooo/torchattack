@@ -11,6 +11,18 @@ class MIFGSM(Attack):
 
     From the paper 'Boosting Adversarial Attacks with Momentum',
     https://arxiv.org/abs/1710.06081
+
+    Args:
+        model: The model to attack.
+        normalize: A transform to normalize images.
+        device: Device to use for tensors. Defaults to cuda if available.
+        eps: The maximum perturbation. Defaults to 8/255.
+        steps: Number of steps. Defaults to 10.
+        alpha: Step size, `eps / steps` if None. Defaults to None.
+        decay: Decay factor for the momentum term. Defaults to 1.0.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
+        targeted: Targeted attack if True. Defaults to False.
     """
 
     def __init__(
@@ -26,21 +38,6 @@ class MIFGSM(Attack):
         clip_max: float = 1.0,
         targeted: bool = False,
     ) -> None:
-        """Initialize the MI-FGSM attack.
-
-        Args:
-            model: The model to attack.
-            normalize: A transform to normalize images.
-            device: Device to use for tensors. Defaults to cuda if available.
-            eps: The maximum perturbation. Defaults to 8/255.
-            steps: Number of steps. Defaults to 10.
-            alpha: Step size, `eps / steps` if None. Defaults to None.
-            decay: Decay factor for the momentum term. Defaults to 1.0.
-            clip_min: Minimum value for clipping. Defaults to 0.0.
-            clip_max: Maximum value for clipping. Defaults to 1.0.
-            targeted: Targeted attack if True. Defaults to False.
-        """
-
         super().__init__(normalize, device)
 
         self.model = model

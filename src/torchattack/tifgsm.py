@@ -13,6 +13,25 @@ class TIFGSM(Attack):
 
     From the paper 'Evading Defenses to Transferable Adversarial Examples by
     Translation-Invariant Attacks' https://arxiv.org/abs/1904.02884
+
+    Note:
+        Key parameters include `kernel_len` and `n_sig`, which defines the size and
+        the radius of the gaussian kernel. The default values are set to 15 and 3
+        respectively, which are best according to the paper.
+
+    Args:
+        model: The model to attack.
+        normalize: A transform to normalize images.
+        device: Device to use for tensors. Defaults to cuda if available.
+        eps: The maximum perturbation. Defaults to 8/255.
+        steps: Number of steps. Defaults to 10.
+        alpha: Step size, `eps / steps` if None. Defaults to None.
+        decay: Decay factor for the momentum term. Defaults to 1.0.
+        kern_len: Length of the kernel (should be an odd number). Defaults to 15.
+        n_sig: Radius of the gaussian kernel. Defaults to 3.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
+        targeted: Targeted attack if True. Defaults to False.
     """
 
     def __init__(
@@ -30,28 +49,6 @@ class TIFGSM(Attack):
         clip_max: float = 1.0,
         targeted: bool = False,
     ) -> None:
-        """Initialize the TI-FGSM attack.
-
-        Note:
-            Key parameters include `kernel_len` and `n_sig`, which defines the size and
-            the radius of the gaussian kernel. The default values are set to 15 and 3
-            respectively, which are best according to the paper.
-
-        Args:
-            model: The model to attack.
-            normalize: A transform to normalize images.
-            device: Device to use for tensors. Defaults to cuda if available.
-            eps: The maximum perturbation. Defaults to 8/255.
-            steps: Number of steps. Defaults to 10.
-            alpha: Step size, `eps / steps` if None. Defaults to None.
-            decay: Decay factor for the momentum term. Defaults to 1.0.
-            kern_len: Length of the kernel (should be an odd number). Defaults to 15.
-            n_sig: Radius of the gaussian kernel. Defaults to 3.
-            clip_min: Minimum value for clipping. Defaults to 0.0.
-            clip_max: Maximum value for clipping. Defaults to 1.0.
-            targeted: Targeted attack if True. Defaults to False.
-        """
-
         super().__init__(normalize, device)
 
         self.model = model

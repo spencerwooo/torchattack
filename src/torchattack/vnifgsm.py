@@ -11,6 +11,25 @@ class VNIFGSM(Attack):
 
     From the paper 'Enhancing the Transferability of Adversarial Attacks through
     Variance Tuning' https://arxiv.org/abs/2103.15571
+
+    Note:
+        Key parameters are `n` and `beta`, where `n` is the number of sampled
+        examples for variance tuning and `beta` is the upper bound of the
+        neighborhood for varying the perturbation.
+
+    Args:
+        model: The model to attack.
+        normalize: A transform to normalize images.
+        device: Device to use for tensors. Defaults to cuda if available.
+        eps: The maximum perturbation. Defaults to 8/255.
+        steps: Number of steps. Defaults to 10.
+        alpha: Step size, `eps / steps` if None. Defaults to None.
+        decay: Decay factor for the momentum term. Defaults to 1.0.
+        n: Number of sampled examples for variance tuning. Defaults to 5.
+        beta: The upper bound of the neighborhood. Defaults to 1.5.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
+        targeted: Targeted attack if True. Defaults to False.
     """
 
     def __init__(
@@ -28,28 +47,6 @@ class VNIFGSM(Attack):
         clip_max: float = 1.0,
         targeted: bool = False,
     ) -> None:
-        """Initialize the VNI-FGSM attack.
-
-        Note:
-            Key parameters are `n` and `beta`, where `n` is the number of sampled
-            examples for variance tuning and `beta` is the upper bound of the
-            neighborhood for varying the perturbation.
-
-        Args:
-            model: The model to attack.
-            normalize: A transform to normalize images.
-            device: Device to use for tensors. Defaults to cuda if available.
-            eps: The maximum perturbation. Defaults to 8/255.
-            steps: Number of steps. Defaults to 10.
-            alpha: Step size, `eps / steps` if None. Defaults to None.
-            decay: Decay factor for the momentum term. Defaults to 1.0.
-            n: Number of sampled examples for variance tuning. Defaults to 5.
-            beta: The upper bound of the neighborhood. Defaults to 1.5.
-            clip_min: Minimum value for clipping. Defaults to 0.0.
-            clip_max: Maximum value for clipping. Defaults to 1.0.
-            targeted: Targeted attack if True. Defaults to False.
-        """
-
         super().__init__(normalize, device)
 
         self.model = model

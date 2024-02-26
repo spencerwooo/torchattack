@@ -9,8 +9,21 @@ from torchattack.base import Attack
 class SINIFGSM(Attack):
     """The SI-NI-FGSM (Scale-invariant Nesterov-accelerated Iterative FGSM) attack.
 
-    From the paper 'Nesterov Accelerated Gradient and Scale Invariance for Adversarial
-    Attacks' https://arxiv.org/abs/1908.06281
+        From the paper 'Nesterov Accelerated Gradient and Scale Invariance for Adversarial
+        Attacks' https://arxiv.org/abs/1908.06281
+
+    Args:
+        model: The model to attack.
+        normalize: A transform to normalize images.
+        device: Device to use for tensors. Defaults to cuda if available.
+        eps: The maximum perturbation. Defaults to 8/255.
+        steps: Number of steps. Defaults to 10.
+        alpha: Step size, `eps / steps` if None. Defaults to None.
+        decay: Decay factor for the momentum term. Defaults to 1.0.
+        m: Number of scaled copies of the image. Defaults to 3.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
+        targeted: Targeted attack if True. Defaults to False.
     """
 
     def __init__(
@@ -27,22 +40,6 @@ class SINIFGSM(Attack):
         clip_max: float = 1.0,
         targeted: bool = False,
     ) -> None:
-        """Initialize the SI-NI-FGSM attack.
-
-        Args:
-            model: The model to attack.
-            normalize: A transform to normalize images.
-            device: Device to use for tensors. Defaults to cuda if available.
-            eps: The maximum perturbation. Defaults to 8/255.
-            steps: Number of steps. Defaults to 10.
-            alpha: Step size, `eps / steps` if None. Defaults to None.
-            decay: Decay factor for the momentum term. Defaults to 1.0.
-            m: Number of scaled copies of the image. Defaults to 3.
-            clip_min: Minimum value for clipping. Defaults to 0.0.
-            clip_max: Maximum value for clipping. Defaults to 1.0.
-            targeted: Targeted attack if True. Defaults to False.
-        """
-
         super().__init__(normalize, device)
 
         self.model = model

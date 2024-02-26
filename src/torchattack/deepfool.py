@@ -11,6 +11,16 @@ class DeepFool(Attack):
 
     From the paper 'DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks'
     https://arxiv.org/abs/1511.04599
+
+    Args:
+        model: The model to attack.
+        normalize: A transform to normalize images.
+        device: Device to use for tensors. Defaults to cuda if available.
+        steps: Number of steps. Defaults to 100.
+        overshoot: Overshoot parameter for noise control. Defaults to 0.02.
+        num_classes: Number of classes to consider. Defaults to 10.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
     """
 
     def __init__(
@@ -24,19 +34,6 @@ class DeepFool(Attack):
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
-        """Initialize the DeepFool attack.
-
-        Args:
-            model: The model to attack.
-            normalize: A transform to normalize images.
-            device: Device to use for tensors. Defaults to cuda if available.
-            steps: Number of steps. Defaults to 100.
-            overshoot: Overshoot parameter for noise control. Defaults to 0.02.
-            num_classes: Number of classes to consider. Defaults to 10.
-            clip_min: Minimum value for clipping. Defaults to 0.0.
-            clip_max: Maximum value for clipping. Defaults to 1.0.
-        """
-
         super().__init__(normalize, device)
 
         self.model = model
