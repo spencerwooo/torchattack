@@ -24,6 +24,8 @@ version = { attr = "torchattack.__version__" }
 
 [tool.ruff]
 line-length = 88
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "N", "B", "SIM"]
 ignore = ["E501"]
 
@@ -32,9 +34,9 @@ ignore = ["E501"]
 quote-style = "single"
 
 [tool.mypy]
-disallow_any_unimported = true
 no_implicit_optional = true
 check_untyped_defs = true
-ignore_missing_imports = true  # Used as torchvision does not ship type hints
+ignore_missing_imports = true # Used as torchvision does not ship type hints
+# disallow_any_unimported = true
 # disallow_untyped_defs = true
 # warn_return_any = true

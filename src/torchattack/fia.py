@@ -58,6 +58,10 @@ class FIA(Attack):
         self.targeted = targeted
         # self.lossfn = nn.CrossEntropyLoss()
 
+        # TODO: Targeted attack is not supported yet.
+        if self.targeted:
+            print('Targeted attack is not supported, using non-targeted variant.')
+
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform FIA on a batch of images.
 
@@ -86,12 +90,12 @@ class FIA(Attack):
             output_random = torch.softmax(output_random, dim=1)
             loss = 0
             for batch_i in range(x.shape[0]):
-                loss += output_random[batch_i][y[batch_i]]
+                loss += output_random[batch_i][y[batch_i]]  # type: ignore
             self.model.zero_grad()
-            loss.backward()
+            loss.backward()  # type: ignore
             agg_grad += self.mid_grad[0].detach()
         for batch_i in range(x.shape[0]):
-            agg_grad[batch_i] /= agg_grad[batch_i].norm(p=2)
+            agg_grad[batch_i] /= agg_grad[batch_i].norm(p=2)  # type: ignore
         h2.remove()
 
         # Perform FIA
