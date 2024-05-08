@@ -16,7 +16,7 @@ class NIPSDataset(Dataset):
         self,
         image_root: str,
         pairs_path: str,
-        transform: Callable[[torch.Tensor], torch.Tensor] | None = None,
+        transform: Callable[[torch.Tensor | Image.Image], torch.Tensor] | None = None,
         max_samples: int | None = None,
     ) -> None:
         """Initialize the NIPS 2017 Adversarial Learning Challenge dataset.
@@ -73,10 +73,10 @@ class NIPSDataset(Dataset):
         name = self.names[index]
         label = int(self.labels[index]) - 1
 
-        image = Image.open(f'{self.image_root}/{name}.png').convert('RGB')
-        # image = np.array(image, dtype=np.uint8)
-        # image = torch.from_numpy(image).permute((2, 0, 1)).contiguous().float().div(255)
-        image = self.transform(image) if self.transform else image
+        pil_image = Image.open(f'{self.image_root}/{name}.png').convert('RGB')
+        # np_image = np.array(pil_image, dtype=np.uint8)
+        # image = torch.from_numpy(np_image).permute((2, 0, 1)).contiguous().float().div(255)
+        image = self.transform(pil_image) if self.transform else pil_image
         return image, label, name
 
 
@@ -89,9 +89,9 @@ class NIPSLoader(DataLoader):
 
         >>> from torchvision.transforms import transforms
         >>> from torchattack.dataset import NIPSLoader
-        >>> transform = transforms.Resize([224])
+        >>> transform = transforms.Compose([transforms.Resize([224]), transforms.ToTensor()])
         >>> dataloader = NIPSLoader(
-        >>>     path="data/nips2017", batch_size=16, transform=transform
+        >>>     path="data/nips2017", batch_size=16, transform=transform, max_samples=100
         >>> )
 
         You can specify a custom image root directory and CSV file location by
@@ -107,7 +107,7 @@ class NIPSLoader(DataLoader):
         batch_size: int = 1,
         shuffle: bool = False,
         num_workers: int = 4,
-        transform: Callable[[torch.Tensor], torch.Tensor] | None = None,
+        transform: Callable[[torch.Tensor | Image.Image], torch.Tensor] | None = None,
         max_samples: int | None = None,
     ):
         # Specifing a custom image root directory is useful when evaluating

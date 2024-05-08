@@ -1,5 +1,5 @@
 from contextlib import suppress
-from typing import Any, Optional
+from typing import Any
 
 import torch
 import torchvision as tv
@@ -11,9 +11,9 @@ class FoolingRateMetric:
     """Fooling rate metric tracker."""
 
     def __init__(self) -> None:
-        self.total_count = 0
-        self.clean_count = 0
-        self.adv_count = 0
+        self.total_count = torch.tensor(0)
+        self.clean_count = torch.tensor(0)
+        self.adv_count = torch.tensor(0)
 
     def update(
         self, labels: torch.Tensor, clean_logits: torch.Tensor, adv_logits: torch.Tensor
@@ -42,7 +42,7 @@ class FoolingRateMetric:
 
 def run_attack(
     attack: Any,
-    attack_cfg: Optional[dict] = None,
+    attack_cfg: dict | None = None,
     model_name: str = 'resnet50',
     max_samples: int = 100,
     batch_size: int = 8,
