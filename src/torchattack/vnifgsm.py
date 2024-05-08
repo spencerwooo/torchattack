@@ -139,6 +139,6 @@ class VNIFGSM(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.utils import run_attack
+    from torchattack.runner import run_attack
 
     run_attack(VNIFGSM, {'eps': 8 / 255, 'steps': 10, 'n': 5, 'beta': 1.5})

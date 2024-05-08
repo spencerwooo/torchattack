@@ -1,4 +1,18 @@
-def run_attack(attack, attack_cfg, model='resnet50', samples=100, batch_size=8) -> None:
+from contextlib import suppress
+
+import torch
+import torchvision as tv
+
+from torchattack.dataset import NIPSLoader
+
+
+def run_attack(
+    attack,
+    attack_cfg,
+    model: str = 'resnet50',
+    samples: int = 100,
+    batch_size: int = 8,
+) -> None:
     """Helper function to run attacks in `__main__`.
 
     Example:
@@ -10,16 +24,9 @@ def run_attack(attack, attack_cfg, model='resnet50', samples=100, batch_size=8) 
     Args:
         attack: The attack class to initialize.
         attack_cfg: A dict of keyword arguments passed to the attack class.
-        model: The model to attack. Defaults to "resnet50".
+        model: The torchvision model to attack. Defaults to "resnet50".
         samples: Max number of samples to attack. Defaults to 100.
     """
-
-    from contextlib import suppress
-
-    import torch
-    import torchvision as tv
-
-    from torchattack.dataset import NIPSLoader
 
     # Try to import rich for progress bar
     with suppress(ImportError):

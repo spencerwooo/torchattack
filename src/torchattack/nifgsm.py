@@ -109,6 +109,6 @@ class NIFGSM(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.utils import run_attack
+    from torchattack.runner import run_attack
 
     run_attack(NIFGSM, {'eps': 8 / 255, 'steps': 10})

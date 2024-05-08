@@ -119,6 +119,6 @@ class PGDL2(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.utils import run_attack
+    from torchattack.runner import run_attack
 
     run_attack(PGDL2, {'eps': 1.0, 'steps': 10, 'random_start': False})
