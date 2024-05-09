@@ -70,9 +70,11 @@ def run_attack(
     if attack_cfg is None:
         attack_cfg = {}
 
-    # Set up model, transform, and normalize
+    # Setup model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = tv.models.get_model(name=model_name, weights='DEFAULT').to(device).eval()
+
+    # Setup transforms and normalization
     transform = tv.transforms.Compose(
         [
             tv.transforms.Resize([256]),
@@ -80,7 +82,9 @@ def run_attack(
             tv.transforms.ToTensor(),
         ]
     )
-    normalize = tv.transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    normalize = tv.transforms.Normalize(
+        mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
+    )
 
     # Set up dataloader
     dataloader = NIPSLoader(

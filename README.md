@@ -39,7 +39,7 @@ attack = FGSM(model, normalize, device)
 attack = MIFGSM(model, normalize, device, eps=0.03, steps=10, decay=1.0)
 ```
 
-Check out [`torchattack.utils.run_attack`](src/torchattack/utils.py) for a simple example.
+Check out [`torchattack.runner.run_attack`](src/torchattack/runner.py) for a simple example.
 
 ## Attacks
 
@@ -66,6 +66,7 @@ Others:
 | :------: | :---------------------: | :------------------------------------------------------------------------------------------------------ | :--------------------- |
 | DeepFool |        $\ell_2$         | [DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks](https://arxiv.org/abs/1511.04599) | `torchattack.DeepFool` |
 |  GeoDA   | $\ell_\infty$, $\ell_2$ | [GeoDA: A Geometric Framework for Black-box Adversarial Attacks](https://arxiv.org/abs/2003.06468)      | `torchattack.GeoDA`    |
+|   SSP    |      $\ell_\infty$      | [A Self-supervised Approach for Adversarial Robustness](https://arxiv.org/abs/2006.04924)               | `torchattack.SSP`      |
 
 ## Development
 
@@ -75,6 +76,7 @@ python -m venv .venv
 source .venv/bin/activate
 
 # Install deps with dev extras
+python -m pip install -r requirements.txt
 python -m pip install -e '.[dev]'
 ```
 

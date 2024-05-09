@@ -10,6 +10,7 @@ from torchattack.base import Attack
 class PerceptualCriteria(nn.Module):
     def __init__(self, ssp_layer: int) -> None:
         super().__init__()
+        self.ssp_layer = ssp_layer
 
         # Use pretrained VGG16 for perceptual loss
         vgg16 = tv.models.vgg16(weights='DEFAULT')
@@ -27,12 +28,30 @@ class PerceptualCriteria(nn.Module):
 
 
 class SSP(Attack):
+    """The Self-supervised (SSP) attack.
+
+    From the paper 'A Self-supervised Approach for Adversarial Robustness'
+    https://arxiv.org/abs/2006.04924
+
+    Args:
+        model: The model to attack.
+        normalize: A transform to normalize images.
+        device: Device to use for tensors. Defaults to cuda if available.
+        eps: The maximum perturbation. Defaults to 8/255.
+        steps: Number of steps. Defaults to 100.
+        alpha: Step size, `eps / steps` if None. Defaults to None.
+        ssp_layer: The VGG layer to use for the perceptual loss. Defaults to 16.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
+        targeted: Targeted attack if True. Defaults to False.
+    """
+
     def __init__(
         self,
         model: nn.Module,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         device: torch.device | None = None,
-        eps: float = 16 / 255,
+        eps: float = 8 / 255,
         steps: int = 100,
         alpha: float | None = None,
         ssp_layer: int = 16,
@@ -54,6 +73,16 @@ class SSP(Attack):
         self.perceptual_criteria = PerceptualCriteria(ssp_layer).to(device)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Perform SSP on a batch of images.
+
+        Args:
+            x: A batch of images. Shape: (N, C, H, W).
+            y: A batch of labels, not required. Shape: (N).
+
+        Returns:
+            The perturbed images if successful. Shape: (N, C, H, W).
+        """
+
         delta = torch.randn_like(x, requires_grad=True)
 
         # If alpha is not given, set to eps / steps
