@@ -21,7 +21,7 @@ class PerceptualCriteria(nn.Module):
 
     def forward(self, x: torch.Tensor, xadv: torch.Tensor) -> torch.Tensor:
         return self.loss_fn(self.perceptual_model(x), self.perceptual_model(xadv))
-    
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(ssp_layer={self.ssp_layer})'
 
@@ -53,7 +53,7 @@ class SSP(Attack):
 
         self.perceptual_criteria = PerceptualCriteria(ssp_layer).to(device)
 
-    def forward(self, x: torch.Tensor, _: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         delta = torch.randn_like(x, requires_grad=True)
 
         # If alpha is not given, set to eps / steps
