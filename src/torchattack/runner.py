@@ -45,7 +45,7 @@ def run_attack(
     attack_cfg: dict | None = None,
     model_name: str = 'resnet50',
     max_samples: int = 100,
-    batch_size: int = 8,
+    batch_size: int = 16,
 ) -> None:
     """Helper function to run attacks in `__main__`.
 
@@ -74,7 +74,11 @@ def run_attack(
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = tv.models.get_model(name=model_name, weights='DEFAULT').to(device).eval()
     transform = tv.transforms.Compose(
-        [tv.transforms.Resize([224]), tv.transforms.ToTensor()]
+        [
+            tv.transforms.Resize([256]),
+            tv.transforms.CenterCrop(224),
+            tv.transforms.ToTensor(),
+        ]
     )
     normalize = tv.transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 
@@ -109,11 +113,11 @@ def run_attack(
         adv_outs = model(normalize(advs))
         frm.update(y, cln_outs, adv_outs)
 
-        # Save one batch of adversarial images
-        if i == 1:
+        # Save first batch of adversarial images
+        if i == 0:
             saved_imgs = advs.detach().cpu().mul(255).to(torch.uint8)
             img_grid = tv.utils.make_grid(saved_imgs, nrow=4)
-            tv.io.write_png(img_grid, 'adv_batch.png')
+            tv.io.write_png(img_grid, 'adv_batch_0.png')
 
     # Print results
     print(f'Clean accuracy: {frm.compute_clean_accuracy():.2%}')

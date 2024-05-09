@@ -13,7 +13,7 @@ from torchattack.tifgsm import TIFGSM
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 __all__ = [
     'Admix',
