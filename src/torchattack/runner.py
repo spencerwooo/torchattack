@@ -72,7 +72,14 @@ def run_attack(
 
     # Setup model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = tv.models.get_model(name=model_name, weights='DEFAULT').to(device).eval()
+    try:
+        model = (
+            tv.models.get_model(name=model_name, weights='DEFAULT').to(device).eval()
+        )
+    except ValueError:
+        import timm
+
+        model = timm.create_model(model_name, pretrained=True).to(device).eval()
 
     # Setup transforms and normalization
     transform = tv.transforms.Compose(
