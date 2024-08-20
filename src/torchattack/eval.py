@@ -18,9 +18,9 @@ class FoolingRateMetric:
         """Update metric tracker during attack progress.
 
         Args:
-            labels (torch.Tensor): Ground truth labels.
-            clean_logits (torch.Tensor): Prediction logits for clean samples.
-            adv_logits (torch.Tensor): Prediction logits for adversarial samples.
+            labels: Ground truth labels.
+            clean_logits: Prediction logits for clean samples.
+            adv_logits: Prediction logits for adversarial samples.
         """
 
         self.total_count += labels.numel()
@@ -180,7 +180,6 @@ def run_attack(
     """Helper function to run attacks in `__main__`.
 
     Example:
-
         >>> from torchattack import FGSM
         >>> cfg = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
         >>> run_attack(attack=FGSM, attack_cfg=cfg)

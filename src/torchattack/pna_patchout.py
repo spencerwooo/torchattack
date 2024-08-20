@@ -10,7 +10,26 @@ from torchattack.base import Attack
 
 
 class PNAPatchOut(Attack):
-    """PNA-PatchOut attack for ViTs (Pay no attention & PatchOut)."""
+    """PNA-PatchOut attack for ViTs (Pay no attention & PatchOut).
+
+    From the paper: 'Towards Transferable Adversarial Attacks on Vision Transformers'
+    https://arxiv.org/abs/2109.04176
+
+    Args:
+        model: The model to attack.
+        model_name: The name of the model.
+        normalize: A transform to normalize images.
+        device: Device to use for tensors. Defaults to cuda if available.
+        eps: The maximum perturbation. Defaults to 8/255.
+        steps: Number of steps. Defaults to 10.
+        alpha: Step size, `eps / steps` if None. Defaults to None.
+        decay: Momentum decay factor. Defaults to 1.0.
+        pna_skip: Whether to apply PNA. Defaults to True.
+        pna_patchout: Whether to apply PatchOut perturbation mask. Defaults to True.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
+        targeted: Targeted attack if True. Defaults to False.
+    """
 
     # fmt: off
     _supported_vit_cfg = {
