@@ -214,7 +214,7 @@ def run_attack(
         transform=transform,
         max_samples=max_samples,
     )
-    dataloader = track(dataloader, description='Attacking')
+    dataloader = track(dataloader, description='Attacking')  # type: ignore
 
     # Set up attack and trackers
     frm = FoolingRateMetric()
