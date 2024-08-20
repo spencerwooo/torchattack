@@ -8,6 +8,7 @@ from torchattack.mifgsm import MIFGSM
 from torchattack.nifgsm import NIFGSM
 from torchattack.pgd import PGD
 from torchattack.pgdl2 import PGDL2
+from torchattack.pna_patchout import PNAPatchOut
 from torchattack.sinifgsm import SINIFGSM
 from torchattack.tifgsm import TIFGSM
 from torchattack.vmifgsm import VMIFGSM
@@ -26,6 +27,7 @@ __all__ = [
     'NIFGSM',
     'PGD',
     'PGDL2',
+    'PNAPatchOut',
     'SINIFGSM',
     'TIFGSM',
     'VMIFGSM',

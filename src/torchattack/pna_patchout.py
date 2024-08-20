@@ -12,6 +12,41 @@ from torchattack.base import Attack
 class PNAPatchOut(Attack):
     """PNA-PatchOut attack for ViTs (Pay no attention & PatchOut)."""
 
+    # fmt: off
+    _supported_vit_cfg = {
+        'vit_base_patch16_224': [
+            f'blocks.{i}.attn.attn_drop' for i in range(12)
+        ],
+        'deit_base_distilled_patch16_224': [
+            f'blocks.{i}.attn.attn_drop' for i in range(12)
+        ],
+        'pit_b_224': [
+            # First transformer block
+            f'transformers.{0}.blocks.{i}.attn.attn_drop' for i in range(3)
+        ] + [
+            # Second transformer block
+            f'transformers.{1}.blocks.{i-3}.attn.attn_drop' for i in range(3, 9)
+        ] + [
+            # Third transformer block
+            f'transformers.{2}.blocks.{i-9}.attn.attn_drop' for i in range(9, 13)
+        ],
+        'cait_s24_224': [
+            # Regular blocks
+            f'blocks.{i}.attn.attn_drop' for i in range(24)
+        ] + [
+            # Token-only block
+            f'blocks_token_only.{i}.attn.attn_drop' for i in range(0, 2)
+        ],
+        'visformer_small': [
+            # Stage 2 blocks
+            f'stage2.{i}.attn.attn_drop' for i in range(4)
+        ] + [
+            # Stage 3 blocks
+            f'stage3.{i}.attn.attn_drop' for i in range(4)
+        ],
+    }
+    # fmt: on
+
     def __init__(
         self,
         model: nn.Module,
@@ -108,44 +143,10 @@ class PNAPatchOut(Attack):
 
         drop_hook_func = partial(attn_drop_mask_grad, gamma=0)
 
-        # fmt: off
-        _supported_vit_cfg = {
-            'vit_base_patch16_224': [
-                f'blocks.{i}.attn.attn_drop' for i in range(12)
-            ],
-            'deit_base_distilled_patch16_224': [
-                f'blocks.{i}.attn.attn_drop' for i in range(12)
-            ],
-            'pit_b_224': [
-                # First transformer block
-                f'transformers.{0}.blocks.{i}.attn.attn_drop' for i in range(3)
-            ] + [
-                # Second transformer block
-                f'transformers.{1}.blocks.{i-3}.attn.attn_drop' for i in range(3, 9)
-            ] + [
-                # Third transformer block
-                f'transformers.{2}.blocks.{i-9}.attn.attn_drop' for i in range(9, 13)
-            ],
-            'cait_s24_224': [
-                # Regular blocks
-                f'blocks.{i}.attn.attn_drop' for i in range(24)
-            ] + [
-                # Token-only block
-                f'blocks_token_only.{i}.attn.attn_drop' for i in range(0, 2)
-            ],
-            'visformer_small': [
-                # Stage 2 blocks
-                f'stage2.{i}.attn.attn_drop' for i in range(4)
-            ] + [
-                # Stage 3 blocks
-                f'stage3.{i}.attn.attn_drop' for i in range(4)
-            ],
-        }
-        # fmt: on
-        assert self.model_name in _supported_vit_cfg, f'{self.model_name} not supported'
+        assert self.model_name in self._supported_vit_cfg
 
         # Register backward hook for layers specified in _supported_vit_cfg
-        for layer in _supported_vit_cfg[self.model_name]:
+        for layer in self._supported_vit_cfg[self.model_name]:
             module = rgetattr(self.model, layer)
             module.register_backward_hook(drop_hook_func)
 
@@ -177,4 +178,5 @@ if __name__ == '__main__':
         PNAPatchOut,
         attack_cfg={'model_name': 'vit_base_patch16_224'},
         model_name='vit_base_patch16_224',
+        from_timm=True,
     )
