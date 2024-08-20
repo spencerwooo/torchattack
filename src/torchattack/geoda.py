@@ -56,7 +56,7 @@ def generate_2d_dct_basis(sub_dim: int, n: int, path: str) -> np.ndarray:
             dct_basis_list.append(basis_img)
 
     dct_basis = np.reshape(np.asarray(dct_basis_list), (max_v * max_u, n * n))
-    dct_basis = np.mat(dct_basis).transpose()
+    dct_basis = np.asmatrix(dct_basis).transpose()
 
     # Cache the generated DCT subspace basis
     np.save(path, dct_basis)
