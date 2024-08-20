@@ -131,6 +131,6 @@ class Admix(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.runner import run_attack
+    from torchattack.eval import run_attack
 
     run_attack(Admix, {'eps': 8 / 255, 'steps': 10})

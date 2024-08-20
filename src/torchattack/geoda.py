@@ -365,6 +365,6 @@ class GeoDA(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.runner import run_attack
+    from torchattack.eval import run_attack
 
     run_attack(GeoDA, {'epsilon': 4, 'p': 'l2', 'max_queries': 4000}, batch_size=2)
