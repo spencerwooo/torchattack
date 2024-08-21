@@ -103,4 +103,9 @@ class MIFGSM(Attack):
 if __name__ == '__main__':
     from torchattack.eval import run_attack
 
-    run_attack(MIFGSM, {'eps': 8 / 255, 'steps': 10})
+    run_attack(
+        attack=MIFGSM,
+        attack_cfg={'eps': 8 / 255, 'steps': 10},
+        model_name='resnet18',
+        victim_model_names=['resnet50', 'vgg13', 'densenet121'],
+    )
