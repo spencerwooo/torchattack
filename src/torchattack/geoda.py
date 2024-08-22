@@ -347,10 +347,11 @@ class GeoDA(Attack):
     def distance(
         self, x_adv: torch.Tensor, x: torch.Tensor | None = None
     ) -> int | float:
-        if x is None:
-            diff = x_adv.reshape(x_adv.size(0), -1)
-        else:
-            diff = (x_adv - x).reshape(x.size(0), -1)
+        diff = (
+            x_adv.reshape(x_adv.size(0), -1)
+            if x is None
+            else (x_adv - x).reshape(x.size(0), -1)
+        )
 
         if self.p == 'l2':
             out = torch.sqrt(torch.sum(diff * diff)).item()

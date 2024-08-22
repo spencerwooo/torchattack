@@ -27,25 +27,27 @@ class FoolingRateMetric:
         self.clean_count += (clean_logits.argmax(dim=1) == labels).sum().item()
         self.adv_count += (adv_logits.argmax(dim=1) == labels).sum().item()
 
-    def compute_cln_acc(self) -> torch.Tensor:
-        """Compute the model accuracy of clean samples."""
-        return self.clean_count / self.total_count
+    def compute(self) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Compute the fooling rate and related metrics.
 
-    def compute_adv_acc(self) -> torch.Tensor:
-        """Compute the model accuracy of adversarial examples."""
-        return self.adv_count / self.total_count
-
-    def compute_fr(self) -> torch.Tensor:
-        """Compute the fooling rate."""
-        return (self.clean_count - self.adv_count) / self.clean_count
+        Returns:
+            A tuple of torch.Tensors containing the clean accuracy, adversarial
+            accuracy, and fooling rate computed, respectively.
+        """
+        return (
+            self.clean_count / self.total_count,
+            self.adv_count / self.total_count,
+            (self.clean_count - self.adv_count) / self.clean_count,
+        )
 
 
 class AttackModel:
     """A wrapper class for a pretrained model used for adversarial attacks.
 
-    Intended to be instantiated with `AttackModel.from_pretrained(pretrained_model_name)` from either
-    `torchvision.models` or `timm`. The model is loaded and attributes including `transform` and `normalize` are
-    attached based on the model's configuration.
+    Intended to be instantiated with
+    `AttackModel.from_pretrained(pretrained_model_name)` from either
+    `torchvision.models` or `timm`. The model is loaded and attributes including
+    `transform` and `normalize` are attached based on the model's configuration.
 
     Attributes:
         model_name (str): The name of the model.
@@ -100,10 +102,10 @@ class AttackModel:
         Args:
             model_name: The name of the model to load.
             device: The device on which to load the model.
-            from_timm: Whether to load the model from the timm library. Defaults to False.
+            from_timm: Whether to load the model from timm. Defaults to False.
 
         Returns:
-            AttackModel: An instance of the AttackModel class initialized with the pretrained model.
+            AttackModel: An instance of AttackModel initialized with pretrained model.
         """
 
         import torchvision.transforms as t
@@ -221,8 +223,9 @@ def run_attack(
     # Set up attack and trackers
     frm = FoolingRateMetric()
     attacker = attack(
-        # Pass the original PyTorch model instead of the wrapped one if the attack requires access to the model's
-        # intermediate layers or other attributes that are not exposed by the AttackModel wrapper.
+        # Pass the original PyTorch model instead of the wrapped one if the attack
+        # requires access to the model's intermediate layers or other attributes that
+        # are not exposed by the AttackModel wrapper.
         model=model.model,
         normalize=normalize,
         device=device,
@@ -258,30 +261,22 @@ def run_attack(
 
         # Track transfer fooling rates if victim models are provided
         if victim_model_names:
-            for _, (vmodel, vfrm) in enumerate(
-                zip(victim_models, victim_frms, strict=True)
-            ):
+            for _, (vmodel, vfrm) in enumerate(zip(victim_models, victim_frms)):
                 v_cln_outs = vmodel(normalize(x))
                 v_adv_outs = vmodel(normalize(advs))
                 vfrm.update(y, v_cln_outs, v_adv_outs)
 
     # Print results
-    cln_acc, adv_acc, fr = (
-        frm.compute_cln_acc(),
-        frm.compute_adv_acc(),
-        frm.compute_fr(),
-    )
+    cln_acc, adv_acc, fr = frm.compute()
     print(
-        f'Surrogate ({model_name}): {cln_acc:.2%} / {adv_acc:.2%} (Fooling rate: {fr:.2%})'
+        f'Surrogate ({model_name}): {cln_acc:.2%} / {adv_acc:.2%} '
+        f'(Fooling rate: {fr:.2%})'
     )
 
     if victim_model_names:
-        for vmodel, vfrm in zip(victim_models, victim_frms, strict=True):
-            vcln_acc, vadv_acc, vfr = (
-                vfrm.compute_cln_acc(),
-                vfrm.compute_adv_acc(),
-                vfrm.compute_fr(),
-            )
+        for vmodel, vfrm in zip(victim_models, victim_frms):
+            vcln_acc, vadv_acc, vfr = vfrm.compute()
             print(
-                f'Victim ({vmodel.model_name}): {vcln_acc:.2%} / {vadv_acc:.2%} (Fooling rate: {vfr:.2%})'
+                f'Victim ({vmodel.model_name}): {vcln_acc:.2%} / {vadv_acc:.2%} '
+                f'(Fooling rate: {vfr:.2%})'
             )

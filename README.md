@@ -25,7 +25,7 @@ from torchattack.eval import AttackModel
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Load a model
-model = AttackModel.from_pretrained(model_name='resnet50', device)
+model = AttackModel.from_pretrained(model_name='resnet50', device=device)
 transform, normalize = model.transform, model.normalize
 
 # Initialize an attack
