@@ -41,21 +41,22 @@ Check out [`torchattack.eval.run_attack`](src/torchattack/eval.py) for a simple 
 
 Gradient-based attacks:
 
-|     Name     |   $\ell_p$    | Paper                                                                                                                      | `torchattack` class       |
-| :----------: | :-----------: | :------------------------------------------------------------------------------------------------------------------------- | :------------------------ |
-|     FGSM     | $\ell_\infty$ | [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572)                                          | `torchattack.FGSM`        |
-|     PGD      | $\ell_\infty$ | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                          | `torchattack.PGD`         |
-|   PGD (L2)   |   $\ell_2$    | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                          | `torchattack.PGDL2`       |
-|   MI-FGSM    | $\ell_\infty$ | [Boosting Adversarial Attacks with Momentum](https://arxiv.org/abs/1710.06081)                                             | `torchattack.MIFGSM`      |
-|   DI-FGSM    | $\ell_\infty$ | [Improving Transferability of Adversarial Examples with Input Diversity](https://arxiv.org/abs/1803.06978)                 | `torchattack.DIFGSM`      |
-|   TI-FGSM    | $\ell_\infty$ | [Evading Defenses to Transferable Adversarial Examples by Translation-Invariant Attacks](https://arxiv.org/abs/1904.02884) | `torchattack.TIFGSM`      |
-|   NI-FGSM    | $\ell_\infty$ | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)             | `torchattack.NIFGSM`      |
-|  SI-NI-FGSM  | $\ell_\infty$ | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)             | `torchattack.SINIFGSM`    |
-|   VMI-FGSM   | $\ell_\infty$ | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)           | `torchattack.VMIFGSM`     |
-|   VNI-FGSM   | $\ell_\infty$ | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)           | `torchattack.VNIFGSM`     |
-|    Admix     | $\ell_\infty$ | [Admix: Enhancing the Transferability of Adversarial Attacks](https://arxiv.org/abs/2102.00436)                            | `torchattack.Admix`       |
-|     FIA      | $\ell_\infty$ | [Feature Importance-aware Transferable Adversarial Attacks](https://arxiv.org/abs/2107.14185)                              | `torchattack.FIA`         |
-| PNA-PatchOut | $\ell_\infty$ | [Towards Transferable Adversarial Attacks on Vision Transformers](https://arxiv.org/abs/2109.04176)                        | `torchattack.PNAPatchOut` |
+|     Name     |   $\ell_p$    | Paper                                                                                                                          | `torchattack` class       |
+| :----------: | :-----------: | :----------------------------------------------------------------------------------------------------------------------------- | :------------------------ |
+|     FGSM     | $\ell_\infty$ | [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572)                                              | `torchattack.FGSM`        |
+|     PGD      | $\ell_\infty$ | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                              | `torchattack.PGD`         |
+|   PGD (L2)   |   $\ell_2$    | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                              | `torchattack.PGDL2`       |
+|   MI-FGSM    | $\ell_\infty$ | [Boosting Adversarial Attacks with Momentum](https://arxiv.org/abs/1710.06081)                                                 | `torchattack.MIFGSM`      |
+|   DI-FGSM    | $\ell_\infty$ | [Improving Transferability of Adversarial Examples with Input Diversity](https://arxiv.org/abs/1803.06978)                     | `torchattack.DIFGSM`      |
+|   TI-FGSM    | $\ell_\infty$ | [Evading Defenses to Transferable Adversarial Examples by Translation-Invariant Attacks](https://arxiv.org/abs/1904.02884)     | `torchattack.TIFGSM`      |
+|   NI-FGSM    | $\ell_\infty$ | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                 | `torchattack.NIFGSM`      |
+|  SI-NI-FGSM  | $\ell_\infty$ | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                 | `torchattack.SINIFGSM`    |
+|   VMI-FGSM   | $\ell_\infty$ | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)               | `torchattack.VMIFGSM`     |
+|   VNI-FGSM   | $\ell_\infty$ | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)               | `torchattack.VNIFGSM`     |
+|    Admix     | $\ell_\infty$ | [Admix: Enhancing the Transferability of Adversarial Attacks](https://arxiv.org/abs/2102.00436)                                | `torchattack.Admix`       |
+|     FIA      | $\ell_\infty$ | [Feature Importance-aware Transferable Adversarial Attacks](https://arxiv.org/abs/2107.14185)                                  | `torchattack.FIA`         |
+| PNA-PatchOut | $\ell_\infty$ | [Towards Transferable Adversarial Attacks on Vision Transformers](https://arxiv.org/abs/2109.04176)                            | `torchattack.PNAPatchOut` |
+|     TGR      | $\ell_\infty$ | [Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization](https://arxiv.org/abs/2303.15754) | `torchattack.TGR`         |
 
 Others:
 
