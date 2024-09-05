@@ -40,21 +40,16 @@ class PNAPatchOut(Attack):
             f'blocks.{i}.attn.attn_drop' for i in range(12)
         ],
         'pit_b_224': [
-            # First transformer block
-            f'transformers.{0}.blocks.{i}.attn.attn_drop' for i in range(3)
-        ] + [
-            # Second transformer block
-            f'transformers.{1}.blocks.{i-3}.attn.attn_drop' for i in range(3, 9)
-        ] + [
-            # Third transformer block
-            f'transformers.{2}.blocks.{i-9}.attn.attn_drop' for i in range(9, 13)
+            f'transformers.{tid}.blocks.{i}.attn.attn_drop'
+            for tid, bid in enumerate([3, 6, 4])
+            for i in range(bid)
         ],
         'cait_s24_224': [
             # Regular blocks
             f'blocks.{i}.attn.attn_drop' for i in range(24)
         ] + [
             # Token-only block
-            f'blocks_token_only.{i}.attn.attn_drop' for i in range(0, 2)
+            f'blocks_token_only.{i}.attn.attn_drop' for i in range(2)
         ],
         'visformer_small': [
             # Stage 2 blocks
