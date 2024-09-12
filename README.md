@@ -9,10 +9,10 @@ A set of adversarial attacks in PyTorch.
 
 ```shell
 # Install from github source
-python -m pip install git+https://github.com/daisylab-bit/torchattack
+python -m pip install git+https://github.com/spencerwooo/torchattack
 
 # Install from gitee mirror
-python -m pip install git+https://gitee.com/daisylab-bit/torchattack
+python -m pip install git+https://gitee.com/spencerwoo/torchattack
 ```
 
 ## Usage
