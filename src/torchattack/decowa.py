@@ -66,5 +66,163 @@ class DeCoWA(Attack):
         self.targeted = targeted
         self.lossfn = nn.CrossEntropyLoss()
 
-    def forward():
-        pass
+    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Perform MI-FGSM on a batch of images.
+
+        Args:
+            x: A batch of images. Shape: (N, C, H, W).
+            y: A batch of labels. Shape: (N).
+
+        Returns:
+            The perturbed images if successful. Shape: (N, C, H, W).
+        """
+
+        delta = torch.zeros_like(x, requires_grad=True)
+
+        # If alpha is not given, set to eps / steps
+        if self.alpha is None:
+            self.alpha = self.eps / self.steps
+
+        for _ in range(self.steps):
+            g = torch.zeros_like(x)
+
+            # Perform warping
+            for _ in range(self.num_warping):
+                # Apply warping to perturbation
+                noise_map_hat = self._update_noise_map(x + delta, y)
+                vwt_x = self._vwt(x + delta, noise_map_hat)
+
+                # Compute loss
+                outs = self.model(self.normalize(vwt_x))
+                loss = self.lossfn(outs, y)
+
+                if self.targeted:
+                    loss = -loss
+
+                # Compute gradient
+                loss.backward()
+
+                if delta.grad is None:
+                    continue
+
+                # Accumulate gradient
+                g += delta.grad
+
+            # Average gradient over warping
+            g /= self.num_warping
+
+            # Apply momentum term
+            g = self.decay * g + delta.grad / torch.mean(
+                torch.abs(delta.grad), dim=(1, 2, 3), keepdim=True
+            )
+
+            # Update delta
+            delta.data = delta.data + self.alpha * g.sign()
+            delta.data = torch.clamp(delta.data, -self.eps, self.eps)
+            delta.data = torch.clamp(x + delta.data, self.clip_min, self.clip_max) - x
+
+            # Zero out gradient
+            delta.grad.detach_()
+            delta.grad.zero_()
+
+        return x + delta
+
+    def _update_noise_map(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        with torch.no_grad():
+            noise_map = torch.rand([self.mesh_height - 2, self.mesh_width - 2, 2]) - 0.5
+            noise_map = noise_map * self.noise_scale
+
+        noise_map.requires_grad_()
+        vwt_x = self._vwt(x, noise_map)
+
+    def _vwt(self, x: torch.Tensor, noise_map_hat: torch.Tensor) -> torch.Tensor:
+        n, c, w, h = x.size()
+        grid_x = self._grid_points_2d(w, h, x.device)
+
+    def _grid_points_2d(
+        self, width: int, height: int, device: torch.device
+    ) -> torch.Tensor:
+        x = torch.linspace(-1, 1, width, device=device)
+        y = torch.linspace(-1, 1, height, device=device)
+        grid_x, grid_y = torch.meshgrid(x, y)
+        grid = torch.stack((grid_y, grid_x), dim=-1)
+        return grid.view(-1, 2)
+
+    def _noisy_grid(
+        self, width: int, height: int, noise_map: torch.Tensor, device: torch.device
+    ) -> torch.Tensor:
+        grid = self._grid_points_2d(width, height, device)
+        mod = torch.zeros((width * height, 2), device=device)
+        mod[1 : height - 1, 1 : width - 1, :] = noise_map
+        return grid + mod.reshape(-1, 2)
+
+
+def k_matrix(x, y):
+    eps = 1e-9
+    d2 = torch.pow(x[:, :, None, :] - y[:, None, :, :], 2).sum(-1)
+    k = d2 * torch.log(d2 + eps)
+    return k
+
+
+def p_matrix(x):
+    n, k = x.shape[:2]
+    p = torch.ones(n, k, 3, device=x.device)
+    p[:, :, 1:] = x
+    return p
+
+
+class TPSCoeffs(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(
+        self, x: torch.Tensor, y: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        n, k_mat = x.shape[:2]
+        z_mat = torch.zeros(1, k_mat + 3, 2, device=x.device)
+        p_mat = torch.ones(n, k_mat, 3, device=x.device)
+        l_mat = torch.zeros(n, k_mat + 3, k_mat + 3, device=x.device)
+        k_mat = k_matrix(x, x)
+
+        p_mat[:, :, 1:] = x
+        z_mat[:, :k_mat, :] = y
+        l_mat[:, :k_mat, :k_mat] = k_mat
+        l_mat[:, :k_mat, k_mat:] = p_mat
+        l_mat[:, k_mat:, :k_mat] = p_mat.permute(0, 2, 1)
+
+        q_mat = torch.linalg.solve(l_mat, z_mat)
+        return q_mat[:, :k_mat], q_mat[:, k_mat:]
+
+
+class TPS(nn.Module):
+    def __init__(self, size: tuple = (256, 256), device: torch.device | None = None):
+        super().__init__()
+        h, w = size
+        self.size = size
+        self.device = device
+
+        self.tps = TPSCoeffs()
+
+        grid = torch.ones(1, h, w, 2, device=device)
+        grid[:, :, :, 0] = torch.linspace(-1, 1, w, device=device)
+        grid[:, :, :, 1] = torch.linspace(-1, 1, h, device=device)[..., None]
+        self.grid = grid.view(-1, h * w, 2)
+
+    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        h, w = self.size
+        w, a = self.tps(x, y)
+        u_mat = k_matrix(self.grid, x)
+        p_mat = p_matrix(self.grid)
+        grid = p_mat @ a + u_mat @ w
+        return grid.view(-1, h, w, 2)
+
+
+if __name__ == '__main__':
+    from torchattack.eval import run_attack
+
+    run_attack(
+        attack=DeCoWA,
+        attack_cfg={'eps': 8 / 255, 'steps': 10},
+        model_name='resnet18',
+        victim_model_names=['resnet50', 'vgg13', 'densenet121'],
+    )
