@@ -1,4 +1,5 @@
 from torchattack.admix import Admix
+from torchattack.decowa import DeCoWA
 from torchattack.deepfool import DeepFool
 from torchattack.difgsm import DIFGSM
 from torchattack.fgsm import FGSM
@@ -10,14 +11,17 @@ from torchattack.pgd import PGD
 from torchattack.pgdl2 import PGDL2
 from torchattack.pna_patchout import PNAPatchOut
 from torchattack.sinifgsm import SINIFGSM
+from torchattack.ssp import SSP
+from torchattack.tgr import TGR
 from torchattack.tifgsm import TIFGSM
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 
 __all__ = [
     'Admix',
+    'DeCoWA',
     'DeepFool',
     'DIFGSM',
     'FIA',
@@ -29,6 +33,8 @@ __all__ = [
     'PGDL2',
     'PNAPatchOut',
     'SINIFGSM',
+    'SSP',
+    'TGR',
     'TIFGSM',
     'VMIFGSM',
     'VNIFGSM',
