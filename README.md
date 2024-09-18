@@ -57,6 +57,7 @@ Gradient-based attacks:
 |     FIA      | $\ell_\infty$ | [Feature Importance-aware Transferable Adversarial Attacks](https://arxiv.org/abs/2107.14185)                                  | `torchattack.FIA`         |
 | PNA-PatchOut | $\ell_\infty$ | [Towards Transferable Adversarial Attacks on Vision Transformers](https://arxiv.org/abs/2109.04176)                            | `torchattack.PNAPatchOut` |
 |     TGR      | $\ell_\infty$ | [Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization](https://arxiv.org/abs/2303.15754) | `torchattack.TGR`         |
+|    DeCoWA    | $\ell_\infty$ | [Boosting Adversarial Transferability across Model Genus by Deformation-Constrained Warping](https://arxiv.org/abs/2402.03951) | `torchattack.DeCoWA`      |
 
 Others:
 
