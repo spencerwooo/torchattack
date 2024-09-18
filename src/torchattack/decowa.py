@@ -105,7 +105,7 @@ class DeCoWA(Attack):
 
                     loss.backward()
 
-                    if delta.grad is None:
+                    if noise_map_hat.grad is None:
                         continue
 
                     noise_map_hat.detach_()
@@ -123,11 +123,11 @@ class DeCoWA(Attack):
                 # Compute gradient
                 loss.backward()
 
-                if delta.grad is None:
-                    continue
-
                 # Accumulate gradient
                 g += delta.grad
+
+            if delta.grad is None:
+                continue
 
             # Average gradient over warping
             g /= self.num_warping
@@ -149,12 +149,15 @@ class DeCoWA(Attack):
         return x + delta
 
     def _vwt(self, x: torch.Tensor, noise_map: torch.Tensor) -> torch.Tensor:
-        n, c, w, h = x.size()
+        n, _, w, h = x.size()
+
         xx = self._grid_points_2d(self.mesh_width, self.mesh_height, self.device)
         yy = self._noisy_grid(self.mesh_width, self.mesh_height, noise_map, self.device)
+
         tpbs = TPS(size=(h, w), device=self.device)
         warped_grid_b = tpbs(xx[None, ...], yy[None, ...])
         warped_grid_b = warped_grid_b.repeat(n, 1, 1, 1)
+
         vwt_x = torch.grid_sampler_2d(
             input=x,
             grid=warped_grid_b,
@@ -162,6 +165,7 @@ class DeCoWA(Attack):
             padding_mode=0,
             align_corners=False,
         )
+
         return vwt_x
 
     def _grid_points_2d(
@@ -169,8 +173,10 @@ class DeCoWA(Attack):
     ) -> torch.Tensor:
         x = torch.linspace(-1, 1, width, device=device)
         y = torch.linspace(-1, 1, height, device=device)
+
         grid_x, grid_y = torch.meshgrid(x, y)
         grid = torch.stack((grid_y, grid_x), dim=-1)
+
         return grid.view(-1, 2)
 
     def _noisy_grid(
@@ -182,18 +188,18 @@ class DeCoWA(Attack):
         return grid + mod.reshape(-1, 2)
 
 
-def k_matrix(x, y):
+def k_matrix(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     eps = 1e-9
     d2 = torch.pow(x[:, :, None, :] - y[:, None, :, :], 2).sum(-1)
-    k = d2 * torch.log(d2 + eps)
-    return k
+    k_mat = d2 * torch.log(d2 + eps)
+    return k_mat
 
 
-def p_matrix(x):
+def p_matrix(x: torch.Tensor) -> torch.Tensor:
     n, k = x.shape[:2]
-    p = torch.ones(n, k, 3, device=x.device)
-    p[:, :, 1:] = x
-    return p
+    p_mat = torch.ones(n, k, 3, device=x.device)
+    p_mat[:, :, 1:] = x
+    return p_mat
 
 
 class TPSCoeffs(nn.Module):
