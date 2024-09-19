@@ -1,11 +1,23 @@
-# 🛡 torchattack
+<div align="center">
+  <div><img src="https://github.com/user-attachments/assets/6e94a09e-557e-4705-a80d-f1ca90a23421" alt="torchattack banner" width="640" /></div>
 
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![lint](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml/badge.svg)](https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daisylab-bit/torchattack)](https://github.com/daisylab-bit/torchattack/releases/latest)
+  <a href="https://github.com/astral-sh/ruff">
+    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json" alt="Ruff">
+  </a>
+  <a href="https://github.com/psf/black">
+    <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black">
+  </a>
+  <a href="https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml">
+    <img src="https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml/badge.svg" alt="lint">
+  </a>
+  <a href="https://github.com/daisylab-bit/torchattack/releases/latest">
+    <img src="https://img.shields.io/github/v/release/daisylab-bit/torchattack" alt="GitHub release (latest by date)">
+  </a>
+</div>
 
-A set of adversarial attacks in PyTorch.
+---
+
+🛡 **torchattack** - A set of adversarial attacks in PyTorch.
 
 ```shell
 # Install from github source
