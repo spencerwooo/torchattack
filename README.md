@@ -19,11 +19,15 @@
 
 🛡 **torchattack** - A set of adversarial attacks in PyTorch.
 
-```shell
-# Install from github source
-python -m pip install git+https://github.com/spencerwooo/torchattack
+<sub><b>Install from GitHub source -</b></sub>
 
-# Install from gitee mirror
+```shell
+python -m pip install git+https://github.com/spencerwooo/torchattack
+```
+
+<sub><b>Install from Gitee mirror -</b></sub>
+
+```shell
 python -m pip install git+https://gitee.com/spencerwoo/torchattack
 ```
 
