@@ -11,13 +11,14 @@ from torchattack.pgd import PGD
 from torchattack.pgdl2 import PGDL2
 from torchattack.pna_patchout import PNAPatchOut
 from torchattack.sinifgsm import SINIFGSM
+from torchattack.ssa import SSA
 from torchattack.ssp import SSP
 from torchattack.tgr import TGR
 from torchattack.tifgsm import TIFGSM
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
-__version__ = '0.7.0'
+__version__ = '0.8.0'
 
 __all__ = [
     'Admix',
@@ -33,6 +34,7 @@ __all__ = [
     'PGDL2',
     'PNAPatchOut',
     'SINIFGSM',
+    'SSA',
     'SSP',
     'TGR',
     'TIFGSM',

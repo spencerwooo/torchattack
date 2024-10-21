@@ -72,6 +72,7 @@ Gradient-based attacks:
 |    Admix     | $\ell_\infty$ | [Admix: Enhancing the Transferability of Adversarial Attacks](https://arxiv.org/abs/2102.00436)                                | `torchattack.Admix`       |
 |     FIA      | $\ell_\infty$ | [Feature Importance-aware Transferable Adversarial Attacks](https://arxiv.org/abs/2107.14185)                                  | `torchattack.FIA`         |
 | PNA-PatchOut | $\ell_\infty$ | [Towards Transferable Adversarial Attacks on Vision Transformers](https://arxiv.org/abs/2109.04176)                            | `torchattack.PNAPatchOut` |
+|     SSA      | $\ell_\infty$ | [Frequency Domain Model Augmentation for Adversarial Attack](https://arxiv.org/abs/2207.05382)                                 | `torchattack.SSA`         |
 |     TGR      | $\ell_\infty$ | [Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization](https://arxiv.org/abs/2303.15754) | `torchattack.TGR`         |
 |    DeCoWA    | $\ell_\infty$ | [Boosting Adversarial Transferability across Model Genus by Deformation-Constrained Warping](https://arxiv.org/abs/2402.03951) | `torchattack.DeCoWA`      |
 
