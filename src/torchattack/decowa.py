@@ -67,7 +67,7 @@ class DeCoWA(Attack):
         self.lossfn = nn.CrossEntropyLoss()
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        """Perform MI-FGSM on a batch of images.
+        """Perform DeCoWA on a batch of images.
 
         Args:
             x: A batch of images. Shape: (N, C, H, W).

@@ -81,7 +81,7 @@ class TGR(Attack):
         if self.alpha is None:
             self.alpha = self.eps / self.steps
 
-        # Perform MI-FGSM
+        # Perform TGR
         for _ in range(self.steps):
             # Compute loss
             outs = self.model(self.normalize(x + delta))
