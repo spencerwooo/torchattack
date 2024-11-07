@@ -78,7 +78,7 @@ class SSA(Attack):
         # Perform SSA
         for _ in range(self.steps):
             # Compute loss
-            outs = self.model(self.normalize(x + delta))
+            outs = self.model(self.transform(self.normalize(x + delta)))
             loss = self.lossfn(outs, y)
 
             if self.targeted:
