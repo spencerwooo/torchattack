@@ -159,7 +159,10 @@ class AttackModel:
             return cls(model_name, device, model, transform, normalize)
 
         except ValueError:
-            print('Model not found in torchvision.models, falling back to timm.')
+            print(
+                f'Warning: Model `{model_name}` not found in torchvision.models, '
+                'falling back to loading weights from timm.'
+            )
             return cls.from_pretrained(model_name, device, from_timm=True)
 
     def forward(self, x):
