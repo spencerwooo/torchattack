@@ -68,7 +68,6 @@ class SSA(Attack):
             The perturbed images if successful. Shape: (N, C, H, W).
         """
 
-        g = torch.zeros_like(x)
         delta = torch.zeros_like(x, requires_grad=True)
 
         # If alpha is not given, set to eps / steps
@@ -77,18 +76,30 @@ class SSA(Attack):
 
         # Perform SSA
         for _ in range(self.steps):
-            # Compute loss
-            outs = self.model(self.normalize(x + delta))
-            loss = self.lossfn(outs, y)
+            g = torch.zeros_like(x)
 
-            if self.targeted:
-                loss = -loss
+            for _ in range(self.num_spectrum):
+                # Frequency transformation (dct + idct)
+                x_adv = self.transform(x + delta)
 
-            # Compute gradient
-            loss.backward()
+                # Compute loss
+                outs = self.model(self.normalize(x_adv))
+                loss = self.lossfn(outs, y)
+
+                if self.targeted:
+                    loss = -loss
+
+                # Compute gradient
+                loss.backward()
+
+                # Accumulate gradient
+                g += delta.grad
 
             if delta.grad is None:
                 continue
+
+            # Average gradient over num_spectrum
+            g /= self.num_spectrum
 
             # Apply momentum term
             g = self.decay * g + delta.grad / torch.mean(
@@ -106,9 +117,11 @@ class SSA(Attack):
 
         return x + delta
 
-    def transform(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    def transform(self, x: torch.Tensor) -> torch.Tensor:
         b = x.shape[0]
-        gauss = torch.randn(b, 3, 224, 224) * self.eps  # must be a multiple of 8
+
+        # H and W must be a multiple of 8
+        gauss = torch.randn(b, 3, 224, 224, device=x.device) * self.eps
 
         x_dct = self._dct_2d(x + gauss)
         mask = torch.rand_like(x) * 2 * self.rho + 1 - self.rho
@@ -116,7 +129,7 @@ class SSA(Attack):
 
         return x_idct
 
-    def _dct(self, x, norm=None):
+    def _dct(self, x: torch.Tensor, norm: str | None = None) -> torch.Tensor:
         """
         Discrete Cosine Transform, Type II (a.k.a. the DCT)
         (This code is copied from https://github.com/yuyang-long/SSA/blob/master/dct.py)
