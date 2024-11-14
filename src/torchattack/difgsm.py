@@ -134,7 +134,7 @@ def input_diversity(
         The diversified batch of images. Shape: (N, C, H, W).
     """
 
-    if torch.rand(1) < diversity_prob:
+    if torch.rand(1) > diversity_prob:
         return x
 
     img_size = x.shape[-1]
