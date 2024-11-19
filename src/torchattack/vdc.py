@@ -71,25 +71,10 @@ class VDC(Attack):
         self.targeted = targeted
         self.lossfn = nn.CrossEntropyLoss()
 
-        self.record_grad = []
-        self.record_grad_mlp = []
-        ###############
-        self.attn_record = []
-        self.mlp_record = []
-        self.attn_add = []
-        self.mlp_add = []
-        self.norm_list = []
-        self.stage = []
-        self.attn_block = 0
-        self.mlp_block = 0
+        # Global hooks for VDC
         self.hooks = []
-        self.skip_record = []
-        self.skip_add = []
-        self.skip_block = 0
 
         assert self.sample_num_batches <= self.max_num_batches
-
-        # self._register_model_hooks()
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform VDC on a batch of images.
@@ -296,6 +281,7 @@ if __name__ == '__main__':
         attack_cfg={'model_name': 'vit_base_patch16_224'},
         model_name='vit_base_patch16_224',
         victim_model_names=['cait_s24_224', 'visformer_small'],
+        max_samples=12,
         batch_size=4,
-        from_timm=False,
+        from_timm=True,
     )
