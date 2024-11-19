@@ -12,7 +12,7 @@ dependencies = [
     "scipy>=1.10.1",
 ]
 dynamic = ["version"]
-optional-dependencies = { dev = ["mypy", "rich"] }
+optional-dependencies = { dev = ["mypy", "rich", "timm"] }
 
 [build-system]
 requires = ["setuptools"]

@@ -1,9 +1,8 @@
 # Dataset files
 datasets/
 
-# PDM files
-.pdm-python
-pdm.lock
+# Lockfiles
+uv.lock
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
