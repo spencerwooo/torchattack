@@ -304,7 +304,7 @@ class TGR(Attack):
         mlp_tgr_hook = partial(mlp_tgr, gamma=0.5)
 
         # fmt: off
-        _supported_vit_cfg = {
+        supported_vit_cfg = {
             'vit_base_patch16_224': [
                 (attn_tgr_hook, [f'blocks.{i}.attn.attn_drop' for i in range(12)]),
                 (v_tgr_hook, [f'blocks.{i}.attn.qkv' for i in range(12)]),
@@ -341,9 +341,9 @@ class TGR(Attack):
         }
         # fmt: on
 
-        assert self.model_name in _supported_vit_cfg
+        assert self.model_name in supported_vit_cfg
 
-        for hook_func, layers in _supported_vit_cfg[self.model_name]:
+        for hook_func, layers in supported_vit_cfg[self.model_name]:
             for layer in layers:
                 module = rgetattr(self.model, layer)
                 hook = module.register_backward_hook(hook_func)

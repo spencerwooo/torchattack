@@ -36,36 +36,6 @@ class PNAPatchOut(Attack):
         targeted: Targeted attack if True. Defaults to False.
     """
 
-    # fmt: off
-    _supported_vit_cfg = {
-        'vit_base_patch16_224': [
-            f'blocks.{i}.attn.attn_drop' for i in range(12)
-        ],
-        'deit_base_distilled_patch16_224': [
-            f'blocks.{i}.attn.attn_drop' for i in range(12)
-        ],
-        'pit_b_224': [
-            f'transformers.{tid}.blocks.{i}.attn.attn_drop'
-            for tid, bid in enumerate([3, 6, 4])
-            for i in range(bid)
-        ],
-        'cait_s24_224': [
-            # Regular blocks
-            f'blocks.{i}.attn.attn_drop' for i in range(24)
-        ] + [
-            # Token-only block
-            f'blocks_token_only.{i}.attn.attn_drop' for i in range(2)
-        ],
-        'visformer_small': [
-            # Stage 2 blocks
-            f'stage2.{i}.attn.attn_drop' for i in range(4)
-        ] + [
-            # Stage 3 blocks
-            f'stage3.{i}.attn.attn_drop' for i in range(4)
-        ],
-    }
-    # fmt: on
-
     def __init__(
         self,
         model: nn.Module | AttackModel,
@@ -184,10 +154,20 @@ class PNAPatchOut(Attack):
 
         drop_hook_func = partial(attn_drop_mask_grad, gamma=0)
 
-        assert self.model_name in self._supported_vit_cfg
+        # fmt: off
+        supported_vit_cfg = {
+            'vit_base_patch16_224': [f'blocks.{i}.attn.attn_drop' for i in range(12)],
+            'deit_base_distilled_patch16_224': [f'blocks.{i}.attn.attn_drop' for i in range(12)],
+            'pit_b_224': [f'transformers.{tid}.blocks.{i}.attn.attn_drop' for tid, bid in enumerate([3, 6, 4]) for i in range(bid)],
+            'cait_s24_224': [f'blocks.{i}.attn.attn_drop' for i in range(24)] + [f'blocks_token_only.{i}.attn.attn_drop' for i in range(2)],
+            'visformer_small': [f'stage2.{i}.attn.attn_drop' for i in range(4)] + [f'stage3.{i}.attn.attn_drop' for i in range(4)],
+        }
+        # fmt: on
 
-        # Register backward hook for layers specified in _supported_vit_cfg
-        for layer in self._supported_vit_cfg[self.model_name]:
+        assert self.model_name in supported_vit_cfg
+
+        # Register backward hook for layers specified in supported_vit_cfg
+        for layer in supported_vit_cfg[self.model_name]:
             module = rgetattr(self.model, layer)
             hook = module.register_backward_hook(drop_hook_func)
             self.hooks.append(hook)
