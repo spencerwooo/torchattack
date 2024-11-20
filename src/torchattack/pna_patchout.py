@@ -95,7 +95,9 @@ class PNAPatchOut(Attack):
         self.targeted = targeted
         self.lossfn = nn.CrossEntropyLoss()
 
+        # Register hooks
         if self.pna_skip:
+            self.hooks: list[torch.utils.hooks.RemovableHandle] = []
             self._register_vit_model_hook()
 
         # Set default image size and number of patches for PatchOut
@@ -143,6 +145,9 @@ class PNAPatchOut(Attack):
             delta.grad.detach_()
             delta.grad.zero_()
 
+            for hook in self.hooks:
+                hook.remove()
+
         return x + delta
 
     def _register_vit_model_hook(self):
@@ -162,7 +167,8 @@ class PNAPatchOut(Attack):
         # Register backward hook for layers specified in _supported_vit_cfg
         for layer in self._supported_vit_cfg[self.model_name]:
             module = rgetattr(self.model, layer)
-            module.register_backward_hook(drop_hook_func)
+            hook = module.register_backward_hook(drop_hook_func)
+            self.hooks.append(hook)
 
     def _apply_patch_out(self, delta: torch.Tensor, seed: int) -> torch.Tensor:
         delta_mask = torch.zeros_like(delta)
