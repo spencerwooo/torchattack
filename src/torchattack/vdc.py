@@ -200,7 +200,7 @@ class VDC(Attack):
             return (out_grad, grad_in[1], grad_in[2])
 
         def mlp_add_vit(module, grad_in, grad_out, gamma):
-            grad_record = grad_in[0].data.cpu().numpy()
+            # grad_record = grad_in[0].data.cpu().numpy()
             mask = torch.ones_like(grad_in[0]) * gamma
             # mask_0 = torch.zeros_like(grad_in[0])
             out_grad = mask * grad_in[0][:]
@@ -228,7 +228,7 @@ class VDC(Attack):
             return (out_grad,)
 
         def attn_add_vit(module, grad_in, grad_out, gamma):
-            grad_record = grad_in[0].data.cpu().numpy()
+            # grad_record = grad_in[0].data.cpu().numpy()
             # mask_0 = torch.zeros_like(grad_in[0])
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
@@ -239,15 +239,15 @@ class VDC(Attack):
 
         def norm_record_vit(module, grad_in, grad_out, gamma):
             grad_record = grad_in[0].data.cpu().numpy()
-            mask = torch.ones_like(grad_in[0]) * gamma
+            # mask = torch.ones_like(grad_in[0]) * gamma
             self.norm_list = grad_record
             return grad_in
 
         # pit
         def pool_record_pit(module, grad_in, grad_out, gamma):
             grad_add = grad_in[0].data
-            B, C, H, W = grad_add.shape
-            grad_add = grad_add.reshape((B, C, H * W)).transpose(1, 2)
+            b, c, h, w = grad_add.shape
+            grad_add = grad_add.reshape((b, c, h * w)).transpose(1, 2)
             self.stage.append(grad_add.cpu().numpy())
             return grad_in
 
@@ -300,7 +300,7 @@ class VDC(Attack):
             return (out_grad, grad_in[1], grad_in[2])
 
         def mlp_add_pit(module, grad_in, grad_out, gamma):
-            grad_record = grad_in[0].data.cpu().numpy()
+            # grad_record = grad_in[0].data.cpu().numpy()
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
             out_grad += torch.tensor(self.mlp_add[self.mlp_block]).cuda()
@@ -349,7 +349,7 @@ class VDC(Attack):
             return (out_grad,)
 
         def attn_add_pit(module, grad_in, grad_out, gamma):
-            grad_record = grad_in[0].data.cpu().numpy()
+            # grad_record = grad_in[0].data.cpu().numpy()
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
             out_grad += torch.tensor(self.attn_add[self.attn_block]).cuda()
@@ -358,7 +358,7 @@ class VDC(Attack):
 
         def norm_record_pit(module, grad_in, grad_out, gamma):
             grad_record = grad_in[0].data.cpu().numpy()
-            mask = torch.ones_like(grad_in[0]) * gamma
+            # mask = torch.ones_like(grad_in[0]) * gamma
             self.norm_list = grad_record
             return grad_in
 
@@ -406,7 +406,7 @@ class VDC(Attack):
             return (out_grad, grad_in[1], grad_in[2])
 
         def mlp_add_vis(module, grad_in, grad_out, gamma):
-            grad_record = grad_in[0].data.cpu().numpy()
+            # grad_record = grad_in[0].data.cpu().numpy()
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
             out_grad += torch.tensor(self.mlp_add[self.mlp_block]).cuda()
@@ -415,7 +415,7 @@ class VDC(Attack):
 
         def norm_record_vis(module, grad_in, grad_out, gamma):
             grad_record = grad_in[0].data.cpu().numpy()
-            mask = torch.ones_like(grad_in[0]) * gamma
+            # mask = torch.ones_like(grad_in[0]) * gamma
             self.norm_list = grad_record
             return grad_in
 
@@ -449,21 +449,20 @@ class VDC(Attack):
             return (out_grad,)
 
         def attn_add_vis(module, grad_in, grad_out, gamma):
-            grad_record = grad_in[0].data.cpu().numpy()
+            # grad_record = grad_in[0].data.cpu().numpy()
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
             out_grad += torch.tensor(self.attn_add[self.attn_block]).cuda()
             self.attn_block += 1
             return (out_grad,)
 
-        ###########
         # vit
         mlp_record_func_vit = partial(mlp_record_vit_stage, gamma=1.0)
         norm_record_func_vit = partial(norm_record_vit, gamma=1.0)
         mlp_add_func_vit = partial(mlp_add_vit, gamma=0.5)
         attn_record_func_vit = partial(attn_record_vit_stage, gamma=1.0)
         attn_add_func_vit = partial(attn_add_vit, gamma=0.25)
-        ###########
+
         # pit
         attn_record_func_pit = partial(attn_record_pit_stage, gamma=1.0)
         mlp_record_func_pit = partial(mlp_record_pit_stage, gamma=1.0)
@@ -473,7 +472,6 @@ class VDC(Attack):
         mlp_add_func_pit = partial(mlp_add_pit, gamma=0.5)
         # mlp_add_func_pit = partial(mlp_add_pit, gamma=0.75)
 
-        ###########
         # visformer
         attn_record_func_vis = partial(attn_record_vis_stage, gamma=1.0)
         mlp_record_func_vis = partial(mlp_record_vis_stage, gamma=1.0)
@@ -524,13 +522,11 @@ class VDC(Attack):
                         .norm2.register_backward_hook(mlp_record_func_pit)
                     )
                     self.hooks.append(hook)
-                # TODO: module `pool` is non-existent in pit_b_224, causing the
-                # following hook register to fail.
-                hook = self.model.transformers[0].pool.register_backward_hook(
+                hook = self.model.transformers[1].pool.register_backward_hook(
                     pool_record_func_pit
                 )
                 self.hooks.append(hook)
-                hook = self.model.transformers[1].pool.register_backward_hook(
+                hook = self.model.transformers[2].pool.register_backward_hook(
                     pool_record_func_pit
                 )
                 self.hooks.append(hook)
@@ -633,10 +629,8 @@ if __name__ == '__main__':
 
     run_attack(
         VDC,
-        attack_cfg={'model_name': 'vit_base_patch16_224'},
-        model_name='vit_base_patch16_224',
+        attack_cfg={'model_name': 'pit_b_224'},
+        model_name='pit_b_224',
         victim_model_names=['cait_s24_224', 'visformer_small'],
-        max_samples=12,
-        batch_size=4,
         from_timm=True,
     )
