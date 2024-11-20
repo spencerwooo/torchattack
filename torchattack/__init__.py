@@ -19,7 +19,7 @@ from torchattack.vdc import VDC
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
-__version__ = '0.8.0'
+__version__ = '1.0.0'
 
 __all__ = [
     'Admix',

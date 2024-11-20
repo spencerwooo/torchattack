@@ -111,7 +111,6 @@ class GeoDA(Attack):
         clip_max: float = 1.0,
     ):
         super().__init__(model, normalize, device)
-        self.model = model
 
         self.epsilon = epsilon
         self.p = p

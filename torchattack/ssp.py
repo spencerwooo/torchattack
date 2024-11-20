@@ -62,7 +62,6 @@ class SSP(Attack):
     ) -> None:
         super().__init__(model, normalize, device)
 
-        self.model = model
         self.eps = eps
         self.steps = steps
         self.alpha = alpha

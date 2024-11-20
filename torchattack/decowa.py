@@ -52,7 +52,6 @@ class DeCoWA(Attack):
     ):
         super().__init__(model, normalize, device)
 
-        self.model = model
         self.eps = eps
         self.steps = steps
         self.alpha = alpha

@@ -41,7 +41,6 @@ class PGD(Attack):
     ) -> None:
         super().__init__(model, normalize, device)
 
-        self.model = model
         self.eps = eps
         self.alpha = alpha
         self.steps = steps

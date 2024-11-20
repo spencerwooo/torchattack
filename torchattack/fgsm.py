@@ -35,7 +35,6 @@ class FGSM(Attack):
     ) -> None:
         super().__init__(model, normalize, device)
 
-        self.model = model
         self.eps = eps
         self.clip_min = clip_min
         self.clip_max = clip_max

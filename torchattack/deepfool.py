@@ -37,7 +37,6 @@ class DeepFool(Attack):
     ) -> None:
         super().__init__(model, normalize, device)
 
-        self.model = model
         self.steps = steps
         self.overshoot = overshoot
         self.num_classes = num_classes
