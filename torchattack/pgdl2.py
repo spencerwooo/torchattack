@@ -3,6 +3,7 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
+from torchattack.attack_model import AttackModel
 from torchattack.base import Attack
 
 EPS_FOR_DIVISION = 1e-12
@@ -29,7 +30,7 @@ class PGDL2(Attack):
 
     def __init__(
         self,
-        model: nn.Module,
+        model: nn.Module | AttackModel,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         device: torch.device | None = None,
         eps: float = 1.0,
@@ -40,7 +41,7 @@ class PGDL2(Attack):
         clip_max: float = 1.0,
         targeted: bool = False,
     ) -> None:
-        super().__init__(normalize, device)
+        super().__init__(model, normalize, device)
 
         self.model = model
         self.eps = eps

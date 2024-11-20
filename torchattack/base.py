@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 from typing import Any, Callable
 
 import torch
+import torch.nn as nn
+
+from torchattack.attack_model import AttackModel
 
 
 class Attack(ABC):
@@ -9,10 +12,14 @@ class Attack(ABC):
 
     def __init__(
         self,
+        model: nn.Module | AttackModel,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         device: torch.device | None,
     ) -> None:
         super().__init__()
+
+        # If model is an AttackModel, use the model attribute
+        self.model = model.model if isinstance(model, AttackModel) else model
 
         # Set device to given or defaults to cuda if available
         is_cuda = torch.cuda.is_available()

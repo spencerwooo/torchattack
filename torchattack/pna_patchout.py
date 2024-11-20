@@ -1,4 +1,3 @@
-import importlib.util
 from functools import partial
 from typing import Callable
 
@@ -6,6 +5,7 @@ import torch
 import torch.nn as nn
 
 from torchattack._rgetattr import rgetattr
+from torchattack.attack_model import AttackModel
 from torchattack.base import Attack
 
 
@@ -17,9 +17,14 @@ class PNAPatchOut(Attack):
 
     Args:
         model: The model to attack.
-        model_name: The name of the model.
         normalize: A transform to normalize images.
         device: Device to use for tensors. Defaults to cuda if available.
+        model_name: The name of the model. Supported models are:
+            * 'vit_base_patch16_224'
+            * 'deit_base_distilled_patch16_224'
+            * 'pit_b_224'
+            * 'cait_s24_224'
+            * 'visformer_small'
         eps: The maximum perturbation. Defaults to 8/255.
         steps: Number of steps. Defaults to 10.
         alpha: Step size, `eps / steps` if None. Defaults to None.
@@ -63,10 +68,10 @@ class PNAPatchOut(Attack):
 
     def __init__(
         self,
-        model: nn.Module,
-        model_name: str,
+        model: nn.Module | AttackModel,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         device: torch.device | None = None,
+        model_name: str = '',
         eps: float = 8 / 255,
         steps: int = 10,
         alpha: float | None = None,
@@ -77,13 +82,20 @@ class PNAPatchOut(Attack):
         clip_max: float = 1.0,
         targeted: bool = False,
     ):
-        # Check if timm is installed
-        importlib.util.find_spec('timm')
+        # Surrogate ViT for VDC must be `timm` models or models that have the same
+        # structure and same implementation/definition as `timm` models.
+        super().__init__(model, normalize, device)
 
-        super().__init__(normalize, device)
+        if model_name:
+            # Explicit model_name takes precedence over model.model_name
+            self.model_name = model_name
+        elif hasattr(model, 'model_name'):
+            # If model is initialized via `torchattack.eval.AttackModel`, the model_name
+            # is automatically attached to the model during instantiation.
+            self.model_name = model.model_name
+        else:
+            raise ValueError('`model_name` must be explicitly provided.')
 
-        self.model = model
-        self.model_name = model_name
         self.eps = eps
         self.steps = steps
         self.alpha = alpha
@@ -110,6 +122,16 @@ class PNAPatchOut(Attack):
             self.sample_num_patches = self.max_num_patches
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Perform PNA-PatchOut on a batch of images.
+
+        Args:
+            x: A batch of images. Shape: (N, C, H, W).
+            y: A batch of labels. Shape: (N).
+
+        Returns:
+            The perturbed images if successful. Shape: (N, C, H, W).
+        """
+
         g = torch.zeros_like(x)
         delta = torch.zeros_like(x, requires_grad=True)
 
@@ -196,7 +218,6 @@ if __name__ == '__main__':
 
     run_attack(
         PNAPatchOut,
-        attack_cfg={'model_name': 'vit_base_patch16_224'},
         model_name='vit_base_patch16_224',
         from_timm=True,
     )

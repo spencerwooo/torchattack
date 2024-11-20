@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from torchattack.attack_model import AttackModel
 from torchattack.base import Attack
 
 with suppress(ImportError):
@@ -94,7 +95,7 @@ class GeoDA(Attack):
 
     def __init__(
         self,
-        model: nn.Module,
+        model: nn.Module | AttackModel,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         device: torch.device | None = None,
         input_shape: tuple = (3, 224, 224),
@@ -109,7 +110,7 @@ class GeoDA(Attack):
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ):
-        super().__init__(normalize, device)
+        super().__init__(model, normalize, device)
         self.model = model
 
         self.epsilon = epsilon

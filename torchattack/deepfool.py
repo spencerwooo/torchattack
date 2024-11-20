@@ -3,6 +3,7 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
+from torchattack.attack_model import AttackModel
 from torchattack.base import Attack
 
 
@@ -25,7 +26,7 @@ class DeepFool(Attack):
 
     def __init__(
         self,
-        model: nn.Module,
+        model: nn.Module | AttackModel,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None,
         device: torch.device | None = None,
         steps: int = 100,
@@ -34,7 +35,7 @@ class DeepFool(Attack):
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
-        super().__init__(normalize, device)
+        super().__init__(model, normalize, device)
 
         self.model = model
         self.steps = steps
