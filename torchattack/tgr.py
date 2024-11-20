@@ -357,7 +357,5 @@ if __name__ == '__main__':
         TGR,
         model_name='vit_base_patch16_224',
         victim_model_names=['cait_s24_224', 'visformer_small'],
-        max_samples=24,
-        batch_size=4,
         from_timm=True,
     )
