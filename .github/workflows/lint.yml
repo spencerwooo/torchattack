@@ -39,4 +39,4 @@ jobs:
 
       - name: Mypy
         run: |
-          mypy src/
+          mypy torchattack

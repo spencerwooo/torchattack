@@ -57,33 +57,33 @@ Check out [`torchattack.eval.run_attack`](src/torchattack/eval.py) for a simple 
 
 Gradient-based attacks:
 
-|     Name     |   $\ell_p$    | Paper                                                                                                                                                    | `torchattack` class       |
-| :----------: | :-----------: | :------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------ |
-|     FGSM     | $\ell_\infty$ | [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572)                                                                        | `torchattack.FGSM`        |
-|     PGD      | $\ell_\infty$ | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                                                        | `torchattack.PGD`         |
-|   PGD (L2)   |   $\ell_2$    | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                                                        | `torchattack.PGDL2`       |
-|   MI-FGSM    | $\ell_\infty$ | [Boosting Adversarial Attacks with Momentum](https://arxiv.org/abs/1710.06081)                                                                           | `torchattack.MIFGSM`      |
-|   DI-FGSM    | $\ell_\infty$ | [Improving Transferability of Adversarial Examples with Input Diversity](https://arxiv.org/abs/1803.06978)                                               | `torchattack.DIFGSM`      |
-|   TI-FGSM    | $\ell_\infty$ | [Evading Defenses to Transferable Adversarial Examples by Translation-Invariant Attacks](https://arxiv.org/abs/1904.02884)                               | `torchattack.TIFGSM`      |
-|   NI-FGSM    | $\ell_\infty$ | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                                           | `torchattack.NIFGSM`      |
-|  SI-NI-FGSM  | $\ell_\infty$ | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                                           | `torchattack.SINIFGSM`    |
-|   VMI-FGSM   | $\ell_\infty$ | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)                                         | `torchattack.VMIFGSM`     |
-|   VNI-FGSM   | $\ell_\infty$ | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)                                         | `torchattack.VNIFGSM`     |
-|    Admix     | $\ell_\infty$ | [Admix: Enhancing the Transferability of Adversarial Attacks](https://arxiv.org/abs/2102.00436)                                                          | `torchattack.Admix`       |
-|     FIA      | $\ell_\infty$ | [Feature Importance-aware Transferable Adversarial Attacks](https://arxiv.org/abs/2107.14185)                                                            | `torchattack.FIA`         |
-| PNA-PatchOut | $\ell_\infty$ | [Towards Transferable Adversarial Attacks on Vision Transformers](https://arxiv.org/abs/2109.04176)                                                      | `torchattack.PNAPatchOut` |
-|     SSA      | $\ell_\infty$ | [Frequency Domain Model Augmentation for Adversarial Attack](https://arxiv.org/abs/2207.05382)                                                           | `torchattack.SSA`         |
-|     TGR      | $\ell_\infty$ | [Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization](https://arxiv.org/abs/2303.15754)                           | `torchattack.TGR`         |
-|    DeCoWA    | $\ell_\infty$ | [Boosting Adversarial Transferability across Model Genus by Deformation-Constrained Warping](https://arxiv.org/abs/2402.03951)                           | `torchattack.DeCoWA`      |
-|     VDC      | $\ell_\infty$ | [Improving the Adversarial Transferability of Vision Transformers with Virtual Dense Connection](https://ojs.aaai.org/index.php/AAAI/article/view/28541) | `torchattack.VDC`         |
+|     Name     |   $\ell_p$    | Publication | Paper (Open Access)                                                                                                                                      | Class Name    |
+| :----------: | :-----------: | :---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+|     FGSM     | $\ell_\infty$ | ICLR 2015   | [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572)                                                                        | `FGSM`        |
+|     PGD      | $\ell_\infty$ | ICLR 2018   | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                                                        | `PGD`         |
+|   PGD (L2)   |   $\ell_2$    | ICLR 2018   | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                                                        | `PGDL2`       |
+|   MI-FGSM    | $\ell_\infty$ | CVPR 2018   | [Boosting Adversarial Attacks with Momentum](https://arxiv.org/abs/1710.06081)                                                                           | `MIFGSM`      |
+|   DI-FGSM    | $\ell_\infty$ | CVPR 2019   | [Improving Transferability of Adversarial Examples with Input Diversity](https://arxiv.org/abs/1803.06978)                                               | `DIFGSM`      |
+|   TI-FGSM    | $\ell_\infty$ | CVPR 2019   | [Evading Defenses to Transferable Adversarial Examples by Translation-Invariant Attacks](https://arxiv.org/abs/1904.02884)                               | `TIFGSM`      |
+|   NI-FGSM    | $\ell_\infty$ | ICLR 2020   | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                                           | `NIFGSM`      |
+|  SI-NI-FGSM  | $\ell_\infty$ | ICLR 2020   | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                                           | `SINIFGSM`    |
+|   VMI-FGSM   | $\ell_\infty$ | CVPR 2021   | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)                                         | `VMIFGSM`     |
+|   VNI-FGSM   | $\ell_\infty$ | CVPR 2021   | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)                                         | `VNIFGSM`     |
+|    Admix     | $\ell_\infty$ | ICCV 2021   | [Admix: Enhancing the Transferability of Adversarial Attacks](https://arxiv.org/abs/2102.00436)                                                          | `Admix`       |
+|     FIA      | $\ell_\infty$ | ICCV 2021   | [Feature Importance-aware Transferable Adversarial Attacks](https://arxiv.org/abs/2107.14185)                                                            | `FIA`         |
+| PNA-PatchOut | $\ell_\infty$ | AAAI 2022   | [Towards Transferable Adversarial Attacks on Vision Transformers](https://arxiv.org/abs/2109.04176)                                                      | `PNAPatchOut` |
+|     SSA      | $\ell_\infty$ | ECCV 2022   | [Frequency Domain Model Augmentation for Adversarial Attack](https://arxiv.org/abs/2207.05382)                                                           | `SSA`         |
+|     TGR      | $\ell_\infty$ | CVPR 2023   | [Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization](https://arxiv.org/abs/2303.15754)                           | `TGR`         |
+|    DeCoWA    | $\ell_\infty$ | AAAI 2024   | [Boosting Adversarial Transferability across Model Genus by Deformation-Constrained Warping](https://arxiv.org/abs/2402.03951)                           | `DeCoWA`      |
+|     VDC      | $\ell_\infty$ | AAAI 2024   | [Improving the Adversarial Transferability of Vision Transformers with Virtual Dense Connection](https://ojs.aaai.org/index.php/AAAI/article/view/28541) | `VDC`         |
 
 Others:
 
-|   Name   |        $\ell_p$         | Paper                                                                                                   | `torchattack` class    |
-| :------: | :---------------------: | :------------------------------------------------------------------------------------------------------ | :--------------------- |
-| DeepFool |        $\ell_2$         | [DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks](https://arxiv.org/abs/1511.04599) | `torchattack.DeepFool` |
-|  GeoDA   | $\ell_\infty$, $\ell_2$ | [GeoDA: A Geometric Framework for Black-box Adversarial Attacks](https://arxiv.org/abs/2003.06468)      | `torchattack.GeoDA`    |
-|   SSP    |      $\ell_\infty$      | [A Self-supervised Approach for Adversarial Robustness](https://arxiv.org/abs/2006.04924)               | `torchattack.SSP`      |
+|   Name   |        $\ell_p$         | Publication | Paper (Open Access)                                                                                     | Class Name |
+| :------: | :---------------------: | :---------- | ------------------------------------------------------------------------------------------------------- | ---------- |
+| DeepFool |        $\ell_2$         | CVPR 2016   | [DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks](https://arxiv.org/abs/1511.04599) | `DeepFool` |
+|  GeoDA   | $\ell_\infty$, $\ell_2$ | CVPR 2020   | [GeoDA: A Geometric Framework for Black-box Adversarial Attacks](https://arxiv.org/abs/2003.06468)      | `GeoDA`    |
+|   SSP    |      $\ell_\infty$      | CVPR 2020   | [A Self-supervised Approach for Adversarial Robustness](https://arxiv.org/abs/2006.04924)               | `SSP`      |
 
 ## Development
 
@@ -94,7 +94,7 @@ source .venv/bin/activate
 
 # Install deps with dev extras
 python -m pip install -r requirements.txt
-python -m pip install -e '.[dev]'
+python -m pip install -e ".[dev]"
 ```
 
 ## License
