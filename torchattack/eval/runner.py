@@ -3,43 +3,7 @@ from typing import Any
 import torch
 
 from torchattack.attack_model import AttackModel
-
-
-class FoolingRateMetric:
-    """Fooling rate metric tracker."""
-
-    def __init__(self) -> None:
-        self.total_count = torch.tensor(0)
-        self.clean_count = torch.tensor(0)
-        self.adv_count = torch.tensor(0)
-
-    def update(
-        self, labels: torch.Tensor, clean_logits: torch.Tensor, adv_logits: torch.Tensor
-    ) -> None:
-        """Update metric tracker during attack progress.
-
-        Args:
-            labels: Ground truth labels.
-            clean_logits: Prediction logits for clean samples.
-            adv_logits: Prediction logits for adversarial samples.
-        """
-
-        self.total_count += labels.numel()
-        self.clean_count += (clean_logits.argmax(dim=1) == labels).sum().item()
-        self.adv_count += (adv_logits.argmax(dim=1) == labels).sum().item()
-
-    def compute(self) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """Compute the fooling rate and related metrics.
-
-        Returns:
-            A tuple of torch.Tensors containing the clean accuracy, adversarial
-            accuracy, and fooling rate computed, respectively.
-        """
-        return (
-            self.clean_count / self.total_count,
-            self.adv_count / self.total_count,
-            (self.clean_count - self.adv_count) / self.clean_count,
-        )
+from torchattack.eval.metric import FoolingRateMetric
 
 
 def run_attack(
@@ -47,6 +11,7 @@ def run_attack(
     attack_cfg: dict | None = None,
     model_name: str = 'resnet50',
     victim_model_names: list[str] | None = None,
+    dataset_root: str = 'datasets/nips2017',
     max_samples: int = 100,
     batch_size: int = 16,
     from_timm: bool = False,
@@ -63,16 +28,16 @@ def run_attack(
         attack_cfg: A dict of keyword arguments passed to the attack class.
         model_name: The surrogate model to attack. Defaults to "resnet50".
         victim_model_names: A list of the victim black-box models to attack. Defaults to None.
+        dataset_root: Root directory of the dataset. Defaults to "datasets/nips2017".
         max_samples: Max number of samples to attack. Defaults to 100.
         batch_size: Batch size for the dataloader. Defaults to 16.
         from_timm: Use timm to load the model. Defaults to True.
     """
 
-    import torchvision as tv
     from rich import print
     from rich.progress import track
 
-    from torchattack.dataset import NIPSLoader
+    from torchattack.eval.dataset import NIPSLoader
 
     if attack_cfg is None:
         attack_cfg = {}
@@ -84,7 +49,7 @@ def run_attack(
 
     # Set up dataloader
     dataloader = NIPSLoader(
-        root='datasets/nips2017',
+        root=dataset_root,
         batch_size=batch_size,
         transform=transform,
         max_samples=max_samples,
@@ -93,15 +58,7 @@ def run_attack(
 
     # Set up attack and trackers
     frm = FoolingRateMetric()
-    attacker = attack(
-        # Pass the original PyTorch model instead of the wrapped one if the attack
-        # requires access to the model's intermediate layers or other attributes that
-        # are not exposed by the AttackModel wrapper.
-        model=model,
-        normalize=normalize,
-        device=device,
-        **attack_cfg,
-    )
+    attacker = attack(model=model, normalize=normalize, device=device, **attack_cfg)
     print(attacker)
 
     # Setup victim models if provided
@@ -124,11 +81,13 @@ def run_attack(
         adv_outs = model(normalize(advs))
         frm.update(y, cln_outs, adv_outs)
 
-        # Save first batch of adversarial examples
-        if i == 0:
-            saved_imgs = advs.detach().cpu().mul(255).to(torch.uint8)
-            img_grid = tv.utils.make_grid(saved_imgs, nrow=4)
-            tv.io.write_png(img_grid, 'adv_batch_0.png')
+        # *Save first batch of adversarial examples
+        # if i == 0:
+        #     import torchvision as tv
+
+        #     saved_imgs = advs.detach().cpu().mul(255).to(torch.uint8)
+        #     img_grid = tv.utils.make_grid(saved_imgs, nrow=4)
+        #     tv.io.write_png(img_grid, 'adv_batch_0.png')
 
         # Track transfer fooling rates if victim models are provided
         if victim_model_names:

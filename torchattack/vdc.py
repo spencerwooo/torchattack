@@ -711,5 +711,7 @@ if __name__ == '__main__':
         VDC,
         model_name='pit_b_224',
         victim_model_names=['cait_s24_224', 'visformer_small'],
+        max_samples=24,
+        batch_size=4,
         from_timm=True,
     )
