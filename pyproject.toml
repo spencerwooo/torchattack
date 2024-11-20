@@ -21,6 +21,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.dynamic]
 version = { attr = "torchattack.__version__" }
 
+[tool.setuptools.packages.find]
+include = ["torchattack"]
+
 [tool.ruff]
 line-length = 88
 
@@ -29,7 +32,6 @@ select = ["E", "F", "I", "N", "B", "SIM"]
 ignore = ["E501", "B905"]
 
 [tool.ruff.format]
-# Use single quotes rather than double quotes.
 quote-style = "single"
 
 [tool.mypy]
