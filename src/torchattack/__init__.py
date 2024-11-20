@@ -15,6 +15,7 @@ from torchattack.ssa import SSA
 from torchattack.ssp import SSP
 from torchattack.tgr import TGR
 from torchattack.tifgsm import TIFGSM
+from torchattack.vdc import VDC
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
@@ -38,6 +39,7 @@ __all__ = [
     'SSP',
     'TGR',
     'TIFGSM',
+    'VDC',
     'VMIFGSM',
     'VNIFGSM',
 ]

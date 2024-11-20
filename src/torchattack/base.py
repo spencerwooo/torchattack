@@ -30,7 +30,7 @@ class Attack(ABC):
         def repr_map(k, v):
             if isinstance(v, float):
                 return f'{k}={v:.3f}'
-            if k in ['model', 'normalize', 'feature_layer']:
+            if k in ['model', 'normalize', 'feature_layer', 'hooks']:
                 return f'{k}={v.__class__.__name__}'
             if isinstance(v, torch.Tensor):
                 return f'{k}={v.shape}'
