@@ -70,7 +70,7 @@ def run_attack(
         victim_frms = [FoolingRateMetric() for _ in victim_model_names]
 
     # Run attack over the dataset (100 images by default)
-    for i, (x, y, _) in enumerate(dataloader):
+    for _i, (x, y, _) in enumerate(dataloader):
         x, y = x.to(device), y.to(device)
 
         # Adversarial images are created here
@@ -82,7 +82,7 @@ def run_attack(
         frm.update(y, cln_outs, adv_outs)
 
         # *Save first batch of adversarial examples
-        # if i == 0:
+        # if _i == 0:
         #     import torchvision as tv
 
         #     saved_imgs = advs.detach().cpu().mul(255).to(torch.uint8)
