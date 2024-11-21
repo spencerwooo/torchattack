@@ -2,6 +2,7 @@ from typing import Callable, Self
 
 import torch
 import torch.nn as nn
+from PIL import Image
 
 
 class AttackModel:
@@ -42,8 +43,8 @@ class AttackModel:
         model_name: str,
         device: torch.device,
         model: nn.Module,
-        transform: Callable,
-        normalize: Callable,
+        transform: Callable[[Image.Image | torch.Tensor], torch.Tensor],
+        normalize: Callable[[torch.Tensor], torch.Tensor],
     ) -> None:
         self.model_name = model_name
         self.device = device

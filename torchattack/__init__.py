@@ -1,5 +1,6 @@
 from torchattack.admix import Admix
 from torchattack.attack_model import AttackModel
+from torchattack.create_attack import create_attack
 from torchattack.decowa import DeCoWA
 from torchattack.deepfool import DeepFool
 from torchattack.difgsm import DIFGSM
@@ -23,6 +24,8 @@ from torchattack.vnifgsm import VNIFGSM
 __version__ = '1.0.0'
 
 __all__ = [
+    # Helper function to create an attack by its name
+    'create_attack',
     # Optional but recommended model wrapper
     'AttackModel',
     # All supported attacks
