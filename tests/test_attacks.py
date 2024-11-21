@@ -52,11 +52,13 @@ def run_attack_test(attack_cls, device, model, x, y):
         VNIFGSM,
         Admix,
         DeCoWA,
+        DeepFool,
+        GeoDA,
     ],
 )
-def test_cnn_attacks(attack_cls, device, prepare_cnn_and_data):
-    model, (x, y) = prepare_cnn_and_data
-    run_attack_test(attack_cls, device, model, x, y)
+def test_cnn_attacks(attack_cls, device, resnet50_model, data):
+    x, y = data(resnet50_model.transform)
+    run_attack_test(attack_cls, device, resnet50_model, x, y)
 
 
 @pytest.mark.parametrize(
@@ -67,12 +69,6 @@ def test_cnn_attacks(attack_cls, device, prepare_cnn_and_data):
         PNAPatchOut,
     ],
 )
-def test_vit_attacks(attack_cls, device, prepare_vit_and_data):
-    model, (x, y) = prepare_vit_and_data
-    run_attack_test(attack_cls, device, model, x, y)
-
-
-@pytest.mark.parametrize('attack_cls', [DeepFool, GeoDA])
-def test_non_gradient_attacks(attack_cls, device, prepare_cnn_and_data):
-    model, (x, y) = prepare_cnn_and_data
-    run_attack_test(attack_cls, device, model, x, y)
+def test_vit_attacks(attack_cls, device, vitb16_model, data):
+    x, y = data(vitb16_model.transform)
+    run_attack_test(attack_cls, device, vitb16_model, x, y)

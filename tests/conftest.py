@@ -1,4 +1,5 @@
 import os
+from typing import Callable
 
 import pytest
 import torch
@@ -7,36 +8,35 @@ from PIL import Image
 from torchattack.attack_model import AttackModel
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def device() -> torch.device:
     return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-@pytest.fixture(scope='session')
-def image() -> Image.Image:
-    image_path = os.path.join(os.path.dirname(__file__), 'image.png')
-    return Image.open(image_path).convert('RGB')
+@pytest.fixture()
+def data() -> (
+    Callable[
+        [Callable[[Image.Image | torch.Tensor], torch.Tensor]],
+        tuple[torch.Tensor, torch.Tensor],
+    ]
+):
+    def _open_and_transform_image(
+        transform: Callable[[Image.Image | torch.Tensor], torch.Tensor],
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        image_path = os.path.join(os.path.dirname(__file__), 'image.png')
+        image = Image.open(image_path).convert('RGB')
+        x = transform(image).unsqueeze(0)
+        y = torch.tensor([665])
+        return x, y
+
+    return _open_and_transform_image
 
 
 @pytest.fixture()
-def prepare_cnn_and_data(
-    device, image
-) -> tuple[AttackModel, tuple[torch.Tensor, torch.Tensor]]:
-    model = AttackModel.from_pretrained('resnet50', device)
-
-    x = model.transform(image).unsqueeze(0)
-    y = torch.tensor([665])
-
-    return model, (x, y)
+def resnet50_model(device: torch.device) -> AttackModel:
+    return AttackModel.from_pretrained('resnet50', device)
 
 
 @pytest.fixture()
-def prepare_vit_and_data(
-    device, image
-) -> tuple[AttackModel, tuple[torch.Tensor, torch.Tensor]]:
-    model = AttackModel.from_pretrained('vit_base_patch16_224', device, from_timm=True)
-
-    x = model.transform(image).unsqueeze(0)
-    y = torch.tensor([665])
-
-    return model, (x, y)
+def vitb16_model(device: torch.device) -> AttackModel:
+    return AttackModel.from_pretrained('vit_base_patch16_224', device, from_timm=True)
