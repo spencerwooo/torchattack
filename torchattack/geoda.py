@@ -7,8 +7,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from torchattack._attack import Attack
 from torchattack.attack_model import AttackModel
-from torchattack.base import Attack
 
 with suppress(ImportError):
     from rich import print
