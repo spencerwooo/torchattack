@@ -27,7 +27,7 @@ class DeepFool(Attack):
     def __init__(
         self,
         model: nn.Module | AttackModel,
-        normalize: Callable[[torch.Tensor], torch.Tensor] | None,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
         device: torch.device | None = None,
         steps: int = 100,
         overshoot: float = 0.02,

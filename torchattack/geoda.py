@@ -96,7 +96,7 @@ class GeoDA(Attack):
     def __init__(
         self,
         model: nn.Module | AttackModel,
-        normalize: Callable[[torch.Tensor], torch.Tensor] | None,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
         device: torch.device | None = None,
         input_shape: tuple = (3, 224, 224),
         epsilon: int = 5,

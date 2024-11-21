@@ -28,6 +28,10 @@ class Attack(ABC):
         # If normalize is None, use identity function
         self.normalize = normalize if normalize else lambda x: x
 
+    @abstractmethod
+    def forward(self, *args: Any, **kwds: Any):
+        pass
+
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         return self.forward(*args, **kwds)
 
@@ -46,6 +50,30 @@ class Attack(ABC):
         args = ', '.join(repr_map(k, v) for k, v in self.__dict__.items())
         return f'{name}({args})'
 
-    @abstractmethod
-    def forward(self, *args: Any, **kwds: Any):
-        pass
+    def __eq__(self, other):
+        if not isinstance(other, Attack):
+            return False
+
+        eq_name_attrs = [
+            'model',
+            'normalize',
+            'lossfn',
+            'feature_layer',  # FIA
+            'hooks',  # PNAPatchOut, TGR, VDC
+            'perceptual_criteria',  # SSP
+            'sub_basis',  # GeoDA
+        ]
+        for attr in eq_name_attrs:
+            if not (hasattr(self, attr) and hasattr(other, attr)):
+                continue
+            if (
+                getattr(self, attr).__class__.__name__
+                != getattr(other, attr).__class__.__name__
+            ):
+                return False
+
+        return all(
+            getattr(self, attr) == getattr(other, attr)
+            for attr in self.__dict__
+            if attr not in eq_name_attrs
+        )
