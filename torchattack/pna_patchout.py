@@ -4,9 +4,9 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
+from torchattack._attack import Attack
 from torchattack._rgetattr import rgetattr
 from torchattack.attack_model import AttackModel
-from torchattack.base import Attack
 
 
 class PNAPatchOut(Attack):

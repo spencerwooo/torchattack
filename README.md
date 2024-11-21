@@ -35,8 +35,8 @@ python -m pip install git+https://gitee.com/spencerwoo/torchattack
 
 ```python
 import torch
-from torchattack import FGSM, MIFGSM
-from torchattack.eval import AttackModel
+
+from torchattack import AttackModel, FGSM, MIFGSM
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -51,7 +51,7 @@ attack = FGSM(model, normalize, device)
 attack = MIFGSM(model, normalize, device, eps=0.03, steps=10, decay=1.0)
 ```
 
-Check out [`torchattack.eval.run_attack`](src/torchattack/eval.py) for a simple example.
+Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a quick example.
 
 ## Attacks
 

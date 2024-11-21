@@ -1,4 +1,5 @@
 from torchattack.admix import Admix
+from torchattack.attack_model import AttackModel
 from torchattack.decowa import DeCoWA
 from torchattack.deepfool import DeepFool
 from torchattack.difgsm import DIFGSM
@@ -22,6 +23,9 @@ from torchattack.vnifgsm import VNIFGSM
 __version__ = '1.0.0'
 
 __all__ = [
+    # Optional but recommended model wrapper
+    'AttackModel',
+    # All supported attacks
     'Admix',
     'DeCoWA',
     'DeepFool',

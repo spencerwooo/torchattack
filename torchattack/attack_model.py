@@ -7,18 +7,16 @@ import torch.nn as nn
 class AttackModel:
     """A wrapper class for a pretrained model used for adversarial attacks.
 
-    Intended to be instantiated with
-    `AttackModel.from_pretrained(pretrained_model_name)` from either
-    `torchvision.models` or `timm`. The model is loaded and attributes including
-    `transform`, `normalize`, and `model_name` are attached based on the model's
-    configuration.
+    Intended to be instantiated with `AttackModel.from_pretrained(<MODEL_NAME>)` from
+    either `torchvision.models` or `timm`. The model is loaded and attributes including
+    `model_name`, `transform`, and `normalize` are attached based on the model's config.
 
     Attributes:
-        model_name (str): The name of the model.
-        device (torch.device): The device on which the model is loaded.
-        model (nn.Module): The pretrained model itself.
-        transform (Callable): The transformation function applied to input images.
-        normalize (Callable): The normalization function applied to input images.
+        model_name: The name of the model.
+        device: The device on which the model is loaded.
+        model: The pretrained model itself.
+        transform: The transformation function applied to input images.
+        normalize: The normalization function applied to input images.
 
     Example:
         >>> model = AttackModel.from_pretrained('resnet50', device='cuda')

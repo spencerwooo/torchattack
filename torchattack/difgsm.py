@@ -4,8 +4,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as f
 
+from torchattack._attack import Attack
 from torchattack.attack_model import AttackModel
-from torchattack.base import Attack
 
 
 class DIFGSM(Attack):
