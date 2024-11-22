@@ -12,7 +12,7 @@ dependencies = [
     "scipy>=1.10.1",
 ]
 dynamic = ["version"]
-optional-dependencies = { dev = ["mypy", "rich", "timm"] }
+optional-dependencies = { dev = ["mypy", "rich", "timm", "pytest"] }
 
 [build-system]
 requires = ["setuptools"]
@@ -38,11 +38,6 @@ quote-style = "single"
 no_implicit_optional = true
 check_untyped_defs = true
 ignore_missing_imports = true # Used as torchvision does not ship type hints
-
-[tool.uv]
-dev-dependencies = [
-    "pytest>=8.3.3",
-]
 # disallow_any_unimported = true
 # disallow_untyped_defs = true
 # warn_return_any = true

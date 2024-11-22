@@ -1,6 +1,5 @@
 import math
 import os
-from contextlib import suppress
 from typing import Callable
 
 import numpy as np
@@ -9,10 +8,6 @@ import torch.nn as nn
 
 from torchattack._attack import Attack
 from torchattack.attack_model import AttackModel
-
-with suppress(ImportError):
-    from rich import print
-    from rich.progress import track
 
 
 def dct(x: int, y: int, v: int, u: int, n: int) -> float:
@@ -31,7 +26,7 @@ def dct(x: int, y: int, v: int, u: int, n: int) -> float:
     )
 
 
-def generate_2d_dct_basis(sub_dim: int, n: int, path: str) -> np.ndarray:
+def gen_2d_dct_sub_basis(sub_dim: int, n: int, path: str) -> np.ndarray:
     # Assume square images, so we don't have different xres and yres. We can get
     # different frequencies by setting u and v.
 
@@ -41,13 +36,9 @@ def generate_2d_dct_basis(sub_dim: int, n: int, path: str) -> np.ndarray:
 
     dct_basis_list = []
 
-    try:
-        u_range = track(range(0, max_u), 'Generating DCT basis')
-    except NameError:
-        u_range = range(0, max_u)
-        print('Generating DCT basis...')
-
-    for u in u_range:
+    for u in range(0, max_u):
+        if u % (max_u // 5) == 0:
+            print(f'GeoDA: generating DCT subspace basis {u + 1}/{max_u}')
         for v in range(0, max_v):
             basis_img = np.zeros((n, n))
             for y in range(0, n):
@@ -123,17 +114,13 @@ class GeoDA(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
-        x_size = input_shape[1]
-        path = f'2d_dct_basis_{self.sub_dim}_{x_size}.npy'
-
-        if os.path.exists(path):
-            sub_basis = np.load(path).astype(np.float32)
-        else:
-            sub_basis = generate_2d_dct_basis(self.sub_dim, x_size, path)
-            sub_basis = sub_basis.astype(np.float32)
-            print(f'Generated DCT sub-basis to [underline]`{path}`[/underline]')
-
-        self.sub_basis = torch.from_numpy(sub_basis).to(self.device)
+        # Prepare the DCT basis
+        self.x_size = input_shape[1]
+        self.sub_basis_path = os.path.join(
+            os.path.dirname(__file__),
+            'output',
+            f'2d_dct_basis_{self.sub_dim}_{self.x_size}.npy',
+        )
 
     def opt_query_iteration(self, nq: int, t: int, eta: float) -> tuple[list[int], int]:
         """Determine optimal distribution of number of queries."""
@@ -312,6 +299,31 @@ class GeoDA(Attack):
         return x_adv, q_num, grad
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Perform GeoDA on a batch of images.
+
+        N.B., although batch size > 1 is supported (attack can be executed), the
+        perturbation magnitude will be incorrect.
+
+        Args:
+            x: A batch of images. Shape: (N, C, H, W).
+            y: A batch of labels. Shape: (N).
+
+        Returns:
+            The perturbed images if successful. Shape: (N, C, H, W).
+        """
+
+        # Load the DCT subspaces basis
+        if not hasattr(self, 'sub_basis'):
+            if os.path.exists(self.sub_basis_path):
+                sub_basis = np.load(self.sub_basis_path).astype(np.float32)
+            else:
+                os.makedirs(os.path.dirname(self.sub_basis_path), exist_ok=True)
+                sub_basis = gen_2d_dct_sub_basis(
+                    self.sub_dim, self.x_size, self.sub_basis_path
+                ).astype(np.float32)
+                print(f'Generated DCT sub-basis to `{self.sub_basis_path}`')
+            self.sub_basis = torch.from_numpy(sub_basis).to(self.device)
+
         # Determine ys with the actual model prediction
         ys = self.predict(x)
 
