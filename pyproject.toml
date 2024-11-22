@@ -12,7 +12,10 @@ dependencies = [
     "scipy>=1.10.1",
 ]
 dynamic = ["version"]
-optional-dependencies = { dev = ["mypy", "rich", "timm", "pytest"] }
+
+[project.optional-dependencies]
+dev = ["mypy", "rich", "timm"]
+test = ["pytest", "pytest-cov"]
 
 [build-system]
 requires = ["setuptools"]

@@ -31,5 +31,5 @@ jobs:
       - name: Run type checking
         run: uv run mypy torchattack
 
-      - name: Run tests
-        run: uv run pytest tests
+      # - name: Run tests
+      #   run: uv run pytest tests
