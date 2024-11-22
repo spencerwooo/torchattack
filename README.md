@@ -7,11 +7,11 @@
   <a href="https://github.com/psf/black">
     <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black">
   </a>
-  <a href="https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml">
-    <img src="https://github.com/daisylab-bit/torchattack/actions/workflows/lint.yml/badge.svg" alt="lint">
+  <a href="https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml">
+    <img src="https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml/badge.svg" alt="lint">
   </a>
-  <a href="https://github.com/daisylab-bit/torchattack/releases/latest">
-    <img src="https://img.shields.io/github/v/release/daisylab-bit/torchattack" alt="GitHub release (latest by date)">
+  <a href="https://github.com/spencerwooo/torchattack/releases/latest">
+    <img src="https://img.shields.io/github/v/release/spencerwooo/torchattack" alt="GitHub release (latest by date)">
   </a>
 </div>
 
