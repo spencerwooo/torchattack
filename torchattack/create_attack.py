@@ -22,11 +22,10 @@ def create_attack(
         if 'eps' in attack_cfg:
             print('Warning: `eps` in `attack_cfg` will be overwritten.')
         attack_cfg['eps'] = eps
-    if attack_name in ['GeoDA', 'DeepFool']:
-        if 'eps' in attack_cfg:
-            print(f'Warning: `eps` is invalid in `{attack_name}` and will be ignored.')
+    if attack_name in ['GeoDA', 'DeepFool'] and 'eps' in attack_cfg:
+        print(f'Warning: `eps` is invalid in `{attack_name}` and will be ignored.')
         attack_cfg.pop('eps', None)
-    attacker_cls = getattr(torchattack, attack_name)
+    attacker_cls: Attack = getattr(torchattack, attack_name)
     return attacker_cls(model, normalize, device, **attack_cfg)
 
 
