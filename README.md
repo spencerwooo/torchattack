@@ -22,13 +22,13 @@
 <sub><b>Install from GitHub source -</b></sub>
 
 ```shell
-python -m pip install git+https://github.com/spencerwooo/torchattack
+python -m pip install git+https://github.com/spencerwooo/torchattack@v1.0.1
 ```
 
 <sub><b>Install from Gitee mirror -</b></sub>
 
 ```shell
-python -m pip install git+https://gitee.com/spencerwoo/torchattack
+python -m pip install git+https://gitee.com/spencerwoo/torchattack@v1.0.1
 ```
 
 ## Usage
@@ -36,13 +36,24 @@ python -m pip install git+https://gitee.com/spencerwoo/torchattack
 ```python
 import torch
 
-from torchattack import AttackModel, FGSM, MIFGSM
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+```
 
-# Load a model
+Load a pretrained model to attack from either torchvision or timm.
+
+```python
+from torchattack import AttackModel
+
+# Load a model with `AttackModel`
 model = AttackModel.from_pretrained(model_name='resnet50', device=device)
+# `AttackModel` automatically attach the model's `transform` and `normalize` functions
 transform, normalize = model.transform, model.normalize
+```
+
+Initialize an attack by importing its attack class.
+
+```python
+from torchattack import FGSM, MIFGSM
 
 # Initialize an attack
 attack = FGSM(model, normalize, device)
@@ -51,7 +62,23 @@ attack = FGSM(model, normalize, device)
 attack = MIFGSM(model, normalize, device, eps=0.03, steps=10, decay=1.0)
 ```
 
-Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a quick example.
+Initialize an attack by its name with `create_attack()`.
+
+```python
+from torchattack import create_attack
+
+# Initialize FGSM attack with create_attack
+attack = create_attack('FGSM', model, normalize, device)
+
+# Initialize PGD attack with specific eps with create_attack
+attack = create_attack('PGD', model, normalize, device, eps=0.03)
+
+# Initialize MI-FGSM attack with extra args with create_attack
+attack_cfg = {'steps': 10, 'decay': 1.0}
+attack = create_attack('MIFGSM', model, normalize, device, eps=0.03, attack_cfg=attack_cfg)
+```
+
+Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a full example.
 
 ## Attacks
 
