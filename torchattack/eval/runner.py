@@ -9,7 +9,6 @@ def run_attack(
     dataset_root: str = 'datasets/nips2017',
     max_samples: int = 100,
     batch_size: int = 4,
-    from_timm: bool = False,
 ) -> None:
     """Helper function to run attacks in `__main__`.
 
@@ -26,7 +25,6 @@ def run_attack(
         dataset_root: Root directory of the dataset. Defaults to "datasets/nips2017".
         max_samples: Max number of samples to attack. Defaults to 100.
         batch_size: Batch size for the dataloader. Defaults to 16.
-        from_timm: Use timm to load the model. Defaults to True.
     """
 
     import torch
@@ -42,7 +40,7 @@ def run_attack(
 
     # Setup model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = AttackModel.from_pretrained(model_name, device, from_timm)
+    model = AttackModel.from_pretrained(model_name, device)
     transform, normalize = model.transform, model.normalize
 
     # Set up dataloader
@@ -70,10 +68,7 @@ def run_attack(
 
     # Setup victim models if provided
     if victim_model_names:
-        victim_models = [
-            AttackModel.from_pretrained(name, device, from_timm)
-            for name in victim_model_names
-        ]
+        victims = [AttackModel.from_pretrained(n, device) for n in victim_model_names]
         victim_frms = [FoolingRateMetric() for _ in victim_model_names]
 
     # Run attack over the dataset (100 images by default)
@@ -98,7 +93,7 @@ def run_attack(
 
         # Track transfer fooling rates if victim models are provided
         if victim_model_names:
-            for _, (vmodel, vfrm) in enumerate(zip(victim_models, victim_frms)):
+            for _, (vmodel, vfrm) in enumerate(zip(victims, victim_frms)):
                 v_cln_outs = vmodel(vmodel.normalize(x))
                 v_adv_outs = vmodel(vmodel.normalize(advs))
                 vfrm.update(y, v_cln_outs, v_adv_outs)
@@ -108,7 +103,7 @@ def run_attack(
     print(f'Surrogate ({model_name}): {cln_acc=:.2%}, {adv_acc=:.2%} ({fr=:.2%})')
 
     if victim_model_names:
-        for vmodel, vfrm in zip(victim_models, victim_frms):
+        for vmodel, vfrm in zip(victims, victim_frms):
             vcln_acc, vadv_acc, vfr = vfrm.compute()
             print(
                 f'Victim ({vmodel.model_name}): cln_acc={vcln_acc:.2%}, '
@@ -127,7 +122,6 @@ if __name__ == '__main__':
     parser.add_argument('--dataset-root', type=str, default='datasets/nips2017')
     parser.add_argument('--max-samples', type=int, default=100)
     parser.add_argument('--batch-size', type=int, default=4)
-    parser.add_argument('--from-timm', action='store_true')
     args = parser.parse_args()
 
     run_attack(
@@ -138,5 +132,4 @@ if __name__ == '__main__':
         dataset_root=args.dataset_root,
         max_samples=args.max_samples,
         batch_size=args.batch_size,
-        from_timm=args.from_timm,
     )

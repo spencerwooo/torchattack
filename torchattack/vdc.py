@@ -709,7 +709,6 @@ if __name__ == '__main__':
 
     run_attack(
         VDC,
-        model_name='pit_b_224',
-        victim_model_names=['cait_s24_224', 'visformer_small'],
-        from_timm=True,
+        model_name='timm/pit_b_224',
+        victim_model_names=['timm/cait_s24_224', 'timm/visformer_small'],
     )

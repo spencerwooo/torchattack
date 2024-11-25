@@ -74,7 +74,6 @@ class TGR(Attack):
         self.lossfn = nn.CrossEntropyLoss()
 
         # Register hooks
-        self.hooks: list[torch.utils.hooks.RemovableHandle] = []
         self._register_tgr_model_hooks()
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
@@ -123,9 +122,6 @@ class TGR(Attack):
             # Zero out gradient
             delta.grad.detach_()
             delta.grad.zero_()
-
-            for hook in self.hooks:
-                hook.remove()
 
         return x + delta
 
@@ -346,8 +342,7 @@ class TGR(Attack):
         for hook_func, layers in supported_vit_cfg[self.model_name]:
             for layer in layers:
                 module = rgetattr(self.model, layer)
-                hook = module.register_backward_hook(hook_func)
-                self.hooks.append(hook)
+                module.register_backward_hook(hook_func)
 
 
 if __name__ == '__main__':
@@ -355,7 +350,6 @@ if __name__ == '__main__':
 
     run_attack(
         TGR,
-        model_name='vit_base_patch16_224',
-        victim_model_names=['cait_s24_224', 'visformer_small'],
-        from_timm=True,
+        model_name='timm/vit_base_patch16_224',
+        victim_model_names=['timm/cait_s24_224', 'timm/visformer_small'],
     )

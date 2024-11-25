@@ -63,9 +63,12 @@ class AttackModel:
         Loads a pretrained model and initializes an AttackModel instance.
 
         Args:
-            model_name: The name of the model to load.
+            model_name: The name of the model to load. Accept specifying the model from
+                `timm` or `torchvision.models` by prefixing the model name with `timm/`
+                or `tv/`. Takes precedence over the `from_timm` flag.
             device: The device on which to load the model.
-            from_timm: Whether to load the model from timm. Defaults to False.
+            from_timm: Explicitly specifying to load the model from timm or torchvision.
+                Priority lower than argument `model_name`. Defaults to False.
 
         Returns:
             AttackModel: An instance of AttackModel initialized with pretrained model.
@@ -73,6 +76,14 @@ class AttackModel:
 
         import torchvision.transforms as t
 
+        # Accept `timm/<model_name>` or `tv/<model_name>` as model_name,
+        # which takes precedence over the `from_timm` flag.
+        if model_name.startswith('timm/'):
+            model_name, from_timm = model_name[5:], True
+        elif model_name.startswith('tv/'):
+            model_name, from_timm = model_name[3:], False
+
+        # Load the model from timm if specified
         if from_timm:
             import timm
 
@@ -122,9 +133,13 @@ class AttackModel:
             return cls(model_name, device, model, transform, normalize)
 
         except ValueError:
-            print(
-                f'Warning: Model `{model_name}` not found in torchvision.models, '
-                'falling back to loading weights from timm.'
+            from warnings import warn
+
+            warn(
+                f'model `{model_name}` not found in torchvision.models, '
+                'falling back to loading weights from timm.',
+                category=UserWarning,
+                stacklevel=2,
             )
             return cls.from_pretrained(model_name, device, from_timm=True)
 
