@@ -1,5 +1,7 @@
 from torchattack.admix import Admix
 from torchattack.attack_model import AttackModel
+from torchattack.bia import BIA
+from torchattack.cda import CDA
 from torchattack.create_attack import create_attack
 from torchattack.decowa import DeCoWA
 from torchattack.deepfool import DeepFool
@@ -30,6 +32,8 @@ __all__ = [
     'AttackModel',
     # All supported attacks
     'Admix',
+    'BIA',
+    'CDA',
     'DeCoWA',
     'DeepFool',
     'DIFGSM',

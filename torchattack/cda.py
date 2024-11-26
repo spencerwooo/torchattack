@@ -30,7 +30,9 @@ class CDA(GenerativeAttack):
     Args:
         device: Device to use for tensors. Defaults to cuda if available.
         eps: The maximum perturbation. Defaults to 10/255.
-        weights: Pretrained weights for the generator. Defaults to CDAWeights.DEFAULT.
+        weights: Pretrained weights for the generator. Either import and use the enum,
+            or use its name. Defaults to CDAWeights.DEFAULT.
+        checkpoint_path: Path to a custom checkpoint. Defaults to None.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
     """
@@ -61,5 +63,5 @@ class CDA(GenerativeAttack):
 
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    attack = CDA(device, eps=8 / 255, weights='VGG19_IMAGENET1K')
+    attack = CDA(device, weights='VGG19_IMAGENET1K')
     print(attack)

@@ -116,7 +116,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Run an attack on a model.')
     parser.add_argument('--attack', type=str, required=True)
-    parser.add_argument('--eps', type=str, default='16/255')
+    parser.add_argument('--eps', type=float, default=16)
     parser.add_argument('--model-name', type=str, default='resnet50')
     parser.add_argument('--victim-model-names', type=str, nargs='+', default=None)
     parser.add_argument('--dataset-root', type=str, default='datasets/nips2017')
@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
     run_attack(
         attack=args.attack,
-        attack_cfg={'eps': float(args.eps)},
+        attack_cfg={'eps': args.eps / 255},
         model_name=args.model_name,
         victim_model_names=args.victim_model_names,
         dataset_root=args.dataset_root,

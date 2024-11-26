@@ -60,6 +60,8 @@ def create_attack(
     if not hasattr(torchattack, attack_name):
         raise ValueError(f"Attack '{attack_name}' is not supported within torchattack.")
     attacker_cls: Attack = getattr(torchattack, attack_name)
+    if attack_name in ['BIA', 'CDA']:
+        return attacker_cls(device, **attack_cfg)
     return attacker_cls(model, normalize, device, **attack_cfg)
 
 

@@ -29,7 +29,7 @@ class GenerativeAttack(Attack):
         # Initialize the generator and its weights
         self.generator = self._init_generator()
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
         """Perform the generative attack via generator inference on a batch of images.
 
         Args:
