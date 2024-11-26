@@ -16,7 +16,7 @@ def attack_warn(message: str) -> None:
 
 def create_attack(
     attack_name: str,
-    model: nn.Module | AttackModel,
+    model: nn.Module | AttackModel | None = None,
     normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
     device: torch.device | None = None,
     eps: float | None = None,

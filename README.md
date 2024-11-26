@@ -52,7 +52,7 @@ transform, normalize = model.transform, model.normalize
 # Additionally, to explicitly specify where to load the pretrained model from (timm or torchvision),
 # prepend the model name with 'timm/' or 'tv/' respectively, or use the `from_timm` argument, e.g.
 vit_b16 = AttackModel.from_pretrained(model_name='timm/vit_base_patch16_224', device=device)
-inception_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3', device=device)
+inv_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3', device=device)
 pit_b = AttackModel.from_pretrained(model_name='pit_b_224', device=device, from_timm=True)
 ```
 
