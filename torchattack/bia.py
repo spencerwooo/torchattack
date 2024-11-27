@@ -1,6 +1,8 @@
+from typing import Any
+
 import torch
 
-from torchattack.generative._inference import GenerativeAttack
+from torchattack._attack import Attack
 from torchattack.generative._weights import Weights, WeightsEnum
 from torchattack.generative.resnet_generator import ResNetGenerator
 
@@ -45,20 +47,20 @@ class BIAWeights(WeightsEnum):
     DEFAULT = RESNET152_DA
 
 
-class BIA(GenerativeAttack):
+class BIA(Attack):
     """Beyond ImageNet Attack (BIA).
 
     From the paper 'Beyond ImageNet Attack: Towards Crafting Adversarial Examples for
     Black-box Domains', https://arxiv.org/abs/2201.11528
 
     Args:
-        device: Device to use for tensors. Defaults to cuda if available. eps: The
-        maximum perturbation. Defaults to 10/255. weights: Pretrained weights for the
-        generator. Either import and use the enum,
+        device: Device to use for tensors. Defaults to cuda if available.
+        eps: The maximum perturbation. Defaults to 10/255.
+        weights: Pretrained weights for the generator. Either import and use the enum,
             or use its name. Defaults to BIAWeights.DEFAULT.
-        checkpoint_path: Path to a custom checkpoint. Defaults to None. clip_min:
-        Minimum value for clipping. Defaults to 0.0. clip_max: Maximum value for
-        clipping. Defaults to 1.0.
+        checkpoint_path: Path to a custom checkpoint. Defaults to None.
+        clip_min: Minimum value for clipping. Defaults to 0.0.
+        clip_max: Maximum value for clipping. Defaults to 1.0.
     """
 
     def __init__(
@@ -70,19 +72,43 @@ class BIA(GenerativeAttack):
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
-        super().__init__(device, eps, weights, checkpoint_path, clip_min, clip_max)
+        # Generative attacks do not require specifying model and normalize.
+        super().__init__(model=None, normalize=None, device=device)
 
-    def _init_generator(self) -> ResNetGenerator:
-        generator = ResNetGenerator()
+        self.eps = eps
+        self.checkpoint_path = checkpoint_path
+        self.clip_min = clip_min
+        self.clip_max = clip_max
+
+        self.generator = ResNetGenerator()
+
         # Prioritize checkpoint path over provided weights enum
         if self.checkpoint_path is not None:
-            generator.load_state_dict(torch.load(self.checkpoint_path))
+            self.generator.load_state_dict(torch.load(self.checkpoint_path))
         else:
             # Verify and load weights from enum if checkpoint path is not provided
-            self.weights: BIAWeights = BIAWeights.verify(self.weights)
+            self.weights: BIAWeights = BIAWeights.verify(weights)
             if self.weights is not None:
-                generator.load_state_dict(self.weights.get_state_dict(check_hash=True))
-        return generator.eval().to(self.device)
+                self.generator.load_state_dict(
+                    self.weights.get_state_dict(check_hash=True)
+                )
+
+        self.generator.eval().to(self.device)
+
+    def forward(self, x: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
+        """Perform BIA on a batch of images.
+
+        Args:
+            x: A batch of images. Shape: (N, C, H, W).
+
+        Returns:
+            The perturbed images if successful. Shape: (N, C, H, W).
+        """
+
+        x_unrestricted = self.generator(x)
+        delta = torch.clamp(x_unrestricted - x, -self.eps, self.eps)
+        x_adv = torch.clamp(x + delta, self.clip_min, self.clip_max)
+        return x_adv
 
 
 if __name__ == '__main__':
