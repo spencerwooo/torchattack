@@ -54,16 +54,7 @@ def run_attack(
 
     # Set up attack and trackers
     frm = FoolingRateMetric()
-    if isinstance(attack, str):
-        attacker = create_attack(
-            attack_name=attack,
-            model=model,
-            normalize=normalize,
-            device=device,
-            attack_cfg=attack_cfg,
-        )
-    else:
-        attacker = attack(model, normalize, device, **attack_cfg)
+    attacker = create_attack(attack, model, normalize, device, attack_cfg=attack_cfg)
     print(attacker)
 
     # Setup victim models if provided
@@ -114,7 +105,7 @@ def run_attack(
 if __name__ == '__main__':
     import argparse
 
-    from torchattack import GENERATIVE_ATTACKS, NON_EPS_ATTACKS
+    import torchattack
 
     parser = argparse.ArgumentParser(description='Run an attack on a model.')
     parser.add_argument('--attack', type=str, required=True)
@@ -129,9 +120,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     attack_cfg = {}
-    if args.attack not in NON_EPS_ATTACKS:
+    if args.attack not in torchattack.NON_EPS_ATTACKS:  # type: ignore
         attack_cfg['eps'] = args.eps
-    if args.attack in GENERATIVE_ATTACKS:
+    if args.attack in torchattack.GENERATIVE_ATTACKS:  # type: ignore
         attack_cfg['weights'] = args.weights
         attack_cfg['checkpoint_path'] = args.checkpoint
 

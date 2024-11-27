@@ -15,7 +15,7 @@ def attack_warn(message: str) -> None:
 
 
 def create_attack(
-    attack_name: str,
+    attack: Any,
     model: nn.Module | AttackModel | None = None,
     normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
     device: torch.device | None = None,
@@ -27,7 +27,7 @@ def create_attack(
     """Create a torchattack instance based on the provided attack name and config.
 
     Args:
-        attack_name: The name of the attack to create.
+        attack: The attack to create, either by name or class instance.
         model: The model to be attacked. Can be an instance of nn.Module or AttackModel. Defaults to None.
         normalize: The normalization function specific to the model. Defaults to None.
         device: The device on which the attack will be executed. Defaults to None.
@@ -54,9 +54,11 @@ def create_attack(
         attack_cfg = {}
 
     # Check if attack_name is supported
+    attack_name = attack if isinstance(attack, str) else attack.__name__
     if attack_name not in torchattack.SUPPORTED_ATTACKS:
         raise ValueError(f"Attack '{attack_name}' is not supported within torchattack.")
-    attacker_cls: Attack = getattr(torchattack, attack_name)
+    if not isinstance(attack, Attack):
+        attack = getattr(torchattack, attack_name)
 
     # Check if eps is provided and overwrite the value in attack_cfg if present
     if eps is not None:
@@ -87,9 +89,9 @@ def create_attack(
     if attack_name in torchattack.GENERATIVE_ATTACKS:
         attack_cfg['weights'] = weights
         attack_cfg['checkpoint_path'] = checkpoint_path
-        return attacker_cls(device, **attack_cfg)
+        return attack(device, **attack_cfg)
 
-    return attacker_cls(model, normalize, device, **attack_cfg)
+    return attack(model, normalize, device, **attack_cfg)
 
 
 if __name__ == '__main__':

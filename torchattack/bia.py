@@ -113,6 +113,11 @@ class BIA(Attack):
 
 
 if __name__ == '__main__':
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    attack = BIA(device, weights='VGG19_DA')
-    print(attack)
+    from torchattack.eval import run_attack
+
+    run_attack(
+        attack=BIA,
+        attack_cfg={'eps': 10 / 255, 'weights': 'VGG16_DA'},
+        model_name='resnet50',
+        victim_model_names=['resnet152'],
+    )
