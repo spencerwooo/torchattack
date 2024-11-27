@@ -180,6 +180,6 @@ if __name__ == '__main__':
 
     run_attack(
         DeepFool,
-        attack_cfg={'steps': 50, 'overshoot': 0.02},
+        attack_args={'steps': 50, 'overshoot': 0.02},
         model_name='resnet152',
     )

@@ -61,7 +61,9 @@ class CDA(Attack):
 
         # Prioritize checkpoint path over provided weights enum
         if self.checkpoint_path is not None:
-            self.generator.load_state_dict(torch.load(self.checkpoint_path))
+            self.generator.load_state_dict(
+                torch.load(self.checkpoint_path, weights_only=True)
+            )
         else:
             # Verify and load weights from enum if checkpoint path is not provided
             self.weights: CDAWeights = CDAWeights.verify(weights)
@@ -93,7 +95,7 @@ if __name__ == '__main__':
 
     run_attack(
         attack=CDA,
-        attack_cfg={'eps': 10 / 255, 'weights': 'VGG16_IMAGENET1K'},
-        model_name='resnet50',
+        attack_args={'eps': 10 / 255, 'weights': 'VGG19_IMAGENET1K'},
+        model_name='vgg19',
         victim_model_names=['resnet152'],
     )

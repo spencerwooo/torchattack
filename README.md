@@ -80,8 +80,8 @@ attack = create_attack('FGSM', model, normalize, device)
 attack = create_attack('PGD', model, normalize, device, eps=0.03)
 
 # Initialize MI-FGSM attack with extra args with create_attack
-attack_cfg = {'steps': 10, 'decay': 1.0}
-attack = create_attack('MIFGSM', model, normalize, device, eps=0.03, attack_cfg=attack_cfg)
+attack_args = {'steps': 10, 'decay': 1.0}
+attack = create_attack('MIFGSM', model, normalize, device, eps=0.03, attack_args=attack_args)
 ```
 
 Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a full example.

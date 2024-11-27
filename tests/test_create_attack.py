@@ -41,37 +41,37 @@ def test_create_generative_attack_same_as_imported(attack_name, expected):
 
 def test_create_attack_with_eps(device, resnet50_model):
     eps = 0.3
-    attack_cfg = {}
+    attack_args = {}
     attacker = create_attack(
         attack='FGSM',
         model=resnet50_model,
         normalize=resnet50_model.normalize,
         device=device,
         eps=eps,
-        attack_cfg=attack_cfg,
+        attack_args=attack_args,
     )
     assert attacker.eps == eps
 
 
-def test_create_attack_with_attack_cfg_eps(device, resnet50_model):
-    attack_cfg = {'eps': 0.1}
+def test_create_attack_with_attack_args_eps(device, resnet50_model):
+    attack_args = {'eps': 0.1}
     attacker = create_attack(
         attack='FGSM',
         model=resnet50_model,
         normalize=resnet50_model.normalize,
         device=device,
-        attack_cfg=attack_cfg,
+        attack_args=attack_args,
     )
-    assert attacker.eps == attack_cfg['eps']
+    assert attacker.eps == attack_args['eps']
 
 
-def test_create_attack_with_both_eps_and_attack_cfg(device, resnet50_model):
+def test_create_attack_with_both_eps_and_attack_args(device, resnet50_model):
     eps = 0.3
-    attack_cfg = {'eps': 0.1}
+    attack_args = {'eps': 0.1}
     with pytest.warns(
         UserWarning,
         match="The 'eps' value provided as an argument will overwrite the existing "
-        "'eps' value in 'attack_cfg'. This MAY NOT be the intended behavior.",
+        "'eps' value in 'attack_args'. This MAY NOT be the intended behavior.",
     ):
         attacker = create_attack(
             attack='FGSM',
@@ -79,7 +79,7 @@ def test_create_attack_with_both_eps_and_attack_cfg(device, resnet50_model):
             normalize=resnet50_model.normalize,
             device=device,
             eps=eps,
-            attack_cfg=attack_cfg,
+            attack_args=attack_args,
         )
     assert attacker.eps == eps
 
@@ -102,7 +102,7 @@ def test_create_attack_with_invalid_eps(device, resnet50_model):
 def test_create_attack_with_weights_and_checkpoint_path(device):
     weights = 'VGG19_IMAGENET1K'
     checkpoint_path = 'path/to/checkpoint'
-    attack_cfg = {}
+    attack_args = {}
     with pytest.warns(
         UserWarning,
         match="argument 'weights' and 'checkpoint_path' are only used for "
@@ -113,7 +113,7 @@ def test_create_attack_with_weights_and_checkpoint_path(device):
             device=device,
             weights=weights,
             checkpoint_path=checkpoint_path,
-            attack_cfg=attack_cfg,
+            attack_args=attack_args,
         )
     assert 'weights' not in attacker.__dict__
     assert 'checkpoint_path' not in attacker.__dict__

@@ -3,7 +3,7 @@ from typing import Any
 
 def run_attack(
     attack: Any,
-    attack_cfg: dict | None = None,
+    attack_args: dict | None = None,
     model_name: str = 'resnet50',
     victim_model_names: list[str] | None = None,
     dataset_root: str = 'datasets/nips2017',
@@ -14,12 +14,12 @@ def run_attack(
 
     Example:
         >>> from torchattack import FGSM
-        >>> cfg = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
-        >>> run_attack(attack=FGSM, attack_cfg=cfg)
+        >>> args = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
+        >>> run_attack(attack=FGSM, attack_args=args)
 
     Args:
         attack: The attack class to initialize, either by name or class instance.
-        attack_cfg: A dict of keyword arguments passed to the attack class.
+        attack_args: A dict of keyword arguments passed to the attack class.
         model_name: The surrogate model to attack. Defaults to "resnet50".
         victim_model_names: A list of the victim black-box models to attack. Defaults to None.
         dataset_root: Root directory of the dataset. Defaults to "datasets/nips2017".
@@ -35,8 +35,8 @@ def run_attack(
     from torchattack.eval.dataset import NIPSLoader
     from torchattack.eval.metric import FoolingRateMetric
 
-    if attack_cfg is None:
-        attack_cfg = {}
+    if attack_args is None:
+        attack_args = {}
 
     # Setup model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -54,7 +54,7 @@ def run_attack(
 
     # Set up attack and trackers
     frm = FoolingRateMetric()
-    attacker = create_attack(attack, model, normalize, device, attack_cfg=attack_cfg)
+    attacker = create_attack(attack, model, normalize, device, attack_args=attack_args)
     print(attacker)
 
     # Setup victim models if provided
@@ -119,16 +119,16 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=4)
     args = parser.parse_args()
 
-    attack_cfg = {}
+    attack_args = {}
     if args.attack not in torchattack.NON_EPS_ATTACKS:  # type: ignore
-        attack_cfg['eps'] = args.eps
+        attack_args['eps'] = args.eps
     if args.attack in torchattack.GENERATIVE_ATTACKS:  # type: ignore
-        attack_cfg['weights'] = args.weights
-        attack_cfg['checkpoint_path'] = args.checkpoint
+        attack_args['weights'] = args.weights
+        attack_args['checkpoint_path'] = args.checkpoint
 
     run_attack(
         attack=args.attack,
-        attack_cfg=attack_cfg,
+        attack_args=attack_args,
         model_name=args.model_name,
         victim_model_names=args.victim_model_names,
         dataset_root=args.dataset_root,
