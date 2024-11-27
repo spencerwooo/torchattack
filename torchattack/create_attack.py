@@ -7,9 +7,6 @@ import torchattack
 from torchattack._attack import Attack
 from torchattack.attack_model import AttackModel
 
-_generative_attacks = ['BIA', 'CDA']
-_non_eps_attacks = ['GeoDA', 'DeepFool']
-
 
 def attack_warn(message: str) -> None:
     from warnings import warn
@@ -35,7 +32,7 @@ def create_attack(
         normalize: The normalization function specific to the model. Defaults to None.
         device: The device on which the attack will be executed. Defaults to None.
         eps: The epsilon value for the attack. Defaults to None.
-        weights: The path to the weights file for generative attacks. Defaults to 'DEFAULT'.
+        weights: The name of the generator weight for generative attacks. Defaults to 'DEFAULT'.
         checkpoint_path: The path to the checkpoint file for generative attacks. Defaults to None.
         attack_cfg: Additional config parameters for the attack. Defaults to None.
 
@@ -57,7 +54,7 @@ def create_attack(
         attack_cfg = {}
 
     # Check if attack_name is supported
-    if not hasattr(torchattack, attack_name):
+    if attack_name not in torchattack.SUPPORTED_ATTACKS:
         raise ValueError(f"Attack '{attack_name}' is not supported within torchattack.")
     attacker_cls: Attack = getattr(torchattack, attack_name)
 
@@ -65,19 +62,19 @@ def create_attack(
     if eps is not None:
         if 'eps' in attack_cfg:
             attack_warn(
-                f"'eps' in 'attack_cfg' ({attack_cfg['eps']}) will be overwritten "
-                f"by the 'eps' argument value ({eps}), which MAY NOT be intended."
+                "The 'eps' value provided as an argument will overwrite the existing "
+                "'eps' value in 'attack_cfg'. This MAY NOT be the intended behavior."
             )
         attack_cfg['eps'] = eps
 
     # Check if attacks that do not require eps have eps in attack_cfg
-    if attack_name in _non_eps_attacks and 'eps' in attack_cfg:
+    if attack_name in torchattack.NON_EPS_ATTACKS and 'eps' in attack_cfg:
         attack_warn(f"argument 'eps' is invalid in {attack_name} and will be ignored.")
         attack_cfg.pop('eps', None)
 
     # Check if non-generative attacks have weights or checkpoint_path
-    if attack_name not in _generative_attacks and (
-        weights is not None or checkpoint_path is not None
+    if attack_name not in torchattack.GENERATIVE_ATTACKS and (
+        weights != 'DEFAULT' or checkpoint_path is not None
     ):
         attack_warn(
             f"argument 'weights' and 'checkpoint_path' are only used for "
@@ -87,7 +84,7 @@ def create_attack(
         attack_cfg.pop('checkpoint_path', None)
 
     # Special handling for generative attacks
-    if attack_name in _generative_attacks:
+    if attack_name in torchattack.GENERATIVE_ATTACKS:
         attack_cfg['weights'] = weights
         attack_cfg['checkpoint_path'] = checkpoint_path
         return attacker_cls(device, **attack_cfg)

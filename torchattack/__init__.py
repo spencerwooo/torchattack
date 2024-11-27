@@ -23,7 +23,7 @@ from torchattack.vdc import VDC
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 __all__ = [
     # Helper function to create an attack by its name
@@ -54,3 +54,30 @@ __all__ = [
     'VMIFGSM',
     'VNIFGSM',
 ]
+
+GRADIENT_NON_VIT_ATTACKS = {
+    'Admix': Admix,
+    'DeCoWA': DeCoWA,
+    'DIFGSM': DIFGSM,
+    'FGSM': FGSM,
+    'FIA': FIA,
+    'MIFGSM': MIFGSM,
+    'NIFGSM': NIFGSM,
+    'PGD': PGD,
+    'PGDL2': PGDL2,
+    'SINIFGSM': SINIFGSM,
+    'SSA': SSA,
+    'SSP': SSP,
+    'TIFGSM': TIFGSM,
+    'VMIFGSM': VMIFGSM,
+    'VNIFGSM': VNIFGSM,
+}
+GRADIENT_VIT_ATTACKS = {'TGR': TGR, 'VDC': VDC, 'PNAPatchOut': PNAPatchOut}
+GENERATIVE_ATTACKS = {'BIA': BIA, 'CDA': CDA}
+NON_EPS_ATTACKS = {'GeoDA': GeoDA, 'DeepFool': DeepFool}
+SUPPORTED_ATTACKS = (
+    GRADIENT_NON_VIT_ATTACKS
+    | GRADIENT_VIT_ATTACKS
+    | GENERATIVE_ATTACKS
+    | NON_EPS_ATTACKS
+)

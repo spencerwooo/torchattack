@@ -114,9 +114,13 @@ def run_attack(
 if __name__ == '__main__':
     import argparse
 
+    from torchattack import GENERATIVE_ATTACKS, NON_EPS_ATTACKS
+
     parser = argparse.ArgumentParser(description='Run an attack on a model.')
     parser.add_argument('--attack', type=str, required=True)
     parser.add_argument('--eps', type=float, default=16)
+    parser.add_argument('--weights', type=str, default='DEFAULT')
+    parser.add_argument('--checkpoint-path', type=str, default=None)
     parser.add_argument('--model-name', type=str, default='resnet50')
     parser.add_argument('--victim-model-names', type=str, nargs='+', default=None)
     parser.add_argument('--dataset-root', type=str, default='datasets/nips2017')
@@ -124,9 +128,16 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=4)
     args = parser.parse_args()
 
+    attack_cfg = {}
+    if args.attack not in NON_EPS_ATTACKS:
+        attack_cfg['eps'] = args.eps
+    if args.attack in GENERATIVE_ATTACKS:
+        attack_cfg['weights'] = args.weights
+        attack_cfg['checkpoint_path'] = args.checkpoint
+
     run_attack(
         attack=args.attack,
-        attack_cfg={'eps': args.eps / 255},
+        attack_cfg=attack_cfg,
         model_name=args.model_name,
         victim_model_names=args.victim_model_names,
         dataset_root=args.dataset_root,
