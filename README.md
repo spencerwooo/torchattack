@@ -22,13 +22,13 @@
 <sub><b>Install from GitHub source -</b></sub>
 
 ```shell
-python -m pip install git+https://github.com/spencerwooo/torchattack@v1.0.1
+python -m pip install git+https://github.com/spencerwooo/torchattack@v1.0.2
 ```
 
 <sub><b>Install from Gitee mirror -</b></sub>
 
 ```shell
-python -m pip install git+https://gitee.com/spencerwoo/torchattack@v1.0.1
+python -m pip install git+https://gitee.com/spencerwoo/torchattack@v1.0.2
 ```
 
 ## Usage
@@ -52,7 +52,7 @@ transform, normalize = model.transform, model.normalize
 # Additionally, to explicitly specify where to load the pretrained model from (timm or torchvision),
 # prepend the model name with 'timm/' or 'tv/' respectively, or use the `from_timm` argument, e.g.
 vit_b16 = AttackModel.from_pretrained(model_name='timm/vit_base_patch16_224', device=device)
-inception_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3', device=device)
+inv_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3', device=device)
 pit_b = AttackModel.from_pretrained(model_name='pit_b_224', device=device, from_timm=True)
 ```
 
@@ -80,8 +80,8 @@ attack = create_attack('FGSM', model, normalize, device)
 attack = create_attack('PGD', model, normalize, device, eps=0.03)
 
 # Initialize MI-FGSM attack with extra args with create_attack
-attack_cfg = {'steps': 10, 'decay': 1.0}
-attack = create_attack('MIFGSM', model, normalize, device, eps=0.03, attack_cfg=attack_cfg)
+attack_args = {'steps': 10, 'decay': 1.0}
+attack = create_attack('MIFGSM', model, normalize, device, eps=0.03, attack_args=attack_args)
 ```
 
 Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a full example.
@@ -109,6 +109,13 @@ Gradient-based attacks:
 |     TGR      | $\ell_\infty$ |  CVPR 2023  | [Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization](https://arxiv.org/abs/2303.15754)                           | `TGR`         |
 |    DeCoWA    | $\ell_\infty$ |  AAAI 2024  | [Boosting Adversarial Transferability across Model Genus by Deformation-Constrained Warping](https://arxiv.org/abs/2402.03951)                           | `DeCoWA`      |
 |     VDC      | $\ell_\infty$ |  AAAI 2024  | [Improving the Adversarial Transferability of Vision Transformers with Virtual Dense Connection](https://ojs.aaai.org/index.php/AAAI/article/view/28541) | `VDC`         |
+
+Generative attacks:
+
+| Name |   $\ell_p$    | Publication  | Paper (Open Access)                                                                                                     | Class Name |
+| :--: | :-----------: | :----------: | ----------------------------------------------------------------------------------------------------------------------- | ---------- |
+| CDA  | $\ell_\infty$ | NeurIPS 2019 | [CDA: contrastive Divergence for Adversarial Attack](https://arxiv.org/abs/1905.11736)                                  | `CDA`      |
+| BIA  | $\ell_\infty$ |  ICLR 2022   | [Beyond ImageNet Attack: Towards Crafting Adversarial Examples for Black-box Domains](https://arxiv.org/abs/2201.11528) | `BIA`      |
 
 Others:
 

@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
     run_attack(
         attack=PGD,
-        attack_cfg={'eps': 8 / 255, 'steps': 20, 'random_start': True},
+        attack_args={'eps': 8 / 255, 'steps': 20, 'random_start': True},
         model_name='resnet18',
         victim_model_names=['resnet50', 'vgg13', 'densenet121'],
     )

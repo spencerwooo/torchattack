@@ -306,7 +306,7 @@ if __name__ == '__main__':
 
     run_attack(
         attack=DeCoWA,
-        attack_cfg={'eps': 16 / 255, 'steps': 10},
+        attack_args={'eps': 16 / 255, 'steps': 10},
         model_name='resnet50',
         victim_model_names=['resnet18', 'vit_b_16'],
     )

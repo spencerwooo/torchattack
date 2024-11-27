@@ -252,7 +252,7 @@ if __name__ == '__main__':
 
     run_attack(
         attack=SSA,
-        attack_cfg={'eps': 8 / 255, 'steps': 10},
+        attack_args={'eps': 8 / 255, 'steps': 10},
         model_name='resnet18',
         victim_model_names=['resnet50', 'vgg13', 'densenet121'],
     )

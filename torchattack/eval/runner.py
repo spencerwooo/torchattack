@@ -3,23 +3,30 @@ from typing import Any
 
 def run_attack(
     attack: Any,
-    attack_cfg: dict | None = None,
+    attack_args: dict | None = None,
     model_name: str = 'resnet50',
     victim_model_names: list[str] | None = None,
     dataset_root: str = 'datasets/nips2017',
     max_samples: int = 100,
     batch_size: int = 4,
 ) -> None:
-    """Helper function to run attacks in `__main__`.
+    """Helper function to run evaluation on attacks.
 
     Example:
         >>> from torchattack import FGSM
-        >>> cfg = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
-        >>> run_attack(attack=FGSM, attack_cfg=cfg)
+        >>> args = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
+        >>> run_attack(attack=FGSM, attack_args=args)
+
+    Note:
+        For generative attacks, the model_name argument that defines the white-box
+        surrogate model is not required. You can, however, manually provide a model name
+        to load according to your designated weight for the generator, to recreate a
+        white-box evaluation scenario, such as using VGG-19 (`model_name='vgg19'`) for
+        BIA's VGG-19 generator weight (`BIAWeights.VGG19`).
 
     Args:
         attack: The attack class to initialize, either by name or class instance.
-        attack_cfg: A dict of keyword arguments passed to the attack class.
+        attack_args: A dict of keyword arguments passed to the attack class.
         model_name: The surrogate model to attack. Defaults to "resnet50".
         victim_model_names: A list of the victim black-box models to attack. Defaults to None.
         dataset_root: Root directory of the dataset. Defaults to "datasets/nips2017".
@@ -35,8 +42,8 @@ def run_attack(
     from torchattack.eval.dataset import NIPSLoader
     from torchattack.eval.metric import FoolingRateMetric
 
-    if attack_cfg is None:
-        attack_cfg = {}
+    if attack_args is None:
+        attack_args = {}
 
     # Setup model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -54,16 +61,7 @@ def run_attack(
 
     # Set up attack and trackers
     frm = FoolingRateMetric()
-    if isinstance(attack, str):
-        attacker = create_attack(
-            attack_name=attack,
-            model=model,
-            normalize=normalize,
-            device=device,
-            attack_cfg=attack_cfg,
-        )
-    else:
-        attacker = attack(model, normalize, device, **attack_cfg)
+    attacker = create_attack(attack, model, normalize, device, attack_args=attack_args)
     print(attacker)
 
     # Setup victim models if provided
@@ -114,9 +112,13 @@ def run_attack(
 if __name__ == '__main__':
     import argparse
 
+    import torchattack
+
     parser = argparse.ArgumentParser(description='Run an attack on a model.')
     parser.add_argument('--attack', type=str, required=True)
-    parser.add_argument('--eps', type=str, default='16/255')
+    parser.add_argument('--eps', type=float, default=16)
+    parser.add_argument('--weights', type=str, default='DEFAULT')
+    parser.add_argument('--checkpoint-path', type=str, default=None)
     parser.add_argument('--model-name', type=str, default='resnet50')
     parser.add_argument('--victim-model-names', type=str, nargs='+', default=None)
     parser.add_argument('--dataset-root', type=str, default='datasets/nips2017')
@@ -124,9 +126,17 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=4)
     args = parser.parse_args()
 
+    attack_args = {}
+    args.eps = args.eps / 255
+    if args.attack not in torchattack.NON_EPS_ATTACKS:  # type: ignore
+        attack_args['eps'] = args.eps
+    if args.attack in torchattack.GENERATIVE_ATTACKS:  # type: ignore
+        attack_args['weights'] = args.weights
+        attack_args['checkpoint_path'] = args.checkpoint_path
+
     run_attack(
         attack=args.attack,
-        attack_cfg={'eps': float(args.eps)},
+        attack_args=attack_args,
         model_name=args.model_name,
         victim_model_names=args.victim_model_names,
         dataset_root=args.dataset_root,
