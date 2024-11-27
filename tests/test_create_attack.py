@@ -1,6 +1,8 @@
 import pytest
 
 from torchattack import (
+    BIA,
+    CDA,
     DIFGSM,
     FGSM,
     FIA,
@@ -48,6 +50,10 @@ expected_vit_attacks = {
     'VDC': VDC,
     'PNAPatchOut': PNAPatchOut,
 }
+expected_generative_attacks = {
+    'BIA': BIA,
+    'CDA': CDA,
+}
 
 
 @pytest.mark.parametrize(('attack_name', 'expected'), expected_non_vit_attacks.items())
@@ -69,6 +75,15 @@ def test_create_vit_attack_same_as_imported(
 ):
     created_attacker = create_attack(attack_name, vitb16_model)
     expected_attacker = expected(vitb16_model)
+    assert created_attacker == expected_attacker
+
+
+@pytest.mark.parametrize(
+    ('attack_name', 'expected'), expected_generative_attacks.items()
+)
+def test_create_generative_attack_same_as_imported(attack_name, expected):
+    created_attacker = create_attack(attack_name)
+    expected_attacker = expected()
     assert created_attacker == expected_attacker
 
 
@@ -119,7 +134,7 @@ def test_create_attack_with_both_eps_and_attack_cfg(device, resnet50_model):
 def test_create_attack_with_invalid_eps(device, resnet50_model):
     eps = 0.3
     with pytest.warns(
-        UserWarning, match="parameter 'eps' is invalid in DeepFool and will be ignored."
+        UserWarning, match="argument 'eps' is invalid in DeepFool and will be ignored."
     ):
         attacker = create_attack(
             attack_name='DeepFool',
@@ -129,6 +144,25 @@ def test_create_attack_with_invalid_eps(device, resnet50_model):
             eps=eps,
         )
     assert 'eps' not in attacker.__dict__
+
+
+def test_create_attack_with_weights_and_checkpoint_path(device):
+    weights = 'VGG19_IMAGENET1K'
+    checkpoint_path = 'path/to/checkpoint'
+    attack_cfg = {}
+    with pytest.warns(
+        UserWarning,
+        match="argument 'weights' and 'checkpoint_path' are only used for generative attacks, and will be ignored for 'FGSM'.",
+    ):
+        attacker = create_attack(
+            attack_name='FGSM',
+            device=device,
+            weights=weights,
+            checkpoint_path=checkpoint_path,
+            attack_cfg=attack_cfg,
+        )
+    assert 'weights' not in attacker.__dict__
+    assert 'checkpoint_path' not in attacker.__dict__
 
 
 def test_create_attack_with_invalid_attack_name(device, resnet50_model):

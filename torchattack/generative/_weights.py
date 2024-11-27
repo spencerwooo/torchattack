@@ -6,11 +6,11 @@ from torch.hub import load_state_dict_from_url
 
 
 @dataclass
-class Weights:
+class GeneratorWeights:
     url: str
 
 
-class WeightsEnum(Enum):
+class GeneratorWeightsEnum(Enum):
     @classmethod
     def verify(cls, obj: Any) -> Any:
         if obj is not None:

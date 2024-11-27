@@ -70,6 +70,7 @@ class Attack(ABC):
             'hooks',  # PNAPatchOut, TGR, VDC
             'perceptual_criteria',  # SSP
             'sub_basis',  # GeoDA
+            'generator',  # BIA, CDA
         ]
         for attr in eq_name_attrs:
             if not (hasattr(self, attr) and hasattr(other, attr)):

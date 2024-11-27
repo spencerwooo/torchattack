@@ -3,45 +3,45 @@ from typing import Any
 import torch
 
 from torchattack._attack import Attack
-from torchattack.generative._weights import Weights, WeightsEnum
+from torchattack.generative._weights import GeneratorWeights, GeneratorWeightsEnum
 from torchattack.generative.resnet_generator import ResNetGenerator
 
 
-class BIAWeights(WeightsEnum):
-    RESNET152 = Weights(
+class BIAWeights(GeneratorWeightsEnum):
+    RESNET152 = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_resnet152_0.pth',
     )
-    RESNET152_RN = Weights(
+    RESNET152_RN = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_resnet152_rn_0.pth',
     )
-    RESNET152_DA = Weights(
+    RESNET152_DA = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_resnet152_da_0.pth',
     )
-    DENSENET169 = Weights(
+    DENSENET169 = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_densenet169_0.pth',
     )
-    DENSENET169_RN = Weights(
+    DENSENET169_RN = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_densenet169_rn_0.pth',
     )
-    DENSENET169_DA = Weights(
+    DENSENET169_DA = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_densenet169_da_0.pth',
     )
-    VGG16 = Weights(
+    VGG16 = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_vgg16_0.pth',
     )
-    VGG16_RN = Weights(
+    VGG16_RN = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_vgg16_rn_0.pth',
     )
-    VGG16_DA = Weights(
+    VGG16_DA = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_vgg16_da_0.pth',
     )
-    VGG19 = Weights(
+    VGG19 = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_vgg19_0.pth',
     )
-    VGG19_RN = Weights(
+    VGG19_RN = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_vgg19_rn_0.pth',
     )
-    VGG19_DA = Weights(
+    VGG19_DA = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_vgg19_da_0.pth',
     )
     DEFAULT = RESNET152_DA
@@ -72,7 +72,7 @@ class BIA(Attack):
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
-        # Generative attacks do not require specifying model and normalize.
+        # Generative attacks do not require specifying model and normalize
         super().__init__(model=None, normalize=None, device=device)
 
         self.eps = eps
@@ -80,6 +80,7 @@ class BIA(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
+        # Initialize the generator and its weights
         self.generator = ResNetGenerator()
 
         # Prioritize checkpoint path over provided weights enum

@@ -3,21 +3,21 @@ from typing import Any
 import torch
 
 from torchattack._attack import Attack
-from torchattack.generative._weights import Weights, WeightsEnum
+from torchattack.generative._weights import GeneratorWeights, GeneratorWeightsEnum
 from torchattack.generative.resnet_generator import ResNetGenerator
 
 
-class CDAWeights(WeightsEnum):
-    RESNET152_IMAGENET1K = Weights(
+class CDAWeights(GeneratorWeightsEnum):
+    RESNET152_IMAGENET1K = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/cda_res152_imagenet_0_rl.pth',
     )
-    INCEPTION_V3_IMAGENET1K = Weights(
+    INCEPTION_V3_IMAGENET1K = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/cda_incv3_imagenet_0_rl.pth',
     )
-    VGG16_IMAGENET1K = Weights(
+    VGG16_IMAGENET1K = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/cda_vgg16_imagenet_0_rl.pth',
     )
-    VGG19_IMAGENET1K = Weights(
+    VGG19_IMAGENET1K = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/cda_vgg19_imagenet_0_rl.pth',
     )
     DEFAULT = RESNET152_IMAGENET1K
@@ -48,7 +48,7 @@ class CDA(Attack):
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
-        # Generative attacks do not require specifying model and normalize.
+        # Generative attacks do not require specifying model and normalize
         super().__init__(model=None, normalize=None, device=device)
 
         self.eps = eps
