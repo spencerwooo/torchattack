@@ -1,33 +1,13 @@
 import pytest
 
-from torchattack import (
-    DIFGSM,
-    FGSM,
-    FIA,
-    MIFGSM,
-    NIFGSM,
-    PGD,
-    PGDL2,
-    SINIFGSM,
-    SSA,
-    SSP,
-    TGR,
-    TIFGSM,
-    VDC,
-    VMIFGSM,
-    VNIFGSM,
-    Admix,
-    DeCoWA,
-    DeepFool,
-    GeoDA,
-    PNAPatchOut,
-)
+import torchattack
 from torchattack.attack_model import AttackModel
 
 
 def run_attack_test(attack_cls, device, model, x, y):
     normalize = model.normalize
-    attacker = attack_cls(model, normalize, device=device)
+    # attacker = attack_cls(model, normalize, device=device)
+    attacker = torchattack.create_attack(attack_cls, model, normalize, device=device)
     x, y = x.to(device), y.to(device)
     x_adv = attacker(x, y)
     x_outs, x_adv_outs = model(normalize(x)), model(normalize(x_adv))
@@ -37,42 +17,29 @@ def run_attack_test(attack_cls, device, model, x, y):
 
 @pytest.mark.parametrize(
     'attack_cls',
-    [
-        DIFGSM,
-        FGSM,
-        FIA,
-        MIFGSM,
-        NIFGSM,
-        PGD,
-        PGDL2,
-        SINIFGSM,
-        SSA,
-        SSP,
-        TIFGSM,
-        VMIFGSM,
-        VNIFGSM,
-        Admix,
-        DeCoWA,
-        DeepFool,
-        GeoDA,
-    ],
+    (torchattack.GRADIENT_NON_VIT_ATTACKS | torchattack.NON_EPS_ATTACKS).keys(),
 )
-def test_cnn_attacks(attack_cls, device, resnet50_model, data):
+def test_common_attacks(attack_cls, device, resnet50_model, data):
     x, y = data(resnet50_model.transform)
     run_attack_test(attack_cls, device, resnet50_model, x, y)
 
 
 @pytest.mark.parametrize(
     'attack_cls',
-    [
-        TGR,
-        VDC,
-        PNAPatchOut,
-    ],
+    torchattack.GRADIENT_VIT_ATTACKS.keys(),
 )
-def test_vit_attacks(attack_cls, device, vitb16_model, data):
+def test_gradient_vit_attacks(attack_cls, device, vitb16_model, data):
     x, y = data(vitb16_model.transform)
     run_attack_test(attack_cls, device, vitb16_model, x, y)
+
+
+@pytest.mark.parametrize(
+    'attack_cls',
+    torchattack.GENERATIVE_ATTACKS.keys(),
+)
+def test_generative_attacks(attack_cls, device, resnet50_model, data):
+    x, y = data(resnet50_model.transform)
+    run_attack_test(attack_cls, device, resnet50_model, x, y)
 
 
 @pytest.mark.parametrize(
@@ -87,7 +54,7 @@ def test_vit_attacks(attack_cls, device, vitb16_model, data):
 def test_tgr_attack_all_supported_models(device, model_name, data):
     model = AttackModel.from_pretrained(model_name, device, from_timm=True)
     x, y = data(model.transform)
-    run_attack_test(TGR, device, model, x, y)
+    run_attack_test(torchattack.TGR, device, model, x, y)
 
 
 @pytest.mark.parametrize(
@@ -101,4 +68,4 @@ def test_tgr_attack_all_supported_models(device, model_name, data):
 def test_vdc_attack_all_supported_models(device, model_name, data):
     model = AttackModel.from_pretrained(model_name, device, from_timm=True)
     x, y = data(model.transform)
-    run_attack_test(VDC, device, model, x, y)
+    run_attack_test(torchattack.VDC, device, model, x, y)

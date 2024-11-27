@@ -10,12 +10,19 @@ def run_attack(
     max_samples: int = 100,
     batch_size: int = 4,
 ) -> None:
-    """Helper function to run attacks in `__main__`.
+    """Helper function to run evaluation on attacks.
 
     Example:
         >>> from torchattack import FGSM
         >>> args = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
         >>> run_attack(attack=FGSM, attack_args=args)
+
+    Note:
+        For generative attacks, the model_name argument that defines the white-box
+        surrogate model is not required. You can, however, manually provide a model name
+        to load according to your designated weight for the generator, to recreate a
+        white-box evaluation scenario, such as using VGG-19 (`model_name='vgg19'`) for
+        BIA's VGG-19 generator weight (`BIAWeights.VGG19`).
 
     Args:
         attack: The attack class to initialize, either by name or class instance.
@@ -120,11 +127,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     attack_args = {}
+    args.eps = args.eps / 255
     if args.attack not in torchattack.NON_EPS_ATTACKS:  # type: ignore
         attack_args['eps'] = args.eps
     if args.attack in torchattack.GENERATIVE_ATTACKS:  # type: ignore
         attack_args['weights'] = args.weights
-        attack_args['checkpoint_path'] = args.checkpoint
+        attack_args['checkpoint_path'] = args.checkpoint_path
 
     run_attack(
         attack=args.attack,

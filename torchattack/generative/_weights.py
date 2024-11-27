@@ -29,6 +29,10 @@ class GeneratorWeightsEnum(Enum):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}.{self._name_}'
 
+    def __eq__(self, other: Any) -> bool:
+        other = self.verify(other)
+        return isinstance(other, self.__class__) and self.name == other.name
+
     @property
     def url(self):
         return self.value.url

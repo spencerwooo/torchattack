@@ -84,6 +84,24 @@ def test_create_attack_with_both_eps_and_attack_args(device, resnet50_model):
     assert attacker.eps == eps
 
 
+def test_create_attack_with_both_weights_and_attack_args(device):
+    weights = 'VGG19_IMAGENET1K'
+    attack_args = {'weights': 'VGG19_IMAGENET1K'}
+    with pytest.warns(
+        UserWarning,
+        match="The 'weights' value provided as an argument will "
+        "overwrite the existing 'weights' value in 'attack_args'. "
+        'This MAY NOT be the intended behavior.',
+    ):
+        attacker = create_attack(
+            attack='CDA',
+            device=device,
+            weights=weights,
+            attack_args=attack_args,
+        )
+    assert attacker.weights == weights
+
+
 def test_create_attack_with_invalid_eps(device, resnet50_model):
     eps = 0.3
     with pytest.warns(
