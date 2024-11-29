@@ -85,8 +85,8 @@ def test_create_attack_with_both_eps_and_attack_args(device, resnet50_model):
 
 
 def test_create_attack_with_both_weights_and_attack_args(device):
-    weights = 'VGG19_IMAGENET1K'
-    attack_args = {'weights': 'VGG19_IMAGENET1K'}
+    weights = 'VGG19_IMAGENET'
+    attack_args = {'weights': 'VGG19_IMAGENET'}
     with pytest.warns(
         UserWarning,
         match="The 'weights' value provided as an argument will "
@@ -118,7 +118,7 @@ def test_create_attack_with_invalid_eps(device, resnet50_model):
 
 
 def test_create_attack_with_weights_and_checkpoint_path(device):
-    weights = 'VGG19_IMAGENET1K'
+    weights = 'VGG19_IMAGENET'
     checkpoint_path = 'path/to/checkpoint'
     attack_args = {}
     with pytest.warns(

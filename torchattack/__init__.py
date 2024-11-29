@@ -10,6 +10,7 @@ from torchattack.dr import DR
 from torchattack.fgsm import FGSM
 from torchattack.fia import FIA
 from torchattack.geoda import GeoDA
+from torchattack.ltp import LTP
 from torchattack.mifgsm import MIFGSM
 from torchattack.nifgsm import NIFGSM
 from torchattack.pgd import PGD
@@ -39,9 +40,10 @@ __all__ = [
     'DeepFool',
     'DIFGSM',
     'DR',
-    'FIA',
     'FGSM',
+    'FIA',
     'GeoDA',
+    'LTP',
     'MIFGSM',
     'NIFGSM',
     'PGD',
@@ -61,8 +63,8 @@ GRADIENT_NON_VIT_ATTACKS = {
     'Admix': Admix,
     'DeCoWA': DeCoWA,
     'DIFGSM': DIFGSM,
-    'FGSM': FGSM,
     'DR': DR,
+    'FGSM': FGSM,
     'FIA': FIA,
     'MIFGSM': MIFGSM,
     'NIFGSM': NIFGSM,
@@ -76,7 +78,7 @@ GRADIENT_NON_VIT_ATTACKS = {
     'VNIFGSM': VNIFGSM,
 }
 GRADIENT_VIT_ATTACKS = {'TGR': TGR, 'VDC': VDC, 'PNAPatchOut': PNAPatchOut}
-GENERATIVE_ATTACKS = {'BIA': BIA, 'CDA': CDA}
+GENERATIVE_ATTACKS = {'BIA': BIA, 'CDA': CDA, 'LTP': LTP}
 NON_EPS_ATTACKS = {'GeoDA': GeoDA, 'DeepFool': DeepFool}
 SUPPORTED_ATTACKS = (
     GRADIENT_NON_VIT_ATTACKS
