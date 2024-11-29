@@ -58,7 +58,7 @@ class TGR(Attack):
             # Explicit model_name takes precedence over model.model_name
             self.model_name = model_name
         elif hasattr(model, 'model_name'):
-            # If model is initialized via `torchattack.eval.AttackModel`, the model_name
+            # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
             self.model_name = model.model_name
         else:

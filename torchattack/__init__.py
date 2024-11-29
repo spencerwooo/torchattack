@@ -6,6 +6,7 @@ from torchattack.create_attack import create_attack
 from torchattack.decowa import DeCoWA
 from torchattack.deepfool import DeepFool
 from torchattack.difgsm import DIFGSM
+from torchattack.dr import DR
 from torchattack.fgsm import FGSM
 from torchattack.fia import FIA
 from torchattack.geoda import GeoDA
@@ -37,6 +38,7 @@ __all__ = [
     'DeCoWA',
     'DeepFool',
     'DIFGSM',
+    'DR',
     'FIA',
     'FGSM',
     'GeoDA',
@@ -60,6 +62,7 @@ GRADIENT_NON_VIT_ATTACKS = {
     'DeCoWA': DeCoWA,
     'DIFGSM': DIFGSM,
     'FGSM': FGSM,
+    'DR': DR,
     'FIA': FIA,
     'MIFGSM': MIFGSM,
     'NIFGSM': NIFGSM,
