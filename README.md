@@ -115,7 +115,7 @@ Generative attacks:
 
 | Name |   $\ell_p$    | Publication  | Paper (Open Access)                                                                                                                              | Class Name |
 | :--: | :-----------: | :----------: | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| CDA  | $\ell_\infty$ | NeurIPS 2019 | [CDA: contrastive Divergence for Adversarial Attack](https://arxiv.org/abs/1905.11736)                                                           | `CDA`      |
+| CDA  | $\ell_\infty$ | NeurIPS 2019 | [Cross-Domain Transferability of Adversarial Perturbations](https://arxiv.org/abs/1905.11736)                                                           | `CDA`      |
 | LTP  | $\ell_\infty$ | NeurIPS 2021 | [Learning Transferable Adversarial Perturbations](https://proceedings.neurips.cc/paper/2021/hash/7486cef2522ee03547cfb970a404a874-Abstract.html) | `LTP`      |
 | BIA  | $\ell_\infty$ |  ICLR 2022   | [Beyond ImageNet Attack: Towards Crafting Adversarial Examples for Black-box Domains](https://arxiv.org/abs/2201.11528)                          | `BIA`      |
 
