@@ -97,7 +97,6 @@ class DR(Attack):
             The perturbed images if successful. Shape: (N, C, H, W).
         """
 
-        g = torch.zeros_like(x)
         delta = torch.zeros_like(x, requires_grad=True)
 
         # If alpha is not given, set to eps / steps
@@ -120,13 +119,10 @@ class DR(Attack):
             if delta.grad is None:
                 continue
 
-            # Apply momentum term
-            g = self.decay * g + delta.grad / torch.mean(
-                torch.abs(delta.grad), dim=(1, 2, 3), keepdim=True
-            )
-
             # Update delta
-            delta.data = delta.data + self.alpha * g.sign()
+            g = delta.grad.data.sign()
+
+            delta.data = delta.data + self.alpha * g
             delta.data = torch.clamp(delta.data, -self.eps, self.eps)
             delta.data = torch.clamp(x + delta.data, self.clip_min, self.clip_max) - x
 
