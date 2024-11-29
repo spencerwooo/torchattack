@@ -20,7 +20,7 @@ class DR(Attack):
         device: Device to use for tensors. Defaults to cuda if available.
         model_name: The name of the model to attack. Defaults to ''.
         eps: The maximum perturbation. Defaults to 8/255.
-        steps: Number of steps. Defaults to 10.
+        steps: Number of steps. Defaults to 100.
         alpha: Step size, `eps / steps` if None. Defaults to None.
         decay: Decay factor for the momentum term. Defaults to 1.0.
         feature_layer: The layer of the model to extract features from and apply
@@ -33,9 +33,9 @@ class DR(Attack):
     # Specified in _builtin_models assume models that are loaded from,
     # or share the exact structure as, torchvision model variants.
     _builtin_models = {
-        'vgg16': 'features.14',
-        'resnet152': 'layer2.7.conv3',
-        'inception_v3': 'Mixed_5b',
+        'vgg16': 'features.14',  # conv3-3 for VGG-16
+        'resnet152': 'layer2.7.conv3',  # conv3-8-3 for ResNet-152
+        'inception_v3': 'Mixed_5b',  # Mixed_5b (Group A) for Inception-v3
     }
 
     def __init__(
@@ -45,7 +45,7 @@ class DR(Attack):
         device: torch.device | None = None,
         model_name: str = '',
         eps: float = 8 / 255,
-        steps: int = 10,
+        steps: int = 100,
         alpha: float | None = None,
         decay: float = 1.0,
         feature_layer: str = '',
@@ -56,7 +56,7 @@ class DR(Attack):
 
         # If model is initialized via `torchattack.AttackModel`, infer its model_name
         # from automatically attached attribute during instantiation.
-        if not model_name:
+        if not model_name and hasattr(model, 'model_name'):
             model_name = model.model_name
 
         self.eps = eps
@@ -137,4 +137,4 @@ class DR(Attack):
 if __name__ == '__main__':
     from torchattack.eval.runner import run_attack
 
-    run_attack(DR, model_name='inception_v3', victim_model_names=['resnet18'])
+    run_attack(DR, model_name='vgg16', victim_model_names=['resnet18'])

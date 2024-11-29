@@ -100,6 +100,7 @@ Gradient-based attacks:
 |   TI-FGSM    | $\ell_\infty$ |  CVPR 2019  | [Evading Defenses to Transferable Adversarial Examples by Translation-Invariant Attacks](https://arxiv.org/abs/1904.02884)                               | `TIFGSM`      |
 |   NI-FGSM    | $\ell_\infty$ |  ICLR 2020  | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                                           | `NIFGSM`      |
 |  SI-NI-FGSM  | $\ell_\infty$ |  ICLR 2020  | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                                           | `SINIFGSM`    |
+|      DR      | $\ell_\infty$ |  CVPR 2020  | [Enhancing Cross-Task Black-Box Transferability of Adversarial Examples With Dispersion Reduction](https://arxiv.org/abs/1911.11616)                     | `DR`          |
 |   VMI-FGSM   | $\ell_\infty$ |  CVPR 2021  | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)                                         | `VMIFGSM`     |
 |   VNI-FGSM   | $\ell_\infty$ |  CVPR 2021  | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)                                         | `VNIFGSM`     |
 |    Admix     | $\ell_\infty$ |  ICCV 2021  | [Admix: Enhancing the Transferability of Adversarial Attacks](https://arxiv.org/abs/2102.00436)                                                          | `Admix`       |
