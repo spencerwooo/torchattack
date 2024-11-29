@@ -76,7 +76,7 @@ class DR(Attack):
             raise ValueError('argument `feature_layer` must be explicitly provided.')
 
         # Register hooks
-        self.features = None
+        self.features: torch.Tensor | None = None
         self._register_model_hooks()
 
     def _register_model_hooks(self) -> None:
@@ -108,7 +108,10 @@ class DR(Attack):
         for _ in range(self.steps):
             # Compute loss
             self.model(self.normalize(x + delta))
-            # loss = self.lossfn(outs, y)
+
+            if self.features is None:
+                continue
+
             loss = -1 * self.features.std()
 
             # Compute gradient
