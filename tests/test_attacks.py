@@ -17,11 +17,23 @@ def run_attack_test(attack_cls, device, model, x, y):
 
 @pytest.mark.parametrize(
     'attack_cls',
-    (torchattack.GRADIENT_NON_VIT_ATTACKS | torchattack.NON_EPS_ATTACKS).keys(),
+    [
+        attack
+        for attack in (
+            torchattack.GRADIENT_NON_VIT_ATTACKS | torchattack.NON_EPS_ATTACKS
+        )
+        if attack != 'DR'
+    ],
 )
 def test_common_attacks(attack_cls, device, resnet50_model, data):
     x, y = data(resnet50_model.transform)
     run_attack_test(attack_cls, device, resnet50_model, x, y)
+
+
+# DR attack requires a non-ResNet-50 model
+def test_dr_attack(device, vgg16_model, data):
+    x, y = data(vgg16_model.transform)
+    run_attack_test(torchattack.DR, device, vgg16_model, x, y)
 
 
 @pytest.mark.parametrize(

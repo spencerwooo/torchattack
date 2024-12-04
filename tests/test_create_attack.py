@@ -5,7 +5,8 @@ from torchattack import create_attack
 
 
 @pytest.mark.parametrize(
-    ('attack_name', 'expected'), torchattack.GRADIENT_NON_VIT_ATTACKS.items()
+    ('attack_name', 'expected'),
+    [i for i in torchattack.GRADIENT_NON_VIT_ATTACKS.items() if i[0] != 'DR'],
 )
 def test_create_non_vit_attack_same_as_imported(
     attack_name,
@@ -14,6 +15,15 @@ def test_create_non_vit_attack_same_as_imported(
 ):
     created_attacker = create_attack(attack_name, resnet50_model)
     expected_attacker = expected(resnet50_model)
+    assert created_attacker == expected_attacker
+
+
+def test_create_dr_attack_same_as_imported(
+    vgg16_model,
+    data,
+):
+    created_attacker = create_attack('DR', vgg16_model)
+    expected_attacker = torchattack.DR(vgg16_model)
     assert created_attacker == expected_attacker
 
 
