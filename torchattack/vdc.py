@@ -21,7 +21,7 @@ class VDC(Attack):
         model: The model to attack.
         normalize: A transform to normalize images.
         device: Device to use for tensors. Defaults to cuda if available.
-        model_name: The name of the model. Supported models are:
+        hook_cfg: Config used for applying hooks to the model. Supported configs are:
             * 'vit_base_patch16_224'
             * 'deit_base_distilled_patch16_224'
             * 'pit_b_224'
@@ -31,7 +31,6 @@ class VDC(Attack):
         alpha: Step size, `eps / steps` if None. Defaults to None.
         decay: Momentum decay factor. Defaults to 1.0.
         sample_num_batches: Number of batches to sample. Defaults to 130.
-        lambd: Lambda value for VDC. Defaults to 0.1.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
         targeted: Targeted attack if True. Defaults to False.
@@ -42,13 +41,13 @@ class VDC(Attack):
         model: nn.Module | AttackModel,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
         device: torch.device | None = None,
-        model_name: str = '',
+        hook_cfg: str = '',
         eps: float = 8 / 255,
         steps: int = 10,
         alpha: float | None = None,
         decay: float = 1.0,
         sample_num_batches: int = 130,
-        lambd: float = 0.1,
+        # lambd: float = 0.1,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
         targeted: bool = False,
@@ -57,15 +56,13 @@ class VDC(Attack):
         # structure and same implementation/definition as `timm` models.
         super().__init__(model, normalize, device)
 
-        if model_name:
-            # Explicit model_name takes precedence over model.model_name
-            self.model_name = model_name
+        if hook_cfg:
+            # Explicit config name takes precedence over inferred model.model_name
+            self.hook_cfg = hook_cfg
         elif hasattr(model, 'model_name'):
             # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
-            self.model_name = model.model_name
-        else:
-            raise ValueError('`model_name` must be explicitly provided.')
+            self.hook_cfg = model.model_name
 
         self.eps = eps
         self.steps = steps
@@ -73,7 +70,7 @@ class VDC(Attack):
         self.decay = decay
 
         self.sample_num_batches = sample_num_batches
-        self.lambd = lambd
+        # self.lambd = lambd
 
         # Default (3, 224, 224) image with ViT-B/16 16x16 patches
         self.max_num_batches = int((224 / 16) ** 2)
@@ -648,7 +645,7 @@ class VDC(Attack):
         # fmt: off
         # Register hooks for supported models.
         #   * Gradient RECORD mode hooks:
-        record_grad_cfg = {
+        grad_record_hook_cfg = {
             'vit_base_patch16_224': [
                 (norm_record_func_vit, ['norm']),
                 (mlp_record_func_vit, [f'blocks.{i}.norm2' for i in range(12)]),
@@ -673,7 +670,7 @@ class VDC(Attack):
             ],
         }
         #   * Gradient ADD mode hooks:
-        add_grad_cfg = {
+        grad_add_hook_cfg = {
             'vit_base_patch16_224': [
                 (mlp_add_func_vit, [f'blocks.{i}.norm2' for i in range(12)]),
                 (attn_add_func_vit, [f'blocks.{i}.attn.attn_drop' for i in range(12)]),
@@ -694,10 +691,20 @@ class VDC(Attack):
         }
         # fmt: on
 
-        activated_vit_cfg = add_grad_cfg if add_grad_mode else record_grad_cfg
-        assert self.model_name in activated_vit_cfg
+        active_hook_cfg = grad_add_hook_cfg if add_grad_mode else grad_record_hook_cfg
 
-        for hook_func, layers in activated_vit_cfg[self.model_name]:
+        if self.hook_cfg not in active_hook_cfg:
+            from warnings import warn
+
+            warn(
+                f'Hook config specified (`{self.hook_cfg}`) is not supported. '
+                'Falling back to default (`vit_base_patch16_224`). '
+                'This MAY NOT be intended.',
+                stacklevel=2,
+            )
+            self.hook_cfg = 'vit_base_patch16_224'
+
+        for hook_func, layers in active_hook_cfg[self.hook_cfg]:
             for layer in layers:
                 module = rgetattr(self.model, layer)
                 hook = module.register_backward_hook(hook_func)
