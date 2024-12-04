@@ -112,6 +112,7 @@ class AttackModel:
         # `torchvision.models` first, then fall back to timm if the model is not found.
         try:
             import torchvision.models as tv_models
+            import torchvision.transforms.functional as f
 
             model = tv_models.get_model(name=model_name, weights='DEFAULT')
             model = model.to(device).eval()
@@ -122,17 +123,19 @@ class AttackModel:
 
             # torchvision/transforms/_presets.py::ImageClassification
             # Manually construct separated transform and normalize
-            transform = t.Compose(
-                [
-                    t.Resize(
-                        cfg.resize_size,
-                        interpolation=cfg.interpolation,
-                        antialias=cfg.antialias,
-                    ),
-                    t.CenterCrop(cfg.crop_size),
-                    t.ToTensor(),
-                ]
-            )
+            def transform(x):
+                x = f.resize(
+                    x,
+                    cfg.resize_size,
+                    interpolation=cfg.interpolation,
+                    antialias=cfg.antialias,
+                )
+                x = f.center_crop(x, cfg.crop_size)
+                if not isinstance(x, torch.Tensor):
+                    x = f.pil_to_tensor(x)
+                x = f.convert_image_dtype(x, torch.float)
+                return x
+
             normalize = t.Normalize(mean=cfg.mean, std=cfg.std)
 
             return cls(model_name, device, model, transform, normalize)
