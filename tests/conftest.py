@@ -38,5 +38,10 @@ def resnet50_model(device: torch.device) -> AttackModel:
 
 
 @pytest.fixture()
+def vgg16_model(device: torch.device) -> AttackModel:
+    return AttackModel.from_pretrained('vgg16', device)
+
+
+@pytest.fixture()
 def vitb16_model(device: torch.device) -> AttackModel:
     return AttackModel.from_pretrained('vit_base_patch16_224', device, from_timm=True)

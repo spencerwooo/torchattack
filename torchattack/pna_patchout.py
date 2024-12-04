@@ -19,7 +19,7 @@ class PNAPatchOut(Attack):
         model: The model to attack.
         normalize: A transform to normalize images.
         device: Device to use for tensors. Defaults to cuda if available.
-        model_name: The name of the model. Supported models are:
+        hook_cfg: Config used for applying hooks to the model. Supported configs are:
             * 'vit_base_patch16_224'
             * 'deit_base_distilled_patch16_224'
             * 'pit_b_224'
@@ -41,7 +41,7 @@ class PNAPatchOut(Attack):
         model: nn.Module | AttackModel,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
         device: torch.device | None = None,
-        model_name: str = '',
+        hook_cfg: str = '',
         eps: float = 8 / 255,
         steps: int = 10,
         alpha: float | None = None,
@@ -56,15 +56,13 @@ class PNAPatchOut(Attack):
         # structure and same implementation/definition as `timm` models.
         super().__init__(model, normalize, device)
 
-        if model_name:
-            # Explicit model_name takes precedence over model.model_name
-            self.model_name = model_name
+        if hook_cfg:
+            # Explicit config name takes precedence over inferred model.model_name
+            self.hook_cfg = hook_cfg
         elif hasattr(model, 'model_name'):
             # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
-            self.model_name = model.model_name
-        else:
-            raise ValueError('`model_name` must be explicitly provided.')
+            self.hook_cfg = model.model_name
 
         self.eps = eps
         self.steps = steps
@@ -151,7 +149,7 @@ class PNAPatchOut(Attack):
         drop_hook_func = partial(attn_drop_mask_grad, gamma=0)
 
         # fmt: off
-        supported_vit_cfg = {
+        supported_hook_cfg = {
             'vit_base_patch16_224': [f'blocks.{i}.attn.attn_drop' for i in range(12)],
             'deit_base_distilled_patch16_224': [f'blocks.{i}.attn.attn_drop' for i in range(12)],
             'pit_b_224': [f'transformers.{tid}.blocks.{i}.attn.attn_drop' for tid, bid in enumerate([3, 6, 4]) for i in range(bid)],
@@ -160,10 +158,19 @@ class PNAPatchOut(Attack):
         }
         # fmt: on
 
-        assert self.model_name in supported_vit_cfg
+        if self.hook_cfg not in supported_hook_cfg:
+            from warnings import warn
 
-        # Register backward hook for layers specified in supported_vit_cfg
-        for layer in supported_vit_cfg[self.model_name]:
+            warn(
+                f'Hook config specified (`{self.hook_cfg}`) is not supported. '
+                'Falling back to default (`vit_base_patch16_224`). '
+                'This MAY NOT be intended.',
+                stacklevel=2,
+            )
+            self.hook_cfg = 'vit_base_patch16_224'
+
+        # Register backward hook for layers specified in the config
+        for layer in supported_hook_cfg[self.hook_cfg]:
             module = rgetattr(self.model, layer)
             module.register_backward_hook(drop_hook_func)
 
