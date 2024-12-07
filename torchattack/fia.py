@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 
 from torchattack._attack import Attack
+from torchattack._rgetattr import rgetattr
 from torchattack.attack_model import AttackModel
 
 
@@ -22,11 +23,10 @@ class FIA(Attack):
         alpha: Step size, `eps / steps` if None. Defaults to None.
         decay: Decay factor for the momentum term. Defaults to 1.0.
         num_ens: Number of aggregate gradients. Defaults to 30.
-        feature_layer: The layer to compute feature importance. Defaults to "layer4".
+        feature_layer_name: Layer to compute feature importance. Defaults to "layer4".
         drop_rate: Dropout rate for random pixels. Defaults to 0.3.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
-        targeted: Targeted attack if True. Defaults to False.
     """
 
     def __init__(
@@ -39,11 +39,10 @@ class FIA(Attack):
         alpha: float | None = None,
         decay: float = 1.0,
         num_ens: int = 30,
-        feature_layer: str = 'layer4',
+        feature_layer_name: str = 'layer4',
         drop_rate: float = 0.3,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
-        targeted: bool = False,
     ) -> None:
         super().__init__(model, normalize, device)
 
@@ -52,16 +51,11 @@ class FIA(Attack):
         self.alpha = alpha
         self.decay = decay
         self.num_ens = num_ens
-        self.feature_layer = self.find_layer(feature_layer)
         self.drop_rate = drop_rate
         self.clip_min = clip_min
         self.clip_max = clip_max
-        self.targeted = targeted
-        # self.lossfn = nn.CrossEntropyLoss()
 
-        # TODO: Targeted attack is not supported yet.
-        if self.targeted:
-            print('Targeted attack is not supported, using non-targeted variant.')
+        self.feature_layer = rgetattr(self.model, feature_layer_name)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform FIA on a batch of images.
@@ -74,6 +68,7 @@ class FIA(Attack):
             The perturbed images if successful. Shape: (N, C, H, W).
         """
 
+        g = torch.zeros_like(x)
         delta = torch.zeros_like(x, requires_grad=True)
 
         # If alpha is not given, set to eps / steps
@@ -84,19 +79,24 @@ class FIA(Attack):
         h2 = self.feature_layer.register_full_backward_hook(self.__backward_hook)  # type: ignore
 
         # Gradient aggregation on ensembles
-        agg_grad = 0
+        agg_grad: torch.Tensor | float = 0.0
         for _ in range(self.num_ens):
+            # Create variants of input with randomly dropped pixels
             x_dropped = self.drop_pixels(x)
-            output_random = self.model(self.normalize(x_dropped))
-            output_random = torch.softmax(output_random, dim=1)
-            loss = 0
-            for batch_i in range(x.shape[0]):
-                loss += output_random[batch_i][y[batch_i]]  # type: ignore
-            self.model.zero_grad()
-            loss.backward()  # type: ignore
-            agg_grad += self.mid_grad[0].detach()  # type: ignore
-        for batch_i in range(x.shape[0]):
-            agg_grad[batch_i] /= agg_grad[batch_i].norm(p=2)  # type: ignore
+
+            # Get model outputs and compute gradients
+            outs_dropped = self.model(self.normalize(x_dropped))
+            outs_dropped = torch.softmax(outs_dropped, dim=1)
+
+            loss = sum(outs_dropped[bi][y[bi]] for bi in range(x.shape[0]))
+            loss.backward()
+
+            # Accumulate gradients
+            agg_grad += self.mid_grad[0].detach()
+
+        # for batch_i in range(x.shape[0]):
+        #     agg_grad[batch_i] /= agg_grad[batch_i].norm(p=2)
+        agg_grad /= torch.norm(agg_grad, p=2, dim=(1, 2, 3), keepdim=True)
         h2.remove()
 
         # Perform FIA
@@ -105,15 +105,25 @@ class FIA(Attack):
             _ = self.model(self.normalize(x + delta))
 
             # Hooks are updated during forward pass
-            outs = (self.mid_output * agg_grad).sum()
+            loss = (self.mid_output * agg_grad).sum()
+            loss.backward()
 
-            self.model.zero_grad()
-            grad = torch.autograd.grad(outs, delta, retain_graph=False)[0]
+            if delta.grad is None:
+                continue
+
+            # Apply momentum term
+            g = self.decay * g + delta.grad / torch.mean(
+                torch.abs(delta.grad), dim=(1, 2, 3), keepdim=True
+            )
 
             # Update delta
-            delta.data = delta.data - self.alpha * grad.sign()
+            delta.data = delta.data - self.alpha * g.sign()
             delta.data = torch.clamp(delta.data, -self.eps, self.eps)
             delta.data = torch.clamp(x + delta.data, self.clip_min, self.clip_max) - x
+
+            # Zero out gradient
+            delta.grad.detach_()
+            delta.grad.zero_()
 
         h.remove()
         return x + delta
@@ -137,25 +147,6 @@ class FIA(Attack):
 
         return x_dropped
 
-    def find_layer(self, feature_layer_name) -> nn.Module:
-        """Find the layer to compute feature importance.
-
-        Returns:
-            The layer to compute feature importance.
-        """
-
-        # for layer in feature_layer_name.split(' '):
-        #     if layer not in self.model._modules:
-        #         raise ValueError(f'Layer {layer} not found in the model.')
-        #     return self.model._modules[layer]
-
-        if feature_layer_name not in self.model._modules:
-            raise ValueError(f'Layer {feature_layer_name} not found in the model.')
-        feature_layer = self.model._modules[feature_layer_name]
-        if not isinstance(feature_layer, nn.Module):
-            raise ValueError(f'Layer {feature_layer_name} invalid.')
-        return feature_layer
-
     def __forward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
         self.mid_output = o
 
@@ -166,4 +157,9 @@ class FIA(Attack):
 if __name__ == '__main__':
     from torchattack.eval import run_attack
 
-    run_attack(FIA, {'eps': 8 / 255, 'steps': 10, 'feature_layer': 'layer2'})
+    run_attack(
+        FIA,
+        attack_args={'feature_layer_name': 'layer2'},
+        model_name='resnet18',
+        victim_model_names=['resnet50', 'vgg13', 'densenet121'],
+    )
