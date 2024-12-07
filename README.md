@@ -22,13 +22,13 @@
 <sub><b>Install from GitHub source -</b></sub>
 
 ```shell
-python -m pip install git+https://github.com/spencerwooo/torchattack@v1.0.4
+python -m pip install git+https://github.com/spencerwooo/torchattack@v1.0.5
 ```
 
 <sub><b>Install from Gitee mirror -</b></sub>
 
 ```shell
-python -m pip install git+https://gitee.com/spencerwoo/torchattack@v1.0.4
+python -m pip install git+https://gitee.com/spencerwoo/torchattack@v1.0.5
 ```
 
 ## Usage

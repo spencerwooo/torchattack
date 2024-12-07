@@ -67,7 +67,7 @@ class PGDL2(Attack):
         # initialized with samples from a uniform distribution.
         if self.random_start:
             delta = torch.empty_like(x).normal_()
-            delta_flat = delta.view(x.size(0), -1)
+            delta_flat = delta.reshape(x.size(0), -1)
 
             n = delta_flat.norm(p=2, dim=1).view(x.size(0), 1, 1, 1)
             r = torch.zeros_like(n).uniform_(0, 1)
