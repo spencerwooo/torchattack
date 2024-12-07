@@ -106,6 +106,7 @@ Gradient-based attacks:
 |    Admix     | $\ell_\infty$ |  ICCV 2021  | [Admix: Enhancing the Transferability of Adversarial Attacks](https://arxiv.org/abs/2102.00436)                                                          | `Admix`       |
 |     FIA      | $\ell_\infty$ |  ICCV 2021  | [Feature Importance-aware Transferable Adversarial Attacks](https://arxiv.org/abs/2107.14185)                                                            | `FIA`         |
 | PNA-PatchOut | $\ell_\infty$ |  AAAI 2022  | [Towards Transferable Adversarial Attacks on Vision Transformers](https://arxiv.org/abs/2109.04176)                                                      | `PNAPatchOut` |
+|     NAA      | $\ell_\infty$ |  CVPR 2022  | [Improving Adversarial Transferability via Neuron Attribution-Based Attacks](https://arxiv.org/abs/2204.00008)                                           | `NAA`         |
 |     SSA      | $\ell_\infty$ |  ECCV 2022  | [Frequency Domain Model Augmentation for Adversarial Attack](https://arxiv.org/abs/2207.05382)                                                           | `SSA`         |
 |     TGR      | $\ell_\infty$ |  CVPR 2023  | [Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization](https://arxiv.org/abs/2303.15754)                           | `TGR`         |
 |    DeCoWA    | $\ell_\infty$ |  AAAI 2024  | [Boosting Adversarial Transferability across Model Genus by Deformation-Constrained Warping](https://arxiv.org/abs/2402.03951)                           | `DeCoWA`      |
@@ -115,7 +116,7 @@ Generative attacks:
 
 | Name |   $\ell_p$    | Publication  | Paper (Open Access)                                                                                                                              | Class Name |
 | :--: | :-----------: | :----------: | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| CDA  | $\ell_\infty$ | NeurIPS 2019 | [Cross-Domain Transferability of Adversarial Perturbations](https://arxiv.org/abs/1905.11736)                                                           | `CDA`      |
+| CDA  | $\ell_\infty$ | NeurIPS 2019 | [Cross-Domain Transferability of Adversarial Perturbations](https://arxiv.org/abs/1905.11736)                                                    | `CDA`      |
 | LTP  | $\ell_\infty$ | NeurIPS 2021 | [Learning Transferable Adversarial Perturbations](https://proceedings.neurips.cc/paper/2021/hash/7486cef2522ee03547cfb970a404a874-Abstract.html) | `LTP`      |
 | BIA  | $\ell_\infty$ |  ICLR 2022   | [Beyond ImageNet Attack: Towards Crafting Adversarial Examples for Black-box Domains](https://arxiv.org/abs/2201.11528)                          | `BIA`      |
 
