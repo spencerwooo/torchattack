@@ -88,8 +88,6 @@ Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a full exa
 
 ## Attacks
 
-Gradient-based attacks:
-
 <table>
   <thead>
     <tr>
@@ -100,6 +98,10 @@ Gradient-based attacks:
     </tr>
   </thead>
   <tbody>
+    <!-- Gradient-based attacks -->
+    <tr>
+      <th colspan="4">Gradient-based attacks</th>
+    </tr>
     <tr>
       <td>FGSM</td>
       <td><code>FGSM</code></td>
@@ -214,21 +216,10 @@ Gradient-based attacks:
       <td><img src="https://img.shields.io/badge/AAAI-2024-C8172C" alt="AAAI 2024"></td>
       <td><a href="https://ojs.aaai.org/index.php/AAAI/article/view/28541">Improving the Adversarial Transferability of Vision Transformers with Virtual Dense Connection</a></td>
     </tr>
-  </tbody>
-</table>
-
-Generative attacks:
-
-<table>
-  <thead>
+    <!-- Generative attacks -->
     <tr>
-      <th>Name</th>
-      <th>Class Name</th>
-      <th>Publication</th>
-      <th>Paper (Open Access)</th>
+      <th colspan="4">Generative attacks</th>
     </tr>
-  </thead>
-  <tbody>
     <tr>
       <td>CDA</td>
       <td><code>CDA</code></td>
@@ -247,21 +238,10 @@ Generative attacks:
       <td><img src="https://img.shields.io/badge/ICLR-2022-62B959" alt="ICLR 2022"></td>
       <td><a href="https://arxiv.org/abs/2201.11528">Beyond ImageNet Attack: Towards Crafting Adversarial Examples for Black-box Domains</a></td>
     </tr>
-  </tbody>
-</table>
-
-Others:
-
-<table>
-  <thead>
+    <!-- Others -->
     <tr>
-      <th>Name</th>
-      <th>Class Name</th>
-      <th>Publication</th>
-      <th>Paper (Open Access)</th>
+      <th colspan="4">Others</th>
     </tr>
-  </thead>
-  <tbody>
     <tr>
       <td>DeepFool</td>
       <td><code>DeepFool</code></td>
