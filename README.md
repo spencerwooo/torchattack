@@ -90,43 +90,226 @@ Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a full exa
 
 Gradient-based attacks:
 
-|     Name     |   $\ell_p$    | Publication | Paper (Open Access)                                                                                                                                      | Class Name    |
-| :----------: | :-----------: | :---------: | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-|     FGSM     | $\ell_\infty$ |  ICLR 2015  | [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572)                                                                        | `FGSM`        |
-|     PGD      | $\ell_\infty$ |  ICLR 2018  | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                                                        | `PGD`         |
-|   PGD (L2)   |   $\ell_2$    |  ICLR 2018  | [Towards Deep Learning Models Resistant to Adversarial Attacks](https://arxiv.org/abs/1706.06083)                                                        | `PGDL2`       |
-|   MI-FGSM    | $\ell_\infty$ |  CVPR 2018  | [Boosting Adversarial Attacks with Momentum](https://arxiv.org/abs/1710.06081)                                                                           | `MIFGSM`      |
-|   DI-FGSM    | $\ell_\infty$ |  CVPR 2019  | [Improving Transferability of Adversarial Examples with Input Diversity](https://arxiv.org/abs/1803.06978)                                               | `DIFGSM`      |
-|   TI-FGSM    | $\ell_\infty$ |  CVPR 2019  | [Evading Defenses to Transferable Adversarial Examples by Translation-Invariant Attacks](https://arxiv.org/abs/1904.02884)                               | `TIFGSM`      |
-|   NI-FGSM    | $\ell_\infty$ |  ICLR 2020  | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                                           | `NIFGSM`      |
-|  SI-NI-FGSM  | $\ell_\infty$ |  ICLR 2020  | [Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks](https://arxiv.org/abs/1908.06281)                                           | `SINIFGSM`    |
-|      DR      | $\ell_\infty$ |  CVPR 2020  | [Enhancing Cross-Task Black-Box Transferability of Adversarial Examples With Dispersion Reduction](https://arxiv.org/abs/1911.11616)                     | `DR`          |
-|   VMI-FGSM   | $\ell_\infty$ |  CVPR 2021  | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)                                         | `VMIFGSM`     |
-|   VNI-FGSM   | $\ell_\infty$ |  CVPR 2021  | [Enhancing the Transferability of Adversarial Attacks through Variance Tuning](https://arxiv.org/abs/2103.15571)                                         | `VNIFGSM`     |
-|    Admix     | $\ell_\infty$ |  ICCV 2021  | [Admix: Enhancing the Transferability of Adversarial Attacks](https://arxiv.org/abs/2102.00436)                                                          | `Admix`       |
-|     FIA      | $\ell_\infty$ |  ICCV 2021  | [Feature Importance-aware Transferable Adversarial Attacks](https://arxiv.org/abs/2107.14185)                                                            | `FIA`         |
-| PNA-PatchOut | $\ell_\infty$ |  AAAI 2022  | [Towards Transferable Adversarial Attacks on Vision Transformers](https://arxiv.org/abs/2109.04176)                                                      | `PNAPatchOut` |
-|     NAA      | $\ell_\infty$ |  CVPR 2022  | [Improving Adversarial Transferability via Neuron Attribution-Based Attacks](https://arxiv.org/abs/2204.00008)                                           | `NAA`         |
-|     SSA      | $\ell_\infty$ |  ECCV 2022  | [Frequency Domain Model Augmentation for Adversarial Attack](https://arxiv.org/abs/2207.05382)                                                           | `SSA`         |
-|     TGR      | $\ell_\infty$ |  CVPR 2023  | [Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization](https://arxiv.org/abs/2303.15754)                           | `TGR`         |
-|    DeCoWA    | $\ell_\infty$ |  AAAI 2024  | [Boosting Adversarial Transferability across Model Genus by Deformation-Constrained Warping](https://arxiv.org/abs/2402.03951)                           | `DeCoWA`      |
-|     VDC      | $\ell_\infty$ |  AAAI 2024  | [Improving the Adversarial Transferability of Vision Transformers with Virtual Dense Connection](https://ojs.aaai.org/index.php/AAAI/article/view/28541) | `VDC`         |
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Class Name</th>
+      <th>Tags</th>
+      <th>Venue</th>
+      <th max>Paper (Open Access)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>FGSM</td>
+      <td><code>FGSM</code></td>
+      <td><code>eps</code></td>
+      <td><img src="https://img.shields.io/badge/ICLR-2015-62B959" alt="ICLR 2015"></td>
+      <td><a href="https://arxiv.org/abs/1412.6572">Explaining and Harnessing Adversarial Examples</a></td>
+    </tr>
+    <tr>
+      <td>PGD</td>
+      <td><code>PGD</code></td>
+      <td><code>eps</code></td>
+      <td><img src="https://img.shields.io/badge/ICLR-2018-62B959" alt="ICLR 2018"></td>
+      <td><a href="https://arxiv.org/abs/1706.06083">Towards Deep Learning Models Resistant to Adversarial Attacks</a></td>
+    </tr>
+    <tr>
+      <td>PGD (L2)</td>
+      <td><code>PGDL2</code></td>
+      <td><code>eps</code>, <code>l2</code></td>
+      <td><img src="https://img.shields.io/badge/ICLR-2018-62B959" alt="ICLR 2018"></td>
+      <td><a href="https://arxiv.org/abs/1706.06083">Towards Deep Learning Models Resistant to Adversarial Attacks</a></td>
+    </tr>
+    <tr>
+      <td>MI-FGSM</td>
+      <td><code>MIFGSM</code></td>
+      <td><code>eps</code>, <code>gradient</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2018-1C72B2" alt="CVPR 2018"></td>
+      <td><a href="https://arxiv.org/abs/1710.06081">Boosting Adversarial Attacks with Momentum</a></td>
+    </tr>
+    <tr>
+      <td>DI-FGSM</td>
+      <td><code>DIFGSM</code></td>
+      <td><code>eps</code>, <code>transform</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2019-1C72B2" alt="CVPR 2019"></td>
+      <td><a href="https://arxiv.org/abs/1803.06978">Improving Transferability of Adversarial Examples with Input Diversity</a></td>
+    </tr>
+    <tr>
+      <td>TI-FGSM</td>
+      <td><code>TIFGSM</code></td>
+      <td><code>eps</code>, <code>transform</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2019-1C72B2" alt="CVPR 2019"></td>
+      <td><a href="https://arxiv.org/abs/1904.02884">Evading Defenses to Transferable Adversarial Examples by Translation-Invariant Attacks</a></td>
+    </tr>
+    <tr>
+      <td>NI-FGSM</td>
+      <td><code>NIFGSM</code></td>
+      <td><code>eps</code>, <code>gradient</code></td>
+      <td><img src="https://img.shields.io/badge/ICLR-2020-62B959" alt="ICLR 2020"></td>
+      <td><a href="https://arxiv.org/abs/1908.06281">Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks</a></td>
+    </tr>
+    <tr>
+      <td>SI-NI-FGSM</td>
+      <td><code>SINIFGSM</code></td>
+      <td><code>eps</code>, <code>transform</code> , <code>gradient</code></td>
+      <td><img src="https://img.shields.io/badge/ICLR-2020-62B959" alt="ICLR 2020"></td>
+      <td><a href="https://arxiv.org/abs/1908.06281">Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks</a></td>
+    </tr>
+    <tr>
+      <td>DR</td>
+      <td><code>DR</code></td>
+      <td><code>eps</code>, <code>feature</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2020-1C72B2" alt="CVPR 2020"></td>
+      <td><a href="https://arxiv.org/abs/1911.11616">Enhancing Cross-Task Black-Box Transferability of Adversarial Examples With Dispersion Reduction</a></td>
+    </tr>
+    <tr>
+      <td>VMI-FGSM</td>
+      <td><code>VMIFGSM</code></td>
+      <td><code>eps</code>, <code>gradient</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2021-1C72B2" alt="CVPR 2021"></td>
+      <td><a href="https://arxiv.org/abs/2103.15571">Enhancing the Transferability of Adversarial Attacks through Variance Tuning</a></td>
+    </tr>
+    <tr>
+      <td>VNI-FGSM</td>
+      <td><code>VNIFGSM</code></td>
+      <td><code>eps</code>, <code>gradient</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2021-1C72B2" alt="CVPR 2021"></td>
+      <td><a href="https://arxiv.org/abs/2103.15571">Enhancing the Transferability of Adversarial Attacks through Variance Tuning</a></td>
+    </tr>
+    <tr>
+      <td>Admix</td>
+      <td><code>Admix</code></td>
+      <td><code>eps</code>, <code>transform</code></td>
+      <td><img src="https://img.shields.io/badge/ICCV-2021-5A428D" alt="ICCV 2021"></td>
+      <td><a href="https://arxiv.org/abs/2102.00436">Admix: Enhancing the Transferability of Adversarial Attacks</a></td>
+    </tr>
+    <tr>
+      <td>FIA</td>
+      <td><code>FIA</code></td>
+      <td><code>eps</code>, <code>feature</code></td>
+      <td><img src="https://img.shields.io/badge/ICCV-2021-5A428D" alt="ICCV 2021"></td>
+      <td><a href="https://arxiv.org/abs/2107.14185">Feature Importance-aware Transferable Adversarial Attacks</a></td>
+    </tr>
+    <tr>
+      <td>PNA-PatchOut</td>
+      <td><code>PNAPatchOut</code></td>
+      <td><code>eps</code>, <code>vit</code></td>
+      <td><img src="https://img.shields.io/badge/AAAI-2022-C8172C" alt="AAAI 2022"></td>
+      <td><a href="https://arxiv.org/abs/2109.04176">Towards Transferable Adversarial Attacks on Vision Transformers</a></td>
+    </tr>
+    <tr>
+      <td>NAA</td>
+      <td><code>NAA</code></td>
+      <td><code>eps</code>, <code>feature</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2022-1C72B2" alt="CVPR 2022"></td>
+      <td><a href="https://arxiv.org/abs/2204.00008">Improving Adversarial Transferability via Neuron Attribution-Based Attacks</a></td>
+    </tr>
+    <tr>
+      <td>SSA</td>
+      <td><code>SSA</code></td>
+      <td><code>eps</code>, <code>frequency</code></td>
+      <td><img src="https://img.shields.io/badge/ECCV-2022-E16B4C" alt="ECCV 2022"></td>
+      <td><a href="https://arxiv.org/abs/2207.05382">Frequency Domain Model Augmentation for Adversarial Attack</a></td>
+    </tr>
+    <tr>
+      <td>TGR</td>
+      <td><code>TGR</code></td>
+      <td><code>eps</code>, <code>vit</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2023-1C72B2" alt="CVPR 2023"></td>
+      <td><a href="https://arxiv.org/abs/2303.15754">Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization</a></td>
+    </tr>
+    <tr>
+      <td>DeCoWA</td>
+      <td><code>DeCoWA</code></td>
+      <td><code>eps</code>, <code>transform</code>, <code>vit</code></td>
+      <td><img src="https://img.shields.io/badge/AAAI-2024-C8172C" alt="AAAI 2024"></td>
+      <td><a href="https://arxiv.org/abs/2402.03951">Boosting Adversarial Transferability across Model Genus by Deformation-Constrained Warping</a></td>
+    </tr>
+    <tr>
+      <td>VDC</td>
+      <td><code>VDC</code></td>
+      <td><code>eps</code>, <code>vit</code></td>
+      <td><img src="https://img.shields.io/badge/AAAI-2024-C8172C" alt="AAAI 2024"></td>
+      <td><a href="https://ojs.aaai.org/index.php/AAAI/article/view/28541">Improving the Adversarial Transferability of Vision Transformers with Virtual Dense Connection</a></td>
+    </tr>
+  </tbody>
+</table>
 
 Generative attacks:
 
-| Name |   $\ell_p$    | Publication  | Paper (Open Access)                                                                                                                              | Class Name |
-| :--: | :-----------: | :----------: | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| CDA  | $\ell_\infty$ | NeurIPS 2019 | [Cross-Domain Transferability of Adversarial Perturbations](https://arxiv.org/abs/1905.11736)                                                    | `CDA`      |
-| LTP  | $\ell_\infty$ | NeurIPS 2021 | [Learning Transferable Adversarial Perturbations](https://proceedings.neurips.cc/paper/2021/hash/7486cef2522ee03547cfb970a404a874-Abstract.html) | `LTP`      |
-| BIA  | $\ell_\infty$ |  ICLR 2022   | [Beyond ImageNet Attack: Towards Crafting Adversarial Examples for Black-box Domains](https://arxiv.org/abs/2201.11528)                          | `BIA`      |
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Class Name</th>
+      <th>Tags</th>
+      <th>Venue</th>
+      <th>Paper (Open Access)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CDA</td>
+      <td><code>CDA</code></td>
+      <td><code>eps</code>, <code>generative</code></td>
+      <td><img src="https://img.shields.io/badge/NeurIPS-2019-654287" alt="NeurIPS 2019"></td>
+      <td><a href="https://arxiv.org/abs/1905.11736">Cross-Domain Transferability of Adversarial Perturbations</a></td>
+    </tr>
+    <tr>
+      <td>LTP</td>
+      <td><code>LTP</code></td>
+      <td><code>eps</code>, <code>generative</code>, <code>feature</code></td>
+      <td><img src="https://img.shields.io/badge/NeurIPS-2021-654287" alt="NeurIPS 2021"></td>
+      <td><a href="https://proceedings.neurips.cc/paper/2021/hash/7486cef2522ee03547cfb970a404a874-Abstract.html">Learning Transferable Adversarial Perturbations</a></td>
+    </tr>
+    <tr>
+      <td>BIA</td>
+      <td><code>BIA</code></td>
+      <td><code>eps</code>, <code>generative</code>, <code>feature</code></td>
+      <td><img src="https://img.shields.io/badge/ICLR-2022-62B959" alt="ICLR 2022"></td>
+      <td><a href="https://arxiv.org/abs/2201.11528">Beyond ImageNet Attack: Towards Crafting Adversarial Examples for Black-box Domains</a></td>
+    </tr>
+  </tbody>
+</table>
 
 Others:
 
-|   Name   |        $\ell_p$         | Publication | Paper (Open Access)                                                                                     | Class Name |
-| :------: | :---------------------: | :---------: | ------------------------------------------------------------------------------------------------------- | ---------- |
-| DeepFool |        $\ell_2$         |  CVPR 2016  | [DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks](https://arxiv.org/abs/1511.04599) | `DeepFool` |
-|  GeoDA   | $\ell_\infty$, $\ell_2$ |  CVPR 2020  | [GeoDA: A Geometric Framework for Black-box Adversarial Attacks](https://arxiv.org/abs/2003.06468)      | `GeoDA`    |
-|   SSP    |      $\ell_\infty$      |  CVPR 2020  | [A Self-supervised Approach for Adversarial Robustness](https://arxiv.org/abs/2006.04924)               | `SSP`      |
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Class Name</th>
+      <th>Tags</th>
+      <th>Venue</th>
+      <th>Paper (Open Access)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>DeepFool</td>
+      <td><code>DeepFool</code></td>
+      <td><code>white-box</code>, <code>minimal-perturbation</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2016-1C72B2" alt="CVPR 2016"></td>
+      <td><a href="https://arxiv.org/abs/1511.04599">DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks</a></td>
+    </tr>
+    <tr>
+      <td>GeoDA</td>
+      <td><code>GeoDA</code></td>
+      <td><code>black-box</code>, <code>minimal-perturbation</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2020-1C72B2" alt="CVPR 2020"></td>
+      <td><a href="https://arxiv.org/abs/2003.06468">GeoDA: A Geometric Framework for Black-box Adversarial Attacks</a></td>
+    </tr>
+    <tr>
+      <td>SSP</td>
+      <td><code>SSP</code></td>
+      <td><code>defense</code>, <code>feature</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2020-1C72B2" alt="CVPR 2020"></td>
+      <td><a href="https://arxiv.org/abs/2006.04924">A Self-supervised Approach for Adversarial Robustness</a></td>
+    </tr>
+  </tbody>
+</table>
 
 ## Development
 
