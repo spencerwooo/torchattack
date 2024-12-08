@@ -95,8 +95,8 @@ Gradient-based attacks:
     <tr>
       <th>Name</th>
       <th>Class Name</th>
-      <th>Venue</th>
-      <th max>Paper (Open Access)</th>
+      <th>Publication</th>
+      <th>Paper (Open Access)</th>
     </tr>
   </thead>
   <tbody>
@@ -224,7 +224,7 @@ Generative attacks:
     <tr>
       <th>Name</th>
       <th>Class Name</th>
-      <th>Venue</th>
+      <th>Publication</th>
       <th>Paper (Open Access)</th>
     </tr>
   </thead>
@@ -257,7 +257,7 @@ Others:
     <tr>
       <th>Name</th>
       <th>Class Name</th>
-      <th>Venue</th>
+      <th>Publication</th>
       <th>Paper (Open Access)</th>
     </tr>
   </thead>
