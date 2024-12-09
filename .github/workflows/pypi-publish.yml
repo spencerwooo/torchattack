@@ -1,0 +1,29 @@
+name: pypi-publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      #   - name: Set up Python
+      #     uses: actions/setup-python@v5
+      #     with:
+      #       python-version-file: "pyproject.toml"
+
+      - name: Install the project with build deps
+        run: uv sync
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish package
+        run: uv publish
