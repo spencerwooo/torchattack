@@ -23,8 +23,8 @@ class DR(Attack):
         steps: Number of steps. Defaults to 100.
         alpha: Step size, `eps / steps` if None. Defaults to None.
         decay: Decay factor for the momentum term. Defaults to 1.0.
-        feature_layer: The layer of the model to extract features from and apply
-            dispersion reduction to. If not provided, tries to infer from built-in
+        feature_layer_name: Module layer name of the model to extract features from and
+            apply dispersion reduction to. If not provided, tries to infer from built-in
             config based on `model_name`. Defaults to ''.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
@@ -48,7 +48,7 @@ class DR(Attack):
         steps: int = 100,
         alpha: float | None = None,
         decay: float = 1.0,
-        feature_layer: str = '',
+        feature_layer_name: str = '',
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
@@ -66,12 +66,12 @@ class DR(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
-        if feature_layer:
+        if feature_layer_name:
             # Explicit feature_layer takes precedence over built-in config
-            self.feature_layer = feature_layer
+            self.feature_layer_name = feature_layer_name
         elif model_name:
             # If model_name is provided, try built-in config
-            self.feature_layer = self._builtin_models[model_name]
+            self.feature_layer_name = self._builtin_models[model_name]
         else:
             raise ValueError('argument `feature_layer` must be explicitly provided.')
 
@@ -83,7 +83,7 @@ class DR(Attack):
         def hook_fn(mod: nn.Module, input: torch.Tensor, output: torch.Tensor) -> None:
             self.features = output
 
-        module = rgetattr(self.model, self.feature_layer)
+        module = rgetattr(self.model, self.feature_layer_name)
         module.register_forward_hook(hook_fn)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:

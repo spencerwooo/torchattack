@@ -54,7 +54,7 @@ class NAA(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
-        self.feature_layer = rgetattr(self.model, feature_layer_name)
+        self.feature_module = rgetattr(self.model, feature_layer_name)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform NAA on a batch of images.
@@ -74,8 +74,8 @@ class NAA(Attack):
         if self.alpha is None:
             self.alpha = self.eps / self.steps
 
-        hf = self.feature_layer.register_forward_hook(self.__forward_hook)  # type: ignore
-        hb = self.feature_layer.register_full_backward_hook(self.__backward_hook)  # type: ignore
+        hf = self.feature_module.register_forward_hook(self._forward_hook)  # type: ignore
+        hb = self.feature_module.register_full_backward_hook(self._backward_hook)  # type: ignore
 
         # NAA's FIA-like gradient aggregation on ensembles
         # Aggregate gradients across multiple samples to estimate neuron importance
@@ -133,18 +133,10 @@ class NAA(Attack):
         hf.remove()
         return x + delta
 
-    def find_layer(self, feature_layer_name: str) -> nn.Module:
-        if feature_layer_name not in self.model._modules:
-            raise ValueError(f'Layer {feature_layer_name} not found in the model.')
-        feature_layer = self.model._modules[feature_layer_name]
-        if not isinstance(feature_layer, nn.Module):
-            raise ValueError(f'Layer {feature_layer_name} invalid.')
-        return feature_layer
-
-    def __forward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
+    def _forward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
         self.mid_output = o
 
-    def __backward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
+    def _backward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
         self.mid_grad = o
 
 
@@ -154,6 +146,6 @@ if __name__ == '__main__':
     run_attack(
         NAA,
         attack_args={'feature_layer_name': 'layer2'},
-        model_name='resnet18',
-        victim_model_names=['resnet50', 'vgg13', 'densenet121'],
+        model_name='resnet50',
+        victim_model_names=['resnet18', 'vgg13', 'densenet121'],
     )
