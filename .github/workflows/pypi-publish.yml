@@ -18,11 +18,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      #   - name: Set up Python
-      #     uses: actions/setup-python@v5
-      #     with:
-      #       python-version-file: "pyproject.toml"
-
       - name: Install the project with build deps
         run: uv sync
 

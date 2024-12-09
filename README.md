@@ -4,17 +4,17 @@
   <a href="https://github.com/astral-sh/ruff">
     <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json" alt="Ruff">
   </a>
-  <a href="https://github.com/psf/black">
-    <img src="https://img.shields.io/badge/code%20style-black-000000?labelColor=2D3339" alt="Code style: black">
+  <a href="https://pypi.python.org/pypi/torchattack">
+    <img src="https://img.shields.io/pypi/pyversions/torchattack.svg?labelColor=2D3339" alt="pypi python versions">
   </a>
   <a href="https://pypi.python.org/pypi/torchattack">
-    <img src="https://img.shields.io/pypi/v/torchattack?labelColor=2D3339" alt="pypi">
+    <img src="https://img.shields.io/pypi/v/torchattack.svg?labelColor=2D3339" alt="pypi version">
+  </a>
+  <a href="https://github.com/spencerwooo/torchattack/releases/latest">
+    <img src="https://img.shields.io/github/v/release/spencerwooo/torchattack?labelColor=2D3339" alt="github release (latest by date)">
   </a>
   <a href="https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml">
     <img src="https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml/badge.svg" alt="lint">
-  </a>
-  <a href="https://github.com/spencerwooo/torchattack/releases/latest">
-    <img src="https://img.shields.io/github/v/release/spencerwooo/torchattack?labelColor=2D3339" alt="GitHub release (latest by date)">
   </a>
 </div>
 
@@ -266,14 +266,20 @@ Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a full exa
 
 ## Development
 
-```shell
-# Create a virtual environment
-python -m venv .venv
-source .venv/bin/activate
+uv is used for development.
 
-# Install deps with dev extras
-python -m pip install -r requirements.txt
-python -m pip install -e ".[dev]"
+First, [install uv](https://docs.astral.sh/uv/getting-started/installation/).
+
+Next, install dev dependencies.
+
+```shell
+uv sync --dev
+```
+
+Install dependency group `test` to run tests.
+
+```shell
+uv sync --dev --group test
 ```
 
 ## License

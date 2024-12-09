@@ -29,7 +29,7 @@ dynamic = ["version"]
 Repository = "https://github.com/spencerwooo/torchattack"
 Documentation = "https://github.com/spencerwooo/torchattack/blob/main/README.md"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = ["mypy", "rich", "timm"]
 test = ["pytest", "pytest-cov"]
 
