@@ -55,7 +55,7 @@ class FIA(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
-        self.feature_layer = rgetattr(self.model, feature_layer_name)
+        self.feature_module = rgetattr(self.model, feature_layer_name)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform FIA on a batch of images.
@@ -75,8 +75,8 @@ class FIA(Attack):
         if self.alpha is None:
             self.alpha = self.eps / self.steps
 
-        h = self.feature_layer.register_forward_hook(self.__forward_hook)  # type: ignore
-        h2 = self.feature_layer.register_full_backward_hook(self.__backward_hook)  # type: ignore
+        hf = self.feature_module.register_forward_hook(self._forward_hook)  # type: ignore
+        hb = self.feature_module.register_full_backward_hook(self._backward_hook)  # type: ignore
 
         # Gradient aggregation on ensembles
         agg_grad: torch.Tensor | float = 0.0
@@ -97,7 +97,7 @@ class FIA(Attack):
         # for batch_i in range(x.shape[0]):
         #     agg_grad[batch_i] /= agg_grad[batch_i].norm(p=2)
         agg_grad /= torch.norm(agg_grad, p=2, dim=(1, 2, 3), keepdim=True)
-        h2.remove()
+        hb.remove()
 
         # Perform FIA
         for _ in range(self.steps):
@@ -125,7 +125,7 @@ class FIA(Attack):
             delta.grad.detach_()
             delta.grad.zero_()
 
-        h.remove()
+        hf.remove()
         return x + delta
 
     def drop_pixels(self, x: torch.Tensor) -> torch.Tensor:
@@ -147,10 +147,10 @@ class FIA(Attack):
 
         return x_dropped
 
-    def __forward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
+    def _forward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
         self.mid_output = o
 
-    def __backward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
+    def _backward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
         self.mid_grad = o
 
 
@@ -160,6 +160,6 @@ if __name__ == '__main__':
     run_attack(
         FIA,
         attack_args={'feature_layer_name': 'layer2'},
-        model_name='resnet18',
-        victim_model_names=['resnet50', 'vgg13', 'densenet121'],
+        model_name='resnet50',
+        victim_model_names=['resnet18', 'vgg13', 'densenet121'],
     )
