@@ -7,6 +7,9 @@
   <a href="https://github.com/psf/black">
     <img src="https://img.shields.io/badge/code%20style-black-000000?labelColor=2D3339" alt="Code style: black">
   </a>
+  <a href="https://pypi.python.org/pypi/torchattack">
+    <img src="https://img.shields.io/pypi/v/torchattack?labelColor=2D3339" alt="pypi">
+  </a>
   <a href="https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml">
     <img src="https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml/badge.svg" alt="lint">
   </a>
@@ -19,16 +22,8 @@
 
 🛡 **torchattack** - A curated list of adversarial attacks in PyTorch, with a focus on transferable black-box attacks.
 
-<sub><b><em>INSTALL FROM GITHUB SOURCE</em></b></sub>
-
 ```shell
-python -m pip install git+https://github.com/spencerwooo/torchattack@v1.0.5
-```
-
-<sub><b><em>INSTALL FROM GITEE MIRROR</em></b></sub>
-
-```shell
-python -m pip install git+https://gitee.com/spencerwoo/torchattack@v1.0.5
+pip install torchattack
 ```
 
 ## Usage
