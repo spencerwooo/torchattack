@@ -57,6 +57,6 @@ quote-style = "single"
 no_implicit_optional = true
 check_untyped_defs = true
 ignore_missing_imports = true # Used as torchvision does not ship type hints
-# disallow_any_unimported = true
+disallow_any_unimported = true
 # disallow_untyped_defs = true
 # warn_return_any = true
