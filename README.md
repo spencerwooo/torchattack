@@ -205,6 +205,12 @@ Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a full exa
       <td><a href="https://arxiv.org/abs/2303.15754">Transferable Adversarial Attacks on Vision Transformers with Token Gradient Regularization</a></td>
     </tr>
     <tr>
+      <td>ILPD</td>
+      <td><code>ILPD</code></td>
+      <td><img src="https://img.shields.io/badge/NeurIPS-2023-654287?labelColor=2D3339" alt="NeurIPS 2023"></td>
+      <td><a href="https://arxiv.org/abs/2304.13410">Improving Adversarial Transferability via Intermediate-level Perturbation Decay</a></td>
+    </tr>
+    <tr>
       <td>DeCoWA</td>
       <td><code>DeCoWA</code></td>
       <td><img src="https://img.shields.io/badge/AAAI-2024-C8172C?labelColor=2D3339" alt="AAAI 2024"></td>
