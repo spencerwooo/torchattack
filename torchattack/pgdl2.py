@@ -100,7 +100,9 @@ class PGDL2(Attack):
             # Update delta
             g = delta.grad
 
-            g_norms = torch.norm(g.reshape(x.size(0), -1), p=2, dim=1) + EPS_FOR_DIVISION
+            g_norms = (
+                torch.norm(g.reshape(x.size(0), -1), p=2, dim=1) + EPS_FOR_DIVISION
+            )
             g = g / g_norms.view(x.size(0), 1, 1, 1)
             delta.data = delta.data + self.alpha * g
 

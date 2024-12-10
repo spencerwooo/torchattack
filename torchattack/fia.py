@@ -75,8 +75,8 @@ class FIA(Attack):
         if self.alpha is None:
             self.alpha = self.eps / self.steps
 
-        hf = self.feature_module.register_forward_hook(self._forward_hook)  # type: ignore
-        hb = self.feature_module.register_full_backward_hook(self._backward_hook)  # type: ignore
+        hf = self.feature_module.register_forward_hook(self._forward_hook)
+        hb = self.feature_module.register_full_backward_hook(self._backward_hook)
 
         # Gradient aggregation on ensembles
         agg_grad: torch.Tensor | float = 0.0
@@ -147,10 +147,10 @@ class FIA(Attack):
 
         return x_dropped
 
-    def _forward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
+    def _forward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor) -> None:
         self.mid_output = o
 
-    def _backward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
+    def _backward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor) -> None:
         self.mid_grad = o
 
 

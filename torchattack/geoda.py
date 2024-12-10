@@ -353,7 +353,7 @@ class GeoDA(Attack):
 
     def predict(self, xs: torch.Tensor) -> torch.Tensor:
         xs = xs.to(self.device)
-        out = self.model(self.normalize(xs))
+        out: torch.Tensor = self.model(self.normalize(xs))
         return out.argmax(dim=1).detach()
 
     def distance(

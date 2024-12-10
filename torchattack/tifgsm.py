@@ -136,8 +136,7 @@ class TIFGSM(Attack):
         x = np.linspace(-n_sig - interval / 2.0, n_sig + interval / 2.0, kern_len + 1)
         kern1d = np.diff(st.norm.cdf(x))
         kernel_raw = np.sqrt(np.outer(kern1d, kern1d))
-        kernel = kernel_raw / kernel_raw.sum()
-        return kernel
+        return np.array(kernel_raw / kernel_raw.sum(), dtype=np.float32)
 
 
 if __name__ == '__main__':

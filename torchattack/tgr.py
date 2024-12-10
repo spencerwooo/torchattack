@@ -123,7 +123,7 @@ class TGR(Attack):
 
         return x + delta
 
-    def _register_tgr_model_hooks(self):
+    def _register_tgr_model_hooks(self) -> None:
         def attn_tgr(
             module: torch.nn.Module,
             grad_in: tuple[torch.Tensor, ...],

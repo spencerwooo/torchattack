@@ -59,10 +59,7 @@ class DeepFool(Attack):
 
         # Get the classes
         classes = logits.argsort(axis=-1).flip(-1).detach()
-        if self.num_classes is None:
-            self.num_classes = logits.shape[-1]
-        else:
-            self.num_classes = min(self.num_classes, logits.shape[-1])
+        self.num_classes = min(self.num_classes, logits.shape[-1])
 
         n = len(x)
         rows = range(n)
@@ -160,9 +157,8 @@ class DeepFool(Attack):
         return deltas_logits
 
     def _get_distances(self, deltas: torch.Tensor, grads: torch.Tensor) -> torch.Tensor:
-        return abs(deltas) / (
-            grads.flatten(start_dim=2, end_dim=-1).abs().sum(axis=-1)  # type: ignore
-            + 1e-8
+        return deltas.abs() / (
+            grads.flatten(start_dim=2, end_dim=-1).abs().sum(dim=-1) + 1e-8
         )
 
     def _get_perturbations(

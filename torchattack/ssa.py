@@ -162,7 +162,7 @@ class SSA(Attack):
 
         mat_v = 2 * mat_v.view(*x_shape)
 
-        return mat_v
+        return mat_v  # type: ignore[no-any-return]
 
     def _idct(self, mat_x: torch.Tensor, norm: str | None = None) -> torch.Tensor:
         """
@@ -209,7 +209,7 @@ class SSA(Attack):
         x[:, ::2] += v[:, : n - (n // 2)]
         x[:, 1::2] += v.flip([1])[:, : n // 2]
 
-        return x.view(*x_shape).real
+        return x.view(*x_shape).real  # type: ignore[no-any-return]
 
     def _dct_2d(self, x: torch.Tensor, norm: str | None = None) -> torch.Tensor:
         """

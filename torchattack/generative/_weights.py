@@ -34,5 +34,9 @@ class GeneratorWeightsEnum(Enum):
         return isinstance(other, self.__class__) and self.name == other.name
 
     @property
-    def url(self):
-        return self.value.url
+    def url(self) -> str:
+        if isinstance(self.value, GeneratorWeights):
+            return self.value.url
+        raise TypeError(
+            f'Expected GeneratorWeights, but got {type(self.value).__name__}'
+        )

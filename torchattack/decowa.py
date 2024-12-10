@@ -246,9 +246,6 @@ def p_matrix(x: torch.Tensor) -> torch.Tensor:
 class TPSCoeffs(nn.Module):
     """Computes the coefficients for the TPS transformation based on control points."""
 
-    def __init__(self):
-        super().__init__()
-
     def forward(
         self, x: torch.Tensor, y: torch.Tensor
     ) -> tuple[torch.Tensor, torch.Tensor]:
@@ -297,7 +294,7 @@ class TPS(nn.Module):
         w_mat, a_mat = self.tps(x, y)
         u_mat = k_matrix(self.grid, x)
         p_mat = p_matrix(self.grid)
-        grid = p_mat @ a_mat + u_mat @ w_mat
+        grid: torch.Tensor = p_mat @ a_mat + u_mat @ w_mat
         return grid.view(-1, h, w, 2)
 
 

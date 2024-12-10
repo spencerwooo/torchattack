@@ -74,8 +74,8 @@ class NAA(Attack):
         if self.alpha is None:
             self.alpha = self.eps / self.steps
 
-        hf = self.feature_module.register_forward_hook(self._forward_hook)  # type: ignore
-        hb = self.feature_module.register_full_backward_hook(self._backward_hook)  # type: ignore
+        hf = self.feature_module.register_forward_hook(self._forward_hook)
+        hb = self.feature_module.register_full_backward_hook(self._backward_hook)
 
         # NAA's FIA-like gradient aggregation on ensembles
         # Aggregate gradients across multiple samples to estimate neuron importance
@@ -133,10 +133,10 @@ class NAA(Attack):
         hf.remove()
         return x + delta
 
-    def _forward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
+    def _forward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor) -> None:
         self.mid_output = o
 
-    def _backward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor):
+    def _backward_hook(self, m: nn.Module, i: torch.Tensor, o: torch.Tensor) -> None:
         self.mid_grad = o
 
 

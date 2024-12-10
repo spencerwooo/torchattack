@@ -46,7 +46,7 @@ class Attack(ABC):
     def __repr__(self) -> str:
         name = self.__class__.__name__
 
-        def repr_map(k, v):
+        def repr_map(k: str, v: Any) -> str:
             if isinstance(v, float):
                 return f'{k}={v:.3f}'
             if k in ['model', 'normalize', 'feature_layer', 'hooks', 'generator']:
@@ -58,7 +58,7 @@ class Attack(ABC):
         args = ', '.join(repr_map(k, v) for k, v in self.__dict__.items())
         return f'{name}({args})'
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Attack):
             return False
 

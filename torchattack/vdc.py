@@ -108,9 +108,9 @@ class VDC(Attack):
         class GradientRecorder:
             """Gradient recorder for attention and MLP blocks."""
 
-            def __init__(self):
-                self.grad_records = []
-                self.grad_additions = []
+            def __init__(self) -> None:
+                self.grad_records: list[np.ndarray] = []
+                self.grad_additions: list[np.ndarray] = []
 
         # Perform VDC
         for _ in range(self.steps):
@@ -157,9 +157,6 @@ class VDC(Attack):
 
             # Compute gradient 2nd time
             loss.backward()
-
-            if delta.grad is None:
-                continue
 
             # Apply momentum term
             g = self.decay * g + delta.grad / torch.mean(

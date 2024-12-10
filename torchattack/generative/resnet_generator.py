@@ -6,7 +6,7 @@ ngf = 64
 
 
 class ResNetGenerator(nn.Module):
-    def __init__(self, inception=False):
+    def __init__(self, inception: bool = False) -> None:
         """Generator network (ResNet).
 
         Args:
@@ -85,7 +85,7 @@ class ResNetGenerator(nn.Module):
 
         self.crop = nn.ConstantPad2d((0, -1, -1, 0), 0)
 
-    def forward(self, input):
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
         x = self.block1(input)
         x = self.block2(x)
         x = self.block3(x)
@@ -104,7 +104,7 @@ class ResNetGenerator(nn.Module):
 
 
 class ResidualBlock(nn.Module):
-    def __init__(self, num_filters):
+    def __init__(self, num_filters: int) -> None:
         super(ResidualBlock, self).__init__()
         self.block = nn.Sequential(
             nn.ReflectionPad2d(1),
@@ -131,8 +131,8 @@ class ResidualBlock(nn.Module):
             nn.BatchNorm2d(num_filters),
         )
 
-    def forward(self, x):
-        residual = self.block(x)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        residual: torch.Tensor = self.block(x)
         return x + residual
 
 

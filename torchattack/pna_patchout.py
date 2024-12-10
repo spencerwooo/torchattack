@@ -136,7 +136,7 @@ class PNAPatchOut(Attack):
 
         return x + delta
 
-    def _register_vit_model_hook(self):
+    def _register_vit_model_hook(self) -> None:
         def attn_drop_mask_grad(
             module: torch.nn.Module,
             grad_in: tuple[torch.Tensor, ...],

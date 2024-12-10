@@ -123,7 +123,7 @@ class AttackModel:
 
             # torchvision/transforms/_presets.py::ImageClassification
             # Manually construct separated transform and normalize
-            def transform(x):
+            def transform(x: Image.Image | torch.Tensor) -> torch.Tensor:
                 x = f.resize(
                     x,
                     cfg.resize_size,
@@ -134,7 +134,7 @@ class AttackModel:
                 if not isinstance(x, torch.Tensor):
                     x = f.pil_to_tensor(x)
                 x = f.convert_image_dtype(x, torch.float)
-                return x
+                return x  # type: ignore[return-value]
 
             normalize = t.Normalize(mean=cfg.mean, std=cfg.std)
 
@@ -151,13 +151,14 @@ class AttackModel:
             )
             return cls.from_pretrained(model_name, device, from_timm=True)
 
-    def forward(self, x):
-        return self.model(x)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        outs: torch.Tensor = self.model(x)
+        return outs
 
-    def __call__(self, x):
+    def __call__(self, x: torch.Tensor) -> torch.Tensor:
         return self.forward(x)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'model_name={self.model_name}, '

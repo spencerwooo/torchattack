@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, Union
 
 import torch
 import torch.nn as nn
@@ -14,15 +14,22 @@ def attack_warn(message: str) -> None:
     warn(message, category=UserWarning, stacklevel=2)
 
 
+def attack_arg_override_warn(arg_name: str) -> None:
+    attack_warn(
+        f"The '{arg_name}' value provided as an argument will overwrite the existing "
+        f"'{arg_name}' value in 'attack_args'. This MAY NOT be the intended behavior."
+    )
+
+
 def create_attack(
-    attack: Any,
-    model: nn.Module | AttackModel | None = None,
-    normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
-    device: torch.device | None = None,
-    eps: float | None = None,
-    weights: str | None = 'DEFAULT',
-    checkpoint_path: str | None = None,
-    attack_args: dict[str, Any] | None = None,
+    attack: Union['Attack', str],
+    model: Union[nn.Module, AttackModel, None] = None,
+    normalize: Union[Callable[[torch.Tensor], torch.Tensor], None] = None,
+    device: Union[torch.device, None] = None,
+    eps: Union[float, None] = None,
+    weights: Union[str, None] = 'DEFAULT',
+    checkpoint_path: Union[str, None] = None,
+    attack_args: Union[dict[str, Any], None] = None,
 ) -> Attack:
     """Create a torchattack instance based on the provided attack name and config.
 
@@ -53,20 +60,18 @@ def create_attack(
     if attack_args is None:
         attack_args = {}
 
-    # Check if attack_name is supported
-    attack_name = attack if isinstance(attack, str) else attack.__name__
+    # Determine attack name and check if it is supported
+    attack_name = attack if isinstance(attack, str) else attack.__name__  # type: ignore[attr-defined]
     if attack_name not in torchattack.SUPPORTED_ATTACKS:
         raise ValueError(f"Attack '{attack_name}' is not supported within torchattack.")
-    if not isinstance(attack, Attack):
-        attack = getattr(torchattack, attack_name)
+    attack_cls: 'Attack' = (
+        getattr(torchattack, attack_name) if isinstance(attack, str) else attack
+    )
 
     # Check if eps is provided and overwrite the value in attack_args if present
     if eps is not None:
         if 'eps' in attack_args:
-            attack_warn(
-                "The 'eps' value provided as an argument will overwrite the existing "
-                "'eps' value in 'attack_args'. This MAY NOT be the intended behavior."
-            )
+            attack_arg_override_warn('eps')
         attack_args['eps'] = eps
 
     # Check if attacks that do not require eps have eps in attack_args
@@ -89,23 +94,15 @@ def create_attack(
     if attack_name in torchattack.GENERATIVE_ATTACKS:
         if weights != 'DEFAULT':
             if 'weights' in attack_args:
-                attack_warn(
-                    "The 'weights' value provided as an argument will "
-                    "overwrite the existing 'weights' value in 'attack_args'. "
-                    'This MAY NOT be the intended behavior.'
-                )
+                attack_arg_override_warn('weights')
             attack_args['weights'] = weights
         if checkpoint_path is not None:
             if 'checkpoint_path' in attack_args:
-                attack_warn(
-                    "The 'checkpoint_path' value provided as an argument will "
-                    "overwrite the existing 'checkpoint_path' value in 'attack_args'. "
-                    'This MAY NOT be the intended behavior.'
-                )
+                attack_arg_override_warn('checkpoint_path')
             attack_args['checkpoint_path'] = checkpoint_path
-        return attack(device, **attack_args)
+        return attack_cls(device, **attack_args)  # type: ignore[no-any-return]
 
-    return attack(model, normalize, device, **attack_args)
+    return attack_cls(model, normalize, device, **attack_args)  # type: ignore[no-any-return]
 
 
 if __name__ == '__main__':
