@@ -22,8 +22,10 @@ class PerceptualCriteria(nn.Module):
         self.loss_fn = nn.MSELoss()
 
     def forward(self, x: torch.Tensor, xadv: torch.Tensor) -> torch.Tensor:
-        loss = self.loss_fn(self.perceptual_model(x), self.perceptual_model(xadv))
-        return torch.tensor(loss, dtype=torch.float32)
+        x_outs = self.perceptual_model(x)
+        xadv_outs = self.perceptual_model(xadv)
+        loss: torch.Tensor = self.loss_fn(x_outs, xadv_outs)
+        return loss
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(ssp_layer={self.ssp_layer})'
