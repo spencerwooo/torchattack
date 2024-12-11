@@ -1,0 +1,7 @@
+site_name: torchattack
+site_url: https://spencerwooo.github.io/torchattack/
+theme:
+  name: material
+plugins:
+  - search
+  - mkdocstrings
