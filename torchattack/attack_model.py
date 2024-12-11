@@ -17,7 +17,7 @@ class AttackModel:
     either `torchvision.models` or `timm`. The model is loaded and attributes including
     `model_name`, `transform`, and `normalize` are attached based on the model's config.
 
-    Attributes:
+    Args:
         model_name: The name of the model.
         device: The device on which the model is loaded.
         model: The pretrained model itself.

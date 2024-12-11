@@ -1,6 +1,6 @@
 [project]
 name = "torchattack"
-description = "A set of adversarial attacks implemented in PyTorch"
+description = "A curated list of adversarial attacks in PyTorch, with a focus on transferable black-box attacks"
 authors = [{ name = "spencerwooo", email = "spencer.woo@outlook.com" }]
 requires-python = ">=3.10,<3.13"
 readme = "README.md"
@@ -30,8 +30,12 @@ Repository = "https://github.com/spencerwooo/torchattack"
 Documentation = "https://github.com/spencerwooo/torchattack/blob/main/README.md"
 
 [dependency-groups]
-dev = ["mypy", "rich", "timm"]
-test = ["pytest", "pytest-cov"]
+dev = ["mypy>=1.13.0", "rich>=13.9.4", "timm>=1.0.12"]
+test = ["pytest-cov>=6.0.0", "pytest>=8.3.4"]
+docs = [
+    "mkdocs-material>=9.5.48",
+    "mkdocstrings[python]>=0.27.0",
+]
 
 [build-system]
 requires = ["setuptools"]
