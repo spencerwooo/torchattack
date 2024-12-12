@@ -1,5 +1,8 @@
 ---
 title: Home
+hide:
+  - navigation
+  - toc
 ---
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -14,6 +17,8 @@ _A curated list of adversarial attacks in PyTorch, with a focus on transferable 
 pip install torchattack
 ```
 
-## API
+!!! note
 
-:::torchattack.create_attack.create_attack
+    This page is currently under heavy construction.
+
+[All supported attacks :material-sword:](./attacks/index.md){ .md-button .md-button--primary }
