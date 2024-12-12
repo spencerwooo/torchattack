@@ -1,7 +1,49 @@
 site_name: torchattack
 site_url: https://spencerwooo.github.io/torchattack/
+repo_url: https://github.com/spencerwooo/torchattack
+repo_name: spencerwooo/torchattack
+edit_uri: edit/main/docs/
 theme:
   name: material
+  icon:
+    logo: material/shield-sword
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: red
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      accent: red
+      toggle:
+        icon: material/weather-night
+        name: Switch to system preference
+  features:
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.top
+    - navigation.sections
+    - navigation.prune
+    - navigation.footer
+    - toc.follow
+    - toc.integrate
+    - search.suggest
+    - content.action.edit
+    - content.code.copy
+    - navigation.path
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.indexes
+    - content.code.annotate
+    - content.tabs.link
 plugins:
   - search
   - mkdocstrings
