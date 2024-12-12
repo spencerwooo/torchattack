@@ -3,6 +3,11 @@ site_url: https://spencerwooo.github.io/torchattack/
 repo_url: https://github.com/spencerwooo/torchattack
 repo_name: spencerwooo/torchattack
 edit_uri: edit/main/docs/
+nav:
+  - index.md
+  - usage.md
+  - ...
+  - development.md
 theme:
   name: material
   icon:
@@ -44,6 +49,21 @@ theme:
     - navigation.indexes
     - content.code.annotate
     - content.tabs.link
+markdown_extensions:
+  - abbr
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 plugins:
   - search
   - mkdocstrings
+  - awesome-pages
