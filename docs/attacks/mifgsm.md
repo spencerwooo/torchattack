@@ -1,5 +1,0 @@
----
-title: MIFGSM
----
-
-::: torchattack.MIFGSM
