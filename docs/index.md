@@ -45,3 +45,7 @@ pip install torchattack
 ## Next Steps
 
 [Usage](./usage.md) | [Attacks](./attacks/index.md)
+
+## License
+
+torchattack is licensed under the [MIT License](https://github.com/spencerwooo/torchattack/blob/main/LICENSE).
