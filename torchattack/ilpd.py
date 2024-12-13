@@ -22,9 +22,8 @@ class ILPD(Attack):
         steps: Number of steps. Defaults to 10.
         alpha: Step size, `eps / steps` if None. Defaults to None.
         decay: Decay factor for the momentum term. Defaults to 1.0.
-        sigma:
-        feature_layer: The layer to compute feature importance. Defaults to "layer2.3".
-        drop_rate: Dropout rate for random pixels. Defaults to 0.3.
+        sigma: Standard deviation for noise. Defaults to 0.05.
+        feature_layer_name: The layer to compute feature importance. Defaults to "layer2.3".
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
     """

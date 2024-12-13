@@ -1,28 +1,16 @@
 <div align="center">
   <p><br><img src="docs/images/torchattack.png" alt="torchattack banner" width="600" /></p>
-
-  <p>
-    <a href="https://github.com/astral-sh/ruff">
-      <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json" alt="Ruff">
-    </a>
-    <a href="https://pypi.python.org/pypi/torchattack">
-      <img src="https://img.shields.io/pypi/pyversions/torchattack.svg?labelColor=2D3339" alt="pypi python versions">
-    </a>
-    <a href="https://pypi.python.org/pypi/torchattack">
-      <img src="https://img.shields.io/pypi/v/torchattack.svg?labelColor=2D3339" alt="pypi version">
-    </a>
-    <a href="https://github.com/spencerwooo/torchattack/releases/latest">
-      <img src="https://img.shields.io/github/v/release/spencerwooo/torchattack?labelColor=2D3339" alt="github release (latest by date)">
-    </a>
-    <a href="https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml">
-      <img src="https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml/badge.svg" alt="lint">
-    </a>
-  </p>
 </div>
 
 ---
 
-🛡 **torchattack** - A curated list of adversarial attacks in PyTorch, with a focus on transferable black-box attacks.
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![pypi python versions](https://img.shields.io/pypi/pyversions/torchattack.svg?labelColor=2D3339)](https://pypi.python.org/pypi/torchattack)
+[![pypi version](https://img.shields.io/pypi/v/torchattack.svg?labelColor=2D3339)](https://pypi.python.org/pypi/torchattack)
+[![github release (latest by date)](https://img.shields.io/github/v/release/spencerwooo/torchattack?labelColor=2D3339)](https://github.com/spencerwooo/torchattack/releases/latest)
+[![lint](https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml/badge.svg)](https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml)
+
+🛡 **torchattack** - _A curated list of adversarial attacks in PyTorch, with a focus on transferable black-box attacks._
 
 ```shell
 pip install torchattack
