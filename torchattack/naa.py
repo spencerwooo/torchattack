@@ -11,8 +11,8 @@ from torchattack.attack_model import AttackModel
 class NAA(Attack):
     """The NAA (Neuron Attribution-based) Attack.
 
-    From the paper 'Improving Adversarial Transferability via Neuron Attribution-Based
-    Attacks'. https://arxiv.org/abs/2204.00008
+    From the paper [Improving Adversarial Transferability via Neuron Attribution-Based
+    Attacks](https://arxiv.org/abs/2204.00008).
 
     Args:
         model: The model to attack.
@@ -24,8 +24,7 @@ class NAA(Attack):
         decay: Decay factor for the momentum term. Defaults to 1.0.
         num_ens: Number of aggregate gradients (NAA use `N` in the original paper
             instead of `num_ens` in FIA). Defaults to 30.
-        feature_layer: The layer to compute feature importance. Defaults to "layer4".
-        drop_rate: Dropout rate for random pixels. Defaults to 0.3.
+        feature_layer_name: The layer to compute feature importance. Defaults to "layer4".
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
     """
