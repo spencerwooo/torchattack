@@ -16,6 +16,16 @@
 pip install torchattack
 ```
 
+## Highlights
+
+- 🛡️ A curated collection of adversarial attacks implemented in PyTorch.
+- 🔍 Focuses on gradient-based transferable black-box attacks.
+- 📦 Easily load pretrained models from torchvision or timm using `AttackModel`.
+- 🔄 Simple interface to initialize attacks with `create_attack`.
+- 🔧 Extensively typed for better code quality and safety.
+- 📊 Tooling for fooling rate metrics and model evaluation in `eval`.
+- 🔁 Numerous attacks reimplemented for readability and efficiency (TGR, VDC, etc.).
+
 ## Usage
 
 ```python
