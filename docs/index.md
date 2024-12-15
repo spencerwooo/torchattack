@@ -28,10 +28,6 @@ _A curated list of adversarial attacks in PyTorch, with a focus on transferable 
 pip install torchattack
 ```
 
-!!! danger "Under Construction"
-
-    This page is currently under heavy construction.
-
 ## Highlights
 
 - 🛡️ A curated collection of adversarial attacks implemented in PyTorch.
@@ -44,8 +40,34 @@ pip install torchattack
 
 ## Next Steps
 
-[Usage](./usage.md) | [Attacks](./attacks/index.md)
+<div class="grid cards" markdown>
+
+- :material-book-open-page-variant:{ .middle } **Usage**
+
+    ***
+
+    Learn how to use abstractions of pre-trained victim models, attack creations, and evaluations.
+
+    :material-arrow-right: [Usage](./usage.md)
+
+- :material-sword-cross:{ .middle } **Attacks**
+
+    ***
+
+    Explore the comprehensive list of adversarial attacks available in `torchattack`.
+
+    :material-arrow-right: [Attacks](./attacks/index.md)
+
+- :material-tools:{ .middle } **Development**
+
+    ***
+
+    On how to install dependencies, run tests, and build documentation.
+
+    :material-arrow-right: [Development](./development/index.md)
+
+</div>
 
 ## License
 
-torchattack is licensed under the [MIT License](https://github.com/spencerwooo/torchattack/blob/main/LICENSE).
+`torchattack` is licensed under the [MIT License](https://github.com/spencerwooo/torchattack/blob/main/LICENSE).
