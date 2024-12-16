@@ -12,7 +12,7 @@ hide:
   }
 </style>
 
-<figure markdown="1">
+<figure markdown="span">
 ![torchattack](./images/torchattack.png){: style="width:600px"}
 </figure>
 
