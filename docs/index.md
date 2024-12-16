@@ -54,7 +54,7 @@ pip install torchattack
 
     ***
 
-    Explore the comprehensive list of adversarial attacks available in `torchattack`.
+    Explore the comprehensive list of adversarial attacks available in torchattack.
 
     :material-arrow-right: [Attacks](./attacks/index.md)
 
@@ -70,4 +70,4 @@ pip install torchattack
 
 ## License
 
-`torchattack` is licensed under the [MIT License](https://github.com/spencerwooo/torchattack/blob/main/LICENSE).
+torchattack is licensed under the [MIT License](https://github.com/spencerwooo/torchattack/blob/main/LICENSE).

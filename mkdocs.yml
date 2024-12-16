@@ -6,7 +6,12 @@ edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2023-Present Spencer Woo
 nav:
   - index.md
-  - usage.md
+  - Usage:
+    - usage/index.md
+    - usage/attack-model.md
+    - usage/attack-creation.md
+    - usage/attack-evaluation.md
+    - usage/runner.md
   - ...
   - development.md
 theme:
@@ -78,4 +83,10 @@ plugins:
           options:
             show_symbol_type_heading: true
             show_symbol_type_toc: true
-            show_root_toc_entry: false
+            show_root_toc_entry: true
+            show_root_heading: true
+            show_root_full_path: false
+extra:
+  analytics:
+    provider: google
+    property: G-P593KY94JQ

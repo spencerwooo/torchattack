@@ -25,6 +25,7 @@ class AttackModel:
         normalize: The normalization function applied to input images.
 
     Example:
+        ```pycon
         >>> model = AttackModel.from_pretrained('resnet50', device='cuda')
         >>> model
         AttackModel(model_name=resnet50, device=cuda, transform=Compose(...), normalize=Normalize(...))
@@ -41,6 +42,7 @@ class AttackModel:
             (conv1): Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
             ...
         )
+        ```
     """
 
     def __init__(

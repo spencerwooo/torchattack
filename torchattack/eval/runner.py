@@ -13,9 +13,11 @@ def run_attack(
     """Helper function to run evaluation on attacks.
 
     Example:
+        ```pycon
         >>> from torchattack import FGSM
         >>> args = {"eps": 8 / 255, "clip_min": 0.0, "clip_max": 1.0}
         >>> run_attack(attack=FGSM, attack_args=args)
+        ```
 
     Note:
         For generative attacks, the model_name argument that defines the white-box
@@ -82,12 +84,16 @@ def run_attack(
         frm.update(y, cln_outs, adv_outs)
 
         # *Save first batch of adversarial examples
-        # if _i == 0:
+        # if _i == 6:
         #     import torchvision as tv
 
+        #     # make grids as square as possible
+        #     nrow = int(advs.size(0) ** 0.5)
+
+        #     # save adversarial examples
         #     saved_imgs = advs.detach().cpu().mul(255).to(torch.uint8)
-        #     img_grid = tv.utils.make_grid(saved_imgs, nrow=4)
-        #     tv.io.write_png(img_grid, 'adv_batch_0.png')
+        #     img_grid = tv.utils.make_grid(saved_imgs, nrow=nrow)
+        #     tv.io.write_png(img_grid, 'advs.png')
 
         # Track transfer fooling rates if victim models are provided
         if victim_model_names:
