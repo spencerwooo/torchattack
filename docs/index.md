@@ -46,7 +46,7 @@ pip install torchattack
 
     ***
 
-    Learn how to use abstractions of pre-trained victim models, attack creations, and evaluations.
+    Learn how to use abstractions of pretrained victim models, attack creations, and evaluations.
 
     :material-arrow-right: [Usage](./usage/index.md)
 
