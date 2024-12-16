@@ -4,10 +4,10 @@
 
 ---
 
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![pypi python versions](https://img.shields.io/pypi/pyversions/torchattack.svg?labelColor=2D3339)](https://pypi.python.org/pypi/torchattack)
-[![pypi version](https://img.shields.io/pypi/v/torchattack.svg?labelColor=2D3339)](https://pypi.python.org/pypi/torchattack)
-[![github release (latest by date)](https://img.shields.io/github/v/release/spencerwooo/torchattack?labelColor=2D3339)](https://github.com/spencerwooo/torchattack/releases/latest)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/refs/heads/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![pypi python versions](https://img.shields.io/pypi/pyversions/torchattack.svg?logo=pypi&logoColor=white&labelColor=2D3339)](https://pypi.python.org/pypi/torchattack)
+[![pypi version](https://img.shields.io/pypi/v/torchattack.svg?logo=pypi&logoColor=white&labelColor=2D3339)](https://pypi.python.org/pypi/torchattack)
+[![pypi weekly downloads](https://img.shields.io/pypi/dm/torchattack?logo=pypi&logoColor=white&labelColor=2D3339)](https://pypi.python.org/pypi/torchattack)
 [![lint](https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml/badge.svg)](https://github.com/spencerwooo/torchattack/actions/workflows/ci.yml)
 
 🛡 **torchattack** - _A curated list of adversarial attacks in PyTorch, with a focus on transferable black-box attacks._
