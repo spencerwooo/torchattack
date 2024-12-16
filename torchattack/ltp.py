@@ -29,8 +29,8 @@ class LTPWeights(GeneratorWeightsEnum):
 class LTP(Attack):
     """LTP Attack (Learning Transferable Adversarial Perturbations).
 
-    From the paper 'Learning Transferable Adversarial Perturbations',
-    https://proceedings.neurips.cc/paper/2021/hash/7486cef2522ee03547cfb970a404a874-Abstract.html
+    From the paper: [Learning Transferable Adversarial
+    Perturbations](https://proceedings.neurips.cc/paper/2021/hash/7486cef2522ee03547cfb970a404a874-Abstract.html).
 
     Args:
         device: Device to use for tensors. Defaults to cuda if available.

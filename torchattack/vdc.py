@@ -13,9 +13,8 @@ from torchattack.attack_model import AttackModel
 class VDC(Attack):
     """VDC (Virtual Dense Connection) attack for ViTs.
 
-    From the paper: 'Improving the Adversarial Transferability of Vision Transformers
-    with Virtual Dense Connection'
-    https://ojs.aaai.org/index.php/AAAI/article/view/28541
+    From the paper: [Improving the Adversarial Transferability of Vision Transformers
+    with Virtual Dense Connection](https://ojs.aaai.org/index.php/AAAI/article/view/28541).
 
     Args:
         model: The model to attack.

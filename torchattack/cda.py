@@ -26,8 +26,7 @@ class CDAWeights(GeneratorWeightsEnum):
 class CDA(Attack):
     """Cross-domain Attack (CDA).
 
-    From the paper 'Cross-Domain Transferability of Adversarial Perturbations',
-    https://arxiv.org/abs/1905.11736
+    From the paper: [Cross-Domain Transferability of Adversarial Perturbations](https://arxiv.org/abs/1905.11736).
 
     Args:
         device: Device to use for tensors. Defaults to cuda if available.

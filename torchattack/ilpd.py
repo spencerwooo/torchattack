@@ -11,8 +11,8 @@ from torchattack.attack_model import AttackModel
 class ILPD(Attack):
     """The ILPD (Intermediate-level Perturbation Decay) Attack.
 
-    From the paper 'Improving Adversarial Transferability via Intermediate-level
-    Perturbation Decay'. https://arxiv.org/abs/2304.13410
+    From the paper: [Improving Adversarial Transferability via Intermediate-level
+    Perturbation Decay](https://arxiv.org/abs/2304.13410).
 
     Args:
         model: The model to attack.

@@ -11,8 +11,8 @@ from torchattack.attack_model import AttackModel
 class DIFGSM(Attack):
     """The DI-FGSM (Diverse-input Iterative FGSM) attack.
 
-    From the paper 'Improving Transferability of Adversarial Examples with Input
-    Diversity' https://arxiv.org/abs/1803.06978
+    From the paper: [Improving Transferability of Adversarial Examples with Input
+    Diversity](https://arxiv.org/abs/1803.06978).
 
     Note:
         Key parameters include `resize_rate` and `diversity_prob`, which defines the

@@ -10,8 +10,8 @@ from torchattack.attack_model import AttackModel
 class Admix(Attack):
     """The Admix attack.
 
-    From the paper 'Admix: Enhancing the Transferability of Adversarial Attacks',
-    https://arxiv.org/abs/2102.00436
+    From the paper: [Admix: Enhancing the Transferability of Adversarial
+    Attacks](https://arxiv.org/abs/2102.00436).
 
     Args:
         model: The model to attack.
@@ -23,7 +23,7 @@ class Admix(Attack):
         decay: Decay factor for the momentum term. Defaults to 1.0.
         portion: Portion for the mixed image. Defaults to 0.2.
         size: Number of randomly sampled images. Defaults to 3.
-        num_classes: Number of classes of the dataset used. Defaults to 1001.
+        num_classes: Number of classes of the dataset used. Defaults to 1000.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
         targeted: Targeted attack if True. Defaults to False.

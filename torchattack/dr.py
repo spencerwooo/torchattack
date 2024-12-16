@@ -11,8 +11,8 @@ from torchattack.attack_model import AttackModel
 class DR(Attack):
     """The DR (Dispersion Reduction) attack.
 
-    From the paper 'Enhancing Cross-Task Black-Box Transferability of Adversarial
-    Examples With Dispersion Reduction', https://arxiv.org/abs/1911.11616
+    From the paper: [Enhancing Cross-Task Black-Box Transferability of Adversarial
+    Examples With Dispersion Reduction](https://arxiv.org/abs/1911.11616).
 
     Args:
         model: The model to attack.

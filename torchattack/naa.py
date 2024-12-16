@@ -11,7 +11,7 @@ from torchattack.attack_model import AttackModel
 class NAA(Attack):
     """The NAA (Neuron Attribution-based) Attack.
 
-    From the paper [Improving Adversarial Transferability via Neuron Attribution-Based
+    From the paper: [Improving Adversarial Transferability via Neuron Attribution-Based
     Attacks](https://arxiv.org/abs/2204.00008).
 
     Args:

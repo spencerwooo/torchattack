@@ -10,8 +10,8 @@ from torchattack.attack_model import AttackModel
 class DeepFool(Attack):
     """The DeepFool attack.
 
-    From the paper 'DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks'
-    https://arxiv.org/abs/1511.04599
+    From the paper: [DeepFool: A Simple and Accurate Method to Fool Deep Neural
+    Networks](https://arxiv.org/abs/1511.04599).
 
     Args:
         model: The model to attack.

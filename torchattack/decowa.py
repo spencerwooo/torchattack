@@ -10,9 +10,8 @@ from torchattack.attack_model import AttackModel
 class DeCoWA(Attack):
     """The DeCoWA (Deformation-Constrained Warping Attack) attack.
 
-    From the paper 'Boosting Adversarial Transferability across Model Genus by
-    Deformation-Constrained Warping',
-    https://arxiv.org/abs/2402.03951
+    From the paper: [Boosting Adversarial Transferability across Model Genus by
+    Deformation-Constrained Warping](https://arxiv.org/abs/2402.03951).
 
     Args:
         model: The model to attack.

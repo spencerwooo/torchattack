@@ -10,8 +10,8 @@ from torchattack.attack_model import AttackModel
 class PGD(Attack):
     """The Projected Gradient Descent (PGD) attack.
 
-    From the paper 'Towards Deep Learning Models Resistant to Adversarial Attacks'
-    https://arxiv.org/abs/1706.06083
+    From the paper: [Towards Deep Learning Models Resistant to Adversarial
+    Attacks](https://arxiv.org/abs/1706.06083).
 
     Args:
         model: The model to attack.

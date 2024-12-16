@@ -10,8 +10,7 @@ from torchattack.attack_model import AttackModel
 class FGSM(Attack):
     """Fast Gradient Sign Method (FGSM).
 
-    From the paper 'Explaining and Harnessing Adversarial Examples',
-    https://arxiv.org/abs/1412.6572
+    From the paper: [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572).
 
     Args:
         model: A torch.nn.Module network model.

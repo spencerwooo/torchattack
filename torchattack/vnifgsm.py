@@ -10,8 +10,8 @@ from torchattack.attack_model import AttackModel
 class VNIFGSM(Attack):
     """The VNI-FGSM (Variance-tuned Nesterov Iterative FGSM) attack.
 
-    From the paper 'Enhancing the Transferability of Adversarial Attacks through
-    Variance Tuning' https://arxiv.org/abs/2103.15571
+    From the paper: [Enhancing the Transferability of Adversarial Attacks through
+    Variance Tuning](https://arxiv.org/abs/2103.15571).
 
     Note:
         Key parameters are `n` and `beta`, where `n` is the number of sampled

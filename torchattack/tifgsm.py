@@ -12,8 +12,8 @@ from torchattack.attack_model import AttackModel
 class TIFGSM(Attack):
     """The TI-FGSM (Translation-invariant Iterative FGSM) attack.
 
-    From the paper 'Evading Defenses to Transferable Adversarial Examples by
-    Translation-Invariant Attacks' https://arxiv.org/abs/1904.02884
+    From the paper: [Evading Defenses to Transferable Adversarial Examples by
+    Translation-Invariant Attacks](https://arxiv.org/abs/1904.02884).
 
     Note:
         Key parameters include `kernel_len` and `n_sig`, which defines the size and

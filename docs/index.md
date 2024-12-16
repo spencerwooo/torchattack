@@ -48,7 +48,7 @@ pip install torchattack
 
     Learn how to use abstractions of pre-trained victim models, attack creations, and evaluations.
 
-    :material-arrow-right: [Usage](./usage.md)
+    :material-arrow-right: [Usage](./usage/index.md)
 
 - :material-sword-cross:{ .middle } **Attacks**
 
@@ -64,7 +64,7 @@ pip install torchattack
 
     On how to install dependencies, run tests, and build documentation.
 
-    :material-arrow-right: [Development](./development/index.md)
+    :material-arrow-right: [Development](./development.md)
 
 </div>
 

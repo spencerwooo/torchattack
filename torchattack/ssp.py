@@ -34,8 +34,8 @@ class PerceptualCriteria(nn.Module):
 class SSP(Attack):
     """The Self-supervised (SSP) attack.
 
-    From the paper 'A Self-supervised Approach for Adversarial Robustness'
-    https://arxiv.org/abs/2006.04924
+    From the paper: [A Self-supervised Approach for Adversarial
+    Robustness](https://arxiv.org/abs/2006.04924).
 
     Args:
         model: The model to attack.

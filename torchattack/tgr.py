@@ -13,9 +13,8 @@ from torchattack.attack_model import AttackModel
 class TGR(Attack):
     """TGR attack for ViTs (Token Gradient Regularization).
 
-    From the paper: 'Transferable Adversarial Attacks on Vision Transformers with Token
-    Gradient Regularization'
-    https://arxiv.org/abs/2303.15754
+    From the paper: [Transferable Adversarial Attacks on Vision Transformers with Token
+    Gradient Regularization](https://arxiv.org/abs/2303.15754).
 
     Args:
         model: The model to attack.

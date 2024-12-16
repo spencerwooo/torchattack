@@ -11,8 +11,8 @@ from torchattack.attack_model import AttackModel
 class SSA(Attack):
     """The SSA - Spectrum Simulation (S^2_I-FGSM) attack.
 
-    From the paper 'Frequency Domain Model Augmentation for Adversarial Attack',
-    https://arxiv.org/abs/2207.05382
+    From the paper: [Frequency Domain Model Augmentation for Adversarial
+    Attack](https://arxiv.org/abs/2207.05382).
 
     N.B.: This is implemented with momentum applied, i.e., on top of MI-FGSM.
 

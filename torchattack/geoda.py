@@ -80,8 +80,8 @@ class GeoDA(Attack):
         This attack does not fully support batch inputs. Batch size of more than 1 will
         generate adversarial perturbations with incorrect magnitude.
 
-    From the paper 'GeoDA: a geometric framework for black-box adversarial attacks'
-    https://arxiv.org/abs/2003.06468
+    From the paper: [GeoDA: a geometric framework for black-box adversarial
+    attacks](https://arxiv.org/abs/2003.06468).
     """
 
     def __init__(

@@ -12,8 +12,8 @@ from torchattack.attack_model import AttackModel
 class PNAPatchOut(Attack):
     """PNA-PatchOut attack for ViTs (Pay no attention & PatchOut).
 
-    From the paper: 'Towards Transferable Adversarial Attacks on Vision Transformers'
-    https://arxiv.org/abs/2109.04176
+    From the paper: [Towards Transferable Adversarial Attacks on Vision
+    Transformers](https://arxiv.org/abs/2109.04176).
 
     Args:
         model: The model to attack.

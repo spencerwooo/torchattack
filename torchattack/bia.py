@@ -50,8 +50,8 @@ class BIAWeights(GeneratorWeightsEnum):
 class BIA(Attack):
     """Beyond ImageNet Attack (BIA).
 
-    From the paper 'Beyond ImageNet Attack: Towards Crafting Adversarial Examples for
-    Black-box Domains', https://arxiv.org/abs/2201.11528
+    From the paper: [Beyond ImageNet Attack: Towards Crafting Adversarial Examples for
+    Black-box Domains](https://arxiv.org/abs/2201.11528).
 
     Args:
         device: Device to use for tensors. Defaults to cuda if available.

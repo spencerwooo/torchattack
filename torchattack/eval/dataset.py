@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader, Dataset
 class NIPSDataset(Dataset):
     """The NIPS 2017 Adversarial Learning Challenge dataset (derived from ImageNet).
 
-    https://www.kaggle.com/datasets/google-brain/nips-2017-adversarial-learning-development-set
+    <https://www.kaggle.com/datasets/google-brain/nips-2017-adversarial-learning-development-set>
     """
 
     def __init__(
@@ -37,7 +37,7 @@ class NIPSDataset(Dataset):
         Args:
             image_root: Path to the folder containing the images.
             pairs_path: Path to the csv file containing the image names and labels.
-            normalize: An optional transform to apply to the images. Defaults to None.
+            transform: An optional transform to apply to the images. Defaults to None.
             max_samples: Maximum number of samples to load. Defaults to None.
         """
 
@@ -83,6 +83,16 @@ class NIPSDataset(Dataset):
 class NIPSLoader(DataLoader):
     """A custom dataloader for the NIPS 2017 dataset.
 
+    Args:
+        root: Path to the root folder containing the images and CSV file.
+        image_root: Path to the folder containing the images. Defaults to None.
+        pairs_path: Path to the csv file containing the image names and labels. Defaults to None.
+        transform: An optional transform to apply to the images. Defaults to None.
+        batch_size: Batch size for the dataloader. Defaults to 1.
+        max_samples: Maximum number of samples to load. Defaults to None.
+        num_workers: Number of workers for the dataloader. Defaults to 4.
+        shuffle: Whether to shuffle the dataset. Defaults to False.
+
     Example:
         The dataloader reads image and label pairs (CSV file) from `{path}/images.csv`
         by default, and loads the images from `{path}/images/`.
@@ -106,11 +116,11 @@ class NIPSLoader(DataLoader):
         root: str | None,
         image_root: str | None = None,
         pairs_path: str | None = None,
-        batch_size: int = 1,
-        shuffle: bool = False,
-        num_workers: int = 4,
         transform: Callable[[torch.Tensor | Image.Image], torch.Tensor] | None = None,
+        batch_size: int = 1,
         max_samples: int | None = None,
+        num_workers: int = 4,
+        shuffle: bool = False,
     ):
         # Specifing a custom image root directory is useful when evaluating
         # transferability on a generated adversarial examples folder
