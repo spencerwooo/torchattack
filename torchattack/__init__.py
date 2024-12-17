@@ -27,7 +27,7 @@ from torchattack.vdc import VDC
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 
 __all__ = [
     # Helper function to create an attack by its name

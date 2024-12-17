@@ -25,7 +25,7 @@ def create_attack(
         normalize: The normalization function specific to the model. Defaults to None.
         device: The device on which the attack will be executed. Defaults to None.
         eps: The epsilon value for the attack. Defaults to None.
-        **attack_kwargs: Additional keyword arguments as parameters for the attack.
+        kwargs: Additional config parameters for the attack. Defaults to None.
 
     Returns:
         Attack: An instance of the specified attack.

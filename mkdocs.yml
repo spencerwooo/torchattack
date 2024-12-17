@@ -7,11 +7,12 @@ copyright: Copyright &copy; 2023-Present Spencer Woo
 nav:
   - index.md
   - Usage:
-    - usage/index.md
-    - usage/attack-model.md
-    - usage/attack-creation.md
-    - usage/attack-evaluation.md
-    - usage/runner.md
+      - usage/index.md
+      - usage/attack-model.md
+      - usage/attack-creation.md
+      - usage/attack-evaluation.md
+      - usage/putting-it-all-together.md
+      - usage/api-reference.md
   - ...
   - development.md
 theme:
@@ -38,39 +39,57 @@ theme:
         name: Switch to system preference
   features:
     - navigation.tracking
+    - navigation.path
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
     - navigation.tabs
     - navigation.top
     - navigation.sections
     - navigation.prune
     - navigation.footer
     - toc.follow
-    - toc.integrate
+    # - toc.integrate
     - search.suggest
     - content.action.edit
     - content.code.copy
-    - navigation.path
-    - navigation.instant
-    - navigation.instant.prefetch
-    - navigation.instant.progress
-    - navigation.indexes
+    # - navigation.indexes
     - content.code.annotate
     - content.tabs.link
 extra_css:
   - stylesheets/extra.css
+  - https://unpkg.com/katex@0/dist/katex.min.css
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
 markdown_extensions:
   - abbr
   - admonition
-  - pymdownx.details
-  - pymdownx.superfences
   - attr_list
   - def_list
   - footnotes
   - md_in_html
   - toc:
       permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.arithmatex:
+      generic: true
 plugins:
   - search
   - gen-files:
