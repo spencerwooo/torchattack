@@ -99,10 +99,10 @@ class NIPSLoader(DataLoader):
 
         ```pycon
         >>> from torchvision.transforms import transforms
-        >>> from torchattack.dataset import NIPSLoader
+        >>> from torchattack.eval import NIPSLoader
         >>> transform = transforms.Compose([transforms.Resize([224]), transforms.ToTensor()])
         >>> dataloader = NIPSLoader(
-        >>>     path="data/nips2017", batch_size=16, transform=transform, max_samples=100
+        >>>     path="data/nips2017", transform=transform, batch_size=16, max_samples=100
         >>> )
         ```
 

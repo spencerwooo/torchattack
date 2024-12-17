@@ -50,9 +50,9 @@ attack = MIFGSM(model, normalize, device, eps=8 / 255, steps=10, decay=1.0)
 
 Finally, please take a look at the actual implementation of FGSM here :octicons-arrow-right-24: [`torchattack.FGSM`][torchattack.FGSM] (expand collapsed `fgsm.py` source code).
 
-## The `create_attack()` method
+## The `create_attack` method
 
-torchattack provides an additional helper to create attacks by its name.
+torchattack provides an additional helper, [`create_attack`][torchattack.create_attack.create_attack], to create an attack by its name.
 
 ```python
 from torchattack import create_attack
@@ -76,10 +76,29 @@ For additional attack specific arguments, pass them as keyword arguments.
 attack = create_attack('MIFGSM', model, normalize, device, eps=8 / 255, steps=10, decay=1.0)
 ```
 
+For generative attacks ([BIA](../attacks/bia.md), [CDA](../attacks/cda.md), and [LTP](../attacks/ltp.md), etc.) that do not require passing the `model` and `normalize` arguments.
+
+```python
+attack = create_attack('BIA', device, eps=10 / 255, weights='DEFAULT')
+attack = create_attack('CDA', device, eps=10 / 255, checkpoint_path='path/to/checkpoint.pth')
+```
+
+!!! tip "Generative attacks are models specifically trained to generate adversarial perturbation directly."
+
+    These models have already been given a pretrained model to attack, which acts as the discriminator in their setups. In inference mode, they load checkpoints like any other pretrained model from torchvision. **The checkpoints provided by torchattack are sourced from their original repositories.**
+
 ## Running the attack
 
-## API Reference
+Similar to PyTorch models, torchattack attacks implement the `forward` method, to run the attack on a batch of images.
 
-::: torchattack.create_attack.create_attack
-    options:
-        heading_level: 3
+Calling the attack class itself also directs to the `forward` method.
+
+Here is a simple example for a batch of dummy images of shape $(4, 3, 224, 224)$ (typical ImageNet images), and their corresponding labels (1000 classes).
+
+```python
+x = torch.rand(4, 3, 224, 224).to(device)
+y = torch.randint(0, 1000, (4,)).to(device)
+
+x_adv = attack(x, y)
+# x_adv is the generated adversarial example
+```

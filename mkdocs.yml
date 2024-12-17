@@ -12,6 +12,7 @@ nav:
       - usage/attack-creation.md
       - usage/attack-evaluation.md
       - usage/runner.md
+      - usage/api-reference.md
   - ...
   - development.md
 theme:

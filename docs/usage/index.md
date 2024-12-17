@@ -19,6 +19,9 @@ title: Usage
     <figcaption markdown>[TGR](../attacks/tgr.md) :octicons-arrow-right-24: ViT-B/16</figcaption>
 </figure>
 </div>
+
+## Introduction
+
 **Adversarial examples** are tricky inputs designed to confuse machine learning models.
 
 In vision tasks like image classification, these examples are created by slightly altering an original image. The changes are so small that humans can't really notice them, yet **they can cause significant shifts in the model's prediction.**
@@ -33,6 +36,8 @@ torchattack is a library for PyTorch that offers a collection of state-of-the-ar
 Attacks in torchattack are implemented over a thin layer of abstraction (`torchattack._attack.Attack`), with minimal changes to the original implementation within its research paper, along with comprehensive type hints and explanatory comments, to make it easy for researchers like me and you to use and understand.
 
 The library also provides tools to load pretrained models, set up attacks, and run tests.
+
+## Getting Started
 
 To get started, follow the links below:
 
