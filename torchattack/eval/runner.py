@@ -63,7 +63,7 @@ def run_attack(
 
     # Set up attack and trackers
     frm = FoolingRateMetric()
-    attacker = create_attack(attack, model, normalize, device, attack_args=attack_args)
+    attacker = create_attack(attack, model, normalize, device, **attack_args)
     print(attacker)
 
     # Setup victim models if provided
