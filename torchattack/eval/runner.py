@@ -1,5 +1,7 @@
 from typing import Any
 
+import torchattack
+
 
 def run_attack(
     attack: Any,
@@ -118,11 +120,9 @@ def run_attack(
 if __name__ == '__main__':
     import argparse
 
-    import torchattack
-
     parser = argparse.ArgumentParser(description='Run an attack on a model.')
     parser.add_argument('--attack', type=str, required=True)
-    parser.add_argument('--eps', type=float, default=16)
+    parser.add_argument('--eps', type=str, default='16/255')
     parser.add_argument('--weights', type=str, default='DEFAULT')
     parser.add_argument('--checkpoint-path', type=str, default=None)
     parser.add_argument('--model-name', type=str, default='resnet50')
@@ -133,7 +133,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     attack_args = {}
-    args.eps = args.eps / 255
+    args.eps = eval(args.eps)
     if args.attack not in torchattack.NON_EPS_ATTACKS:  # type: ignore
         attack_args['eps'] = args.eps
     if args.attack in torchattack.GENERATIVE_ATTACKS:  # type: ignore

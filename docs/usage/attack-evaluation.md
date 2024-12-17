@@ -39,6 +39,9 @@ dataloader = NIPSLoader(root='datasets/nips2017', transform=transform, batch_siz
 attack = FGSM(model, normalize, device)
 ```
 
+!!! tip "Only the transform is applied to the dataloader, ==the normalize is left out==."
+    Note that the earlier _separated transform and normalize function_ here. Only the transform function is passed to the dataloader,
+
 And wrap the dataloader in the progress bar of your choice, [such as rich](https://rich.readthedocs.io/en/stable/progress.html).
 
 ```python
@@ -55,7 +58,7 @@ When iterated over, the [`NIPSLoader`][torchattack.eval.NIPSLoader] returns a tu
 - `y` is the batch of labels,
 - and `fname` is the batch of filenames useful for saving the generated adversarial examples if needed.
 
-We can now run the attack by iterating over the dataset.
+We can now run the attack by iterating over the dataset and attacking batches of input samples.
 
 ```python
 for x, y, fname in dataloader:
@@ -67,4 +70,28 @@ for x, y, fname in dataloader:
 
 How would we know if the attack was successful?
 
-We can evaluate the attack's fooling rate, by comparing the model's accuracy on clean samples and their associated adversarial examples.
+We can evaluate the attack's **==fooling rate==**, by comparing the model's accuracy on clean samples and their associated adversarial examples. Fortunately, torchattack also provides a [`FoolingRateMetric`][torchattack.eval.FoolingRateMetric] tracker to do just that.
+
+```python hl_lines="3 8-11"
+from torchattack.eval import FoolingRateMetric
+
+frm = FoolingRateMetric()
+for x, y, fname in dataloader:
+    x, y = x.to(device), y.to(device)
+    x_adv = attack(x, y)
+
+    # Track fooling rate
+    x_outs = model(normalize(x))
+    adv_outs = model(normalize(x_adv))
+    frm.update(y, x_outs, adv_outs)
+```
+
+Finally, we can acquire the key metrics with `frm.compute()`, which returns a tuple of
+
+- `clean_accuracy`: the model's accuracy on clean samples,
+- `adv_accuracy`: the model's accuracy on adversarial examples,
+- `fooling_rate`: the fooling rate of the attack.
+
+```python
+clean_accuracy, adv_accuracy, fooling_rate = frm.compute()
+```

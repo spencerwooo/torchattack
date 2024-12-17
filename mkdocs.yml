@@ -11,7 +11,7 @@ nav:
       - usage/attack-model.md
       - usage/attack-creation.md
       - usage/attack-evaluation.md
-      - usage/runner.md
+      - usage/putting-it-all-together.md
       - usage/api-reference.md
   - ...
   - development.md
@@ -39,21 +39,21 @@ theme:
         name: Switch to system preference
   features:
     - navigation.tracking
+    - navigation.path
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
     - navigation.tabs
     - navigation.top
     - navigation.sections
     - navigation.prune
     - navigation.footer
     - toc.follow
-    - toc.integrate
+    # - toc.integrate
     - search.suggest
     - content.action.edit
     - content.code.copy
-    - navigation.path
-    - navigation.instant
-    - navigation.instant.prefetch
-    - navigation.instant.progress
-    - navigation.indexes
+    # - navigation.indexes
     - content.code.annotate
     - content.tabs.link
 extra_css:

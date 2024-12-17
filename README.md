@@ -26,6 +26,10 @@ pip install torchattack
 - 📊 Tooling for fooling rate metrics and model evaluation in `eval`.
 - 🔁 Numerous attacks reimplemented for readability and efficiency (TGR, VDC, etc.).
 
+## Documentation
+
+torchattack's docs are available at [docs.swo.moe/torchattack](https://docs.swo.moe/torchattack/).
+
 ## Usage
 
 ```python
@@ -79,7 +83,7 @@ attack_args = {'steps': 10, 'decay': 1.0}
 attack = create_attack('MIFGSM', model, normalize, device, eps=0.03, **attack_args)
 ```
 
-Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a full example.
+Check out [examples/](examples/mifgsm_transfer.py) and [`torchattack.eval.runner`](torchattack/eval/runner.py) for full examples.
 
 ## Attacks
 
@@ -266,21 +270,7 @@ Check out [`torchattack.eval.runner`](torchattack/eval/runner.py) for a full exa
 
 ## Development
 
-uv is used for development.
-
-First, [install uv](https://docs.astral.sh/uv/getting-started/installation/).
-
-Next, install dev dependencies.
-
-```shell
-uv sync --dev
-```
-
-Install dependency group `test` to run tests.
-
-```shell
-uv sync --dev --group test
-```
+On how to install dependencies, run tests, and build documentation. See [Development - torchattack](https://docs.swo.moe/torchattack/development/).
 
 ## License
 

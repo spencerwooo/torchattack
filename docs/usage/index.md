@@ -1,9 +1,4 @@
----
-title: Usage
----
-
-!!! danger
-    Under construction. Please check back later.
+# Introduction
 
 <div markdown style="display: flex; justify-content: space-around;">
 <figure markdown="span">
@@ -20,7 +15,7 @@ title: Usage
 </figure>
 </div>
 
-## Introduction
+## Adversarial examples
 
 **Adversarial examples** are tricky inputs designed to confuse machine learning models.
 
@@ -44,6 +39,6 @@ To get started, follow the links below:
 - [Loading pretrained models and important attributes](./attack-model.md)
 - [Creating and running attacks](./attack-creation.md)
 - [Loading a dataset and running evaluations](./attack-evaluation.md)
-- [A full example to evaluate transferability](./runner.md)
+- [A full example to evaluate transferability](./api-reference.md)
 
 Or dive straight into [all available attacks](../attacks/index.md).
