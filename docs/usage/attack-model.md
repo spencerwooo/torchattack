@@ -31,30 +31,38 @@ The [`AttackModel.from_pretrained()`][torchattack.attack_model.AttackModel.from_
 2. It sets the model to evaluation mode by calling `model.eval()`, and moves the model to the specified device.
 3. It resolves the model's `transform` and `normalize` functions associated with its pretrained weights to the `AttackModel` instance, also automatically.
 
-Doing so, we not only get the pretrained model set up, but also **its necessary associated, and more importantly, ==separated== transform and normalization functions.**
+Doing so, we not only get our pretrained model set up, but also its necessary associated, and more importantly, **==_separated_ transform and normalization functions==(1).**
+{ .annotate }
+
+1. Separating the model's normalize function from its transform is crucial for launching attacks, **as adversarial perturbation is crafted within the original image space — most often within `(0, 1)`.**
 
 ```python
 transform, normalize = model.transform, model.normalize
 ```
 
-<!-- Load a pretrained model to attack from either torchvision or timm.
+## Specifying the model source
+
+`AttackModel` honors an explicit model source to load from, by prepending the model name with `tv/` or `timm/`, for `torchvision` and `timm` respectively.
+
+For instance, to load the ViT-B/16 model from `timm`.
 
 ```python
-from torchattack import AttackModel
-
-# Load a model with `AttackModel`
-model = AttackModel.from_pretrained(model_name='resnet50', device=device)
-# `AttackModel` automatically attach the model's `transform` and `normalize` functions
-transform, normalize = model.transform, model.normalize
-
-# Additionally, to explicitly specify where to load the pretrained model from (timm or torchvision),
-# prepend the model name with 'timm/' or 'tv/' respectively, or use the `from_timm` argument, e.g.
 vit_b16 = AttackModel.from_pretrained(model_name='timm/vit_base_patch16_224', device=device)
-inv_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3', device=device)
-pit_b = AttackModel.from_pretrained(model_name='pit_b_224', device=device, from_timm=True)
-``` -->
+```
 
-## API
+To load the Inception-v3 model from `torchvision`.
+
+```python
+inv_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3', device=device)
+```
+
+Or, explicitly specify using `timm` as the source with `from_timm=True`.
+
+```python
+pit_b = AttackModel.from_pretrained(model_name='pit_b_224', device=device, from_timm=True)
+```
+
+## API Reference
 
 ::: torchattack.attack_model.AttackModel
     options:
