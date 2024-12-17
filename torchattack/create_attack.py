@@ -25,9 +25,7 @@ def create_attack(
         normalize: The normalization function specific to the model. Defaults to None.
         device: The device on which the attack will be executed. Defaults to None.
         eps: The epsilon value for the attack. Defaults to None.
-        weights: The name of the generator weight for generative attacks. Defaults to 'DEFAULT'.
-        checkpoint_path: The path to the checkpoint file for generative attacks. Defaults to None.
-        attack_args: Additional config parameters for the attack. Defaults to None.
+        kwargs: Additional config parameters for the attack. Defaults to None.
 
     Returns:
         Attack: An instance of the specified attack.
