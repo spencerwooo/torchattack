@@ -1,4 +1,5 @@
 from torchattack.admix import Admix
+from torchattack.att import ATT
 from torchattack.attack_model import AttackModel
 from torchattack.bia import BIA
 from torchattack.cda import CDA
@@ -36,6 +37,7 @@ __all__ = [
     'AttackModel',
     # All supported attacks
     'Admix',
+    'ATT',
     'BIA',
     'CDA',
     'DeCoWA',
@@ -83,9 +85,21 @@ GRADIENT_NON_VIT_ATTACKS = {
     'VMIFGSM': VMIFGSM,
     'VNIFGSM': VNIFGSM,
 }
-GRADIENT_VIT_ATTACKS = {'TGR': TGR, 'VDC': VDC, 'PNAPatchOut': PNAPatchOut}
-GENERATIVE_ATTACKS = {'BIA': BIA, 'CDA': CDA, 'LTP': LTP}
-NON_EPS_ATTACKS = {'GeoDA': GeoDA, 'DeepFool': DeepFool}
+GRADIENT_VIT_ATTACKS = {
+    'TGR': TGR,
+    'VDC': VDC,
+    'PNAPatchOut': PNAPatchOut,
+    'ATT': ATT,
+}
+GENERATIVE_ATTACKS = {
+    'BIA': BIA,
+    'CDA': CDA,
+    'LTP': LTP,
+}
+NON_EPS_ATTACKS = {
+    'GeoDA': GeoDA,
+    'DeepFool': DeepFool,
+}
 SUPPORTED_ATTACKS = (
     GRADIENT_NON_VIT_ATTACKS
     | GRADIENT_VIT_ATTACKS

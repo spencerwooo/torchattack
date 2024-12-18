@@ -11,6 +11,7 @@ def run_attack(
     dataset_root: str = 'datasets/nips2017',
     max_samples: int = 100,
     batch_size: int = 4,
+    save_adv_batch: int = -1,
 ) -> None:
     """Helper function to run evaluation on attacks.
 
@@ -36,6 +37,8 @@ def run_attack(
         dataset_root: Root directory of the dataset. Defaults to "datasets/nips2017".
         max_samples: Max number of samples to attack. Defaults to 100.
         batch_size: Batch size for the dataloader. Defaults to 16.
+        save_adv_batch: Save one batch of adversarial examples to visualize (as a grid).
+            If lower than 0, do not save anything. Defaults to -1.
     """
 
     import torch
@@ -85,17 +88,17 @@ def run_attack(
         adv_outs = model(normalize(advs))
         frm.update(y, cln_outs, adv_outs)
 
-        # *Save first batch of adversarial examples
-        # if _i == 6:
-        #     import torchvision as tv
+        # Save one batch of adversarial examples if requested
+        if _i == save_adv_batch:
+            import torchvision as tv
 
-        #     # make grids as square as possible
-        #     nrow = int(advs.size(0) ** 0.5)
+            # make grids as square as possible
+            nrow = int(advs.size(0) ** 0.5)
 
-        #     # save adversarial examples
-        #     saved_imgs = advs.detach().cpu().mul(255).to(torch.uint8)
-        #     img_grid = tv.utils.make_grid(saved_imgs, nrow=nrow)
-        #     tv.io.write_png(img_grid, 'advs.png')
+            # save adversarial examples
+            saved_imgs = advs.detach().cpu().mul(255).to(torch.uint8)
+            img_grid = tv.utils.make_grid(saved_imgs, nrow=nrow)
+            tv.io.write_png(img_grid, f'adv_grid_{save_adv_batch}.png')
 
         # Track transfer fooling rates if victim models are provided
         if victim_model_names:
