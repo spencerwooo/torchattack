@@ -202,19 +202,7 @@ class TGR(Attack):
             grad_out: tuple[torch.Tensor, ...],
             gamma: float,
         ) -> tuple[torch.Tensor, ...]:
-            # show diff between high and low PyTorch version
-            # print('v len(grad_in)',len(grad_in))
-            # high, 1
-            # low, 2
-
-            # print('v grad_in[0].shape',grad_in[0].shape)
-            # high, torch.Size([197, 2304])
-            # low, torch.Size([1, 197, 2304])
-            is_high_pytorch = False
-            if len(grad_in[0].shape) == 2:
-                grad_in = list(grad_in)  # type: ignore
-                is_high_pytorch = True
-                grad_in[0] = grad_in[0].unsqueeze(0)  # type: ignore
+            grad_in = (grad_in[0].unsqueeze(0),) + grad_in[1:]
 
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
@@ -240,8 +228,7 @@ class TGR(Attack):
                 out_grad[:, max_all, range(c)] = 0.0
                 out_grad[:, min_all, range(c)] = 0.0
 
-            if is_high_pytorch:
-                out_grad = out_grad.squeeze(0)
+            out_grad = out_grad.squeeze(0)
 
             # return (out_grad, grad_in[1])
             return (out_grad,) + tuple(grad_in[1:])
@@ -252,11 +239,7 @@ class TGR(Attack):
             grad_out: tuple[torch.Tensor, ...],
             gamma: float,
         ) -> tuple[torch.Tensor, ...]:
-            is_high_pytorch = False
-            if len(grad_in[0].shape) == 2:
-                grad_in = list(grad_in)  # type: ignore
-                is_high_pytorch = True
-                grad_in[0] = grad_in[0].unsqueeze(0)  # type: ignore
+            grad_in = (grad_in[0].unsqueeze(0),) + grad_in[1:]
 
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
@@ -285,8 +268,7 @@ class TGR(Attack):
                 out_grad[:, max_all, range(c)] = 0.0
                 out_grad[:, min_all, range(c)] = 0.0
 
-            if is_high_pytorch:
-                out_grad = out_grad.squeeze(0)
+            out_grad = out_grad.squeeze(0)
 
             return (out_grad,) + tuple(grad_in[1:])
 
