@@ -76,8 +76,8 @@ class ATT(Attack):
         self.crop_len = 16
         self.max_num_patches = int((self.image_size / self.crop_len) ** 2)
 
-        self.mid_feats = None
-        self.mid_grads = None
+        self.mid_feats = torch.tensor([])
+        self.mid_grads = torch.tensor([])
         self.lambd = 0.01  # lambda
         self.patch_index = self._patch_index(self.image_size, self.crop_len)
 
@@ -219,7 +219,7 @@ class ATT(Attack):
         return torch.cat((torch.ones(num), torch.zeros(length - num)))
 
     def _get_gf(self) -> torch.Tensor:
-        def resize(x: torch.Tensor) -> torch.Tensor:
+        def _resize(x: torch.Tensor) -> torch.Tensor:
             return torch.nn.functional.interpolate(
                 x.unsqueeze(0),
                 size=(self.image_size, self.image_size),
@@ -227,40 +227,40 @@ class ATT(Attack):
                 align_corners=False,
             ).squeeze(0)
 
+        def _vit_base_patch16_224_gf() -> torch.Tensor:
+            return torch.sum(self.mid_feats[0][1:] * self.mid_grads[0][1:], dim=-1)
+
+        def _pit_b_224_gf() -> torch.Tensor:
+            return torch.sum(self.mid_feats[0][1:] * self.mid_grads[0][1:], dim=-1)
+
+        def _cait_s24_224_gf() -> torch.Tensor:
+            return torch.sum(self.mid_feats[0] * self.mid_grads, dim=-1)
+
+        def _visformer_small_gf() -> torch.Tensor:
+            return torch.sum(self.mid_feats[0] * self.mid_grads, dim=0)
+
         gf_cfg = {
-            'vit_base_patch16_224': (
-                lambda: (self.mid_feats[0][1:] * self.mid_grads[0][1:]).sum(-1),
-                (1, 14, 14),
-            ),
-            'pit_b_224': (
-                lambda: (self.mid_feats[0][1:] * self.mid_grads[0][1:]).sum(-1),
-                (1, 8, 8),
-            ),
-            'cait_s24_224': (
-                lambda: (self.mid_feats[0] * self.mid_grads).sum(-1),
-                (1, 14, 14),
-            ),
-            'visformer_small': (
-                lambda: (self.mid_feats[0] * self.mid_grads).sum(0),
-                None,
-            ),
+            'vit_base_patch16_224': (_vit_base_patch16_224_gf, (1, 14, 14)),
+            'pit_b_224': (_pit_b_224_gf, (1, 8, 8)),
+            'cait_s24_224': (_cait_s24_224_gf, (1, 14, 14)),
+            'visformer_small': (_visformer_small_gf, None),
         }
         assert self.hook_cfg in gf_cfg
 
         gf_func, reshape_size = gf_cfg[self.hook_cfg]
         gf = gf_func()
         if reshape_size:
-            gf = resize(gf.reshape(*reshape_size))
+            gf = _resize(gf.reshape(*reshape_size))
         else:
-            gf = resize(gf.unsqueeze(0))
+            gf = _resize(gf.unsqueeze(0))
 
         return gf
 
     def _register_vit_model_hook(self) -> None:
-        self.var_a = 0
-        self.var_qkv = 0
-        self.var_mlp = 0
-        self.gamma = 0.5
+        self.var_a = torch.tensor(0)
+        self.var_qkv = torch.tensor(0)
+        self.var_mlp = torch.tensor(0)
+        self.gamma = torch.tensor(0.5)
 
         @dataclass
         class HookParams:
@@ -309,20 +309,27 @@ class ATT(Attack):
         self.scale = hook_params.scale
         self.offset = hook_params.offset
 
-        def attn_att(module, grad_in, grad_out):
+        def attn_att(
+            module: nn.Module,
+            grad_in: tuple[torch.Tensor, ...],
+            grad_out: tuple[torch.Tensor, ...],
+        ) -> tuple[torch.Tensor, ...]:
             mask = (
                 torch.ones_like(grad_in[0])
                 * self.truncate_layers[self.back_attn]
                 * self.weaken_factor[0]
             )
             out_grad = mask * grad_in[0][:]
-            if self.var_a != 0:
-                gpf = (
-                    self.gamma
-                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_a))
-                ).clamp(0, 1)
-            else:
+
+            if self.var_a.item() == 0:
                 gpf = self.gamma
+            else:
+                gpf = torch.clamp(
+                    self.gamma
+                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_a)),
+                    min=0,
+                    max=1,
+                )
             if self.hook_cfg in [
                 'vit_base_patch16_224',
                 'visformer_small',
@@ -362,7 +369,11 @@ class ATT(Attack):
             self.back_attn -= 1
             return (out_grad,)
 
-        def attn_cait_att(module, grad_in, grad_out):
+        def attn_cait_att(
+            module: nn.Module,
+            grad_in: tuple[torch.Tensor, ...],
+            grad_out: tuple[torch.Tensor, ...],
+        ) -> tuple[torch.Tensor, ...]:
             mask = (
                 torch.ones_like(grad_in[0])
                 * self.truncate_layers[self.back_attn]
@@ -370,13 +381,15 @@ class ATT(Attack):
             )
 
             out_grad = mask * grad_in[0][:]
-            if self.var_a != 0:
-                gpf = (
-                    self.gamma
-                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_a))
-                ).clamp(0, 1)
-            else:
+            if self.var_a.item() == 0:
                 gpf = self.gamma
+            else:
+                gpf = torch.clamp(
+                    self.gamma
+                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_a)),
+                    min=0,
+                    max=1,
+                )
             b, h, w, c = grad_in[0].shape
             out_grad_cpu = out_grad.data.clone().cpu().numpy()
             max_all = np.argmax(out_grad_cpu[0, :, 0, :], axis=0)
@@ -389,33 +402,45 @@ class ATT(Attack):
             self.back_attn -= 1
             return (out_grad,)
 
-        def q_att(module, grad_in, grad_out):
+        def q_att(
+            module: nn.Module,
+            grad_in: tuple[torch.Tensor, ...],
+            grad_out: tuple[torch.Tensor, ...],
+        ) -> tuple[torch.Tensor, ...]:
             # cait Q only uses class token
             mask = torch.ones_like(grad_in[0]) * self.weaken_factor[1]
             out_grad = mask * grad_in[0][:]
-            if self.var_qkv != 0:
-                gpf = (
-                    self.gamma
-                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_qkv))
-                ).clamp(0, 1)
-            else:
+            if self.var_qkv.item() == 0:
                 gpf = self.gamma
+            else:
+                gpf = torch.clamp(
+                    self.gamma
+                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_qkv)),
+                    min=0,
+                    max=1,
+                )
             out_grad[:] *= gpf
             self.var_qkv = torch.var(out_grad)
             return (out_grad, grad_in[1], grad_in[2])
 
-        def v_att(module, grad_in, grad_out):
+        def v_att(
+            module: nn.Module,
+            grad_in: tuple[torch.Tensor, ...],
+            grad_out: tuple[torch.Tensor, ...],
+        ) -> tuple[torch.Tensor, ...]:
             grad_in = (grad_in[0].unsqueeze(0),) + grad_in[1:]
 
             mask = torch.ones_like(grad_in[0]) * self.weaken_factor[1]
             out_grad = mask * grad_in[0][:]
-            if self.var_qkv != 0:
-                gpf = (
-                    self.gamma
-                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_qkv))
-                ).clamp(0, 1)
-            else:
+            if self.var_qkv.item() == 0:
                 gpf = self.gamma
+            else:
+                gpf = torch.clamp(
+                    self.gamma
+                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_qkv)),
+                    min=0,
+                    max=1,
+                )
 
             if self.hook_cfg in ['visformer_small']:
                 b, c, h, w = grad_in[0].shape
@@ -445,18 +470,24 @@ class ATT(Attack):
             # return (out_grad, grad_in[1])
             return (out_grad,) + tuple(grad_in[1:])
 
-        def mlp_att(module, grad_in, grad_out):
+        def mlp_att(
+            module: nn.Module,
+            grad_in: tuple[torch.Tensor, ...],
+            grad_out: tuple[torch.Tensor, ...],
+        ) -> tuple[torch.Tensor, ...]:
             grad_in = (grad_in[0].unsqueeze(0),) + grad_in[1:]
 
             mask = torch.ones_like(grad_in[0]) * self.weaken_factor[2]
             out_grad = mask * grad_in[0][:]
-            if self.var_mlp != 0:
-                gpf = (
-                    self.gamma
-                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_mlp))
-                ).clamp(0, 1)
-            else:
+            if self.var_mlp.item() == 0:
                 gpf = self.gamma
+            else:
+                gpf = torch.clamp(
+                    self.gamma
+                    + self.lambd * (1 - torch.sqrt(torch.var(out_grad) / self.var_mlp)),
+                    min=0,
+                    max=1,
+                )
 
             if self.hook_cfg in ['visformer_small']:
                 b, c, h, w = grad_in[0].shape
