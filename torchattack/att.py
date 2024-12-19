@@ -194,7 +194,14 @@ class ATT(Attack):
                 tmpidx += 1
         return torch.LongTensor(np.tile(index, (1, 1, 1))).to(self.device)
 
-    def _norm_patchs(self, gf, index, patch, scale, offset):
+    def _norm_patchs(
+        self,
+        gf: torch.Tensor,
+        index: torch.Tensor,
+        patch: int,
+        scale: float,
+        offset: float,
+    ) -> torch.Tensor:
         patch_size = patch**2
         for i in range(len(gf)):
             tmp = torch.take(gf[i], index[i])
@@ -211,8 +218,8 @@ class ATT(Attack):
     def _tr_01_pc(self, num: int, length: int) -> torch.Tensor:
         return torch.cat((torch.ones(num), torch.zeros(length - num)))
 
-    def _get_gf(self):
-        def resize(x):
+    def _get_gf(self) -> torch.Tensor:
+        def resize(x: torch.Tensor) -> torch.Tensor:
             return torch.nn.functional.interpolate(
                 x.unsqueeze(0),
                 size=(self.image_size, self.image_size),
