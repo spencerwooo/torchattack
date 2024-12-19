@@ -128,22 +128,15 @@ class ATT(Attack):
         gf_patchs_t = self._norm_patchs(
             gf, self.patch_index, self.crop_len, self.scale, self.offset
         )
-        gf_patchs_start = torch.ones_like(gf_patchs_t).cuda() * 0.99
+        gf_patchs_start = torch.ones_like(gf_patchs_t, device=self.device) * 0.99
         gf_offset = (gf_patchs_start - gf_patchs_t) / self.steps
 
         for i in range(self.steps):
-            random_patch = (
-                torch.rand(14, 14, device=self.device)
-                .repeat_interleave(16)
-                .reshape(14, 14 * 16)
-                .repeat(1, 16)
-                .reshape(224, 224)
+            random_patch = torch.rand(224, 224, device=self.device)
+            gf_patchs_threshold = gf_patchs_start - gf_offset * (i + 1)
+            gf_patchs = torch.where(random_patch > gf_patchs_threshold, 0.0, 1.0).to(
+                self.device
             )
-            gf_patchs = torch.where(
-                torch.as_tensor(random_patch > gf_patchs_start - gf_offset * (i + 1)),
-                0.0,
-                1.0,
-            ).to(self.device)
             outs = self.model(self.normalize(x + delta * gf_patchs.detach()))
             loss = self.lossfn(outs, y)
 
@@ -203,16 +196,21 @@ class ATT(Attack):
         offset: float,
     ) -> torch.Tensor:
         patch_size = patch**2
-        for i in range(len(gf)):
-            tmp = torch.take(gf[i], index[i])
-            norm_tmp = torch.mean(tmp, dim=-1)
-            scale_norm = (
-                scale
-                * ((norm_tmp - norm_tmp.min()) / (norm_tmp.max() - norm_tmp.min()))
-                + offset
+        tmp = torch.take(gf, index)
+        norm_tmp = torch.mean(tmp, dim=-1, keepdim=True)
+        scale_norm = (
+            scale
+            * (
+                (norm_tmp - norm_tmp.min(dim=-1, keepdim=True)[0])
+                / (
+                    norm_tmp.max(dim=-1, keepdim=True)[0]
+                    - norm_tmp.min(dim=-1, keepdim=True)[0]
+                )
             )
-            tmp_bi = torch.as_tensor(scale_norm.repeat_interleave(patch_size)) * 1.0
-            gf[i] = gf[i].put_(index[i], tmp_bi)
+            + offset
+        )
+        tmp_bi = scale_norm.repeat_interleave(patch_size, dim=-1)
+        gf = gf.put_(index, tmp_bi)
         return gf
 
     def _tr_01_pc(self, num: int, length: int) -> torch.Tensor:
@@ -591,6 +589,6 @@ if __name__ == '__main__':
     run_attack(
         ATT,
         model_name='timm/vit_base_patch16_224',
-        victim_model_names=['timm/cait_s24_224', 'timm/visformer_small'],
+        victim_model_names=['timm/cait_s24_224', 'timm/visformer_small', 'resnet50'],
         save_adv_batch=6,
     )
