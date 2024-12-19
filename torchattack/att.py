@@ -79,7 +79,7 @@ class ATT(Attack):
         self.mid_feats = torch.tensor([])
         self.mid_grads = torch.tensor([])
         self.lambd = 0.01  # lambda
-        self.patch_index = self._patch_index(self.image_size, self.crop_len)
+        self.patch_index = self._patch_index(self.image_size, self.crop_len).to(device)
 
         # Check if hook config is supported
         if self.hook_cfg not in [
@@ -128,16 +128,15 @@ class ATT(Attack):
         gf_patchs_t = self._norm_patchs(
             gf, self.patch_index, self.crop_len, self.scale, self.offset
         )
-        gf_patchs_start = torch.ones_like(gf_patchs_t, device=self.device) * 0.99
+        gf_patchs_start = torch.ones_like(gf_patchs_t) * 0.99
         gf_offset = (gf_patchs_start - gf_patchs_t) / self.steps
 
         for i in range(self.steps):
-            random_patch = torch.rand(224, 224, device=self.device)
+            random_patch = torch.rand_like(x)
             gf_patchs_threshold = gf_patchs_start - gf_offset * (i + 1)
-            gf_patchs = torch.where(random_patch > gf_patchs_threshold, 0.0, 1.0).to(
-                self.device
-            )
-            outs = self.model(self.normalize(x + delta * gf_patchs.detach()))
+            gf_patchs = torch.where(random_patch > gf_patchs_threshold, 0.0, 1.0)
+
+            outs = self.model(self.normalize(x + delta * gf_patchs))
             loss = self.lossfn(outs, y)
 
             if self.targeted:
@@ -166,26 +165,35 @@ class ATT(Attack):
         return x + delta
 
     def _patch_index(self, image_size: int, crop_len: int) -> torch.Tensor:
-        filter_size = crop_len
-        stride = crop_len
-        mat_p = np.floor((image_size - filter_size) / stride) + 1
-        mat_p = mat_p.astype(np.int32)
-        mat_q = mat_p
-        index = np.ones([mat_p * mat_q, filter_size * filter_size], dtype=int)
-        tmpidx = 0
-        for q in range(mat_q):
-            plus1 = q * stride * image_size
-            for p in range(mat_p):
-                plus2 = p * stride
-                index_ = np.array([], dtype=int)
-                for i in range(filter_size):
-                    plus = i * image_size + plus1 + plus2
-                    index_ = np.append(
-                        index_, np.arange(plus, plus + filter_size, dtype=int)
-                    )
-                index[tmpidx] = index_
-                tmpidx += 1
-        return torch.LongTensor(np.tile(index, (1, 1, 1))).to(self.device)
+        # Calculate number of patches in each dimension
+        mat_dim = torch.floor(torch.tensor((image_size - crop_len) / crop_len) + 1)
+        mat_dim = mat_dim.to(torch.int64)
+
+        # Create base indices template for a single patch
+        base_indices = torch.arange(crop_len, dtype=torch.int64)
+
+        # Generate row and column offsets for each element within a patch
+        row_offsets = (base_indices.view(-1, 1) * image_size).repeat(1, crop_len)
+        col_offsets = base_indices.repeat(crop_len, 1)
+
+        # Combine offsets to get indices for elements in a single patch
+        patch_indices = (row_offsets + col_offsets).reshape(-1)
+
+        # Generate offset grid for all patch positions
+        stride_row_offsets = torch.arange(mat_dim, dtype=torch.int64).view(-1, 1)
+        stride_row_offsets = stride_row_offsets * crop_len * image_size
+        stride_row_offsets = stride_row_offsets.repeat(1, mat_dim)
+
+        stride_col_offsets = torch.arange(mat_dim, dtype=torch.int64)
+        stride_col_offsets = (stride_col_offsets * crop_len).repeat(mat_dim, 1)
+
+        stride_offsets = (stride_row_offsets + stride_col_offsets).reshape(-1, 1)
+
+        # Combine base patch indices with position offsets
+        index = patch_indices.view(1, -1) + stride_offsets
+
+        # Add batch dimension and move to device
+        return index.unsqueeze(0).repeat(1, 1, 1)
 
     def _norm_patchs(
         self,
@@ -245,14 +253,11 @@ class ATT(Attack):
         }
         assert self.hook_cfg in gf_cfg
 
-        gf_func, reshape_size = gf_cfg[self.hook_cfg]
-        gf = gf_func()
-        if reshape_size:
-            gf = _resize(gf.reshape(*reshape_size))
-        else:
-            gf = _resize(gf.unsqueeze(0))
+        get_grad_feat_fn, reshape_size = gf_cfg[self.hook_cfg]
 
-        return gf
+        gf = get_grad_feat_fn()
+        gf = gf.reshape(*reshape_size) if reshape_size else gf.unsqueeze(0)
+        return _resize(gf)
 
     def _register_vit_model_hook(self) -> None:
         self.var_a = torch.tensor(0)
@@ -590,5 +595,7 @@ if __name__ == '__main__':
         ATT,
         model_name='timm/vit_base_patch16_224',
         victim_model_names=['timm/cait_s24_224', 'timm/visformer_small', 'resnet50'],
-        save_adv_batch=6,
+        # save_adv_batch=6,
+        batch_size=2,
+        max_samples=10,
     )
