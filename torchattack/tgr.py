@@ -339,5 +339,5 @@ if __name__ == '__main__':
     run_attack(
         TGR,
         model_name='timm/vit_base_patch16_224',
-        victim_model_names=['timm/cait_s24_224', 'timm/visformer_small'],
+        victim_model_names=['timm/cait_s24_224', 'timm/visformer_small', 'resnet50'],
     )
