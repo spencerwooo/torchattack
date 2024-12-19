@@ -131,8 +131,9 @@ if __name__ == '__main__':
     parser.add_argument('--model-name', type=str, default='resnet50')
     parser.add_argument('--victim-model-names', type=str, nargs='+', default=None)
     parser.add_argument('--dataset-root', type=str, default='datasets/nips2017')
-    parser.add_argument('--max-samples', type=int, default=100)
+    parser.add_argument('--max-samples', type=int, default=None)
     parser.add_argument('--batch-size', type=int, default=4)
+    parser.add_argument('--save-adv-batch', type=int, default=-1)
     args = parser.parse_args()
 
     attack_args = {}
@@ -151,4 +152,5 @@ if __name__ == '__main__':
         dataset_root=args.dataset_root,
         max_samples=args.max_samples,
         batch_size=args.batch_size,
+        save_adv_batch=args.save_adv_batch,
     )
