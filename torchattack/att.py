@@ -81,6 +81,23 @@ class ATT(Attack):
         self.lambd = 0.01  # lambda
         self.patch_index = self._patch_index(self.image_size, self.crop_len)
 
+        # Check if hook config is supported
+        if self.hook_cfg not in [
+            'vit_base_patch16_224',
+            'pit_b_224',
+            'cait_s24_224',
+            'visformer_small',
+        ]:
+            from warnings import warn
+
+            warn(
+                f'Hook config specified (`{self.hook_cfg}`) is not supported. '
+                'Falling back to default (`vit_base_patch16_224`). '
+                'This MAY NOT be intended.',
+                stacklevel=2,
+            )
+            self.hook_cfg = 'vit_base_patch16_224'
+
         # Register hooks
         self._register_vit_model_hook()
 
@@ -203,20 +220,33 @@ class ATT(Attack):
                 align_corners=False,
             ).squeeze(0)
 
-        if self.hook_cfg == 'vit_base_patch16_224':
-            gf = (self.mid_feats[0][1:] * self.mid_grads[0][1:]).sum(-1)
-            gf = resize(gf.reshape(1, 14, 14))
-        elif self.hook_cfg == 'pit_b_224':
-            gf = (self.mid_feats[0][1:] * self.mid_grads[0][1:]).sum(-1)
-            gf = resize(gf.reshape(1, 8, 8))
-        elif self.hook_cfg == 'cait_s24_224':
-            gf = (self.mid_feats[0] * self.mid_grads).sum(-1)
-            gf = resize(gf.reshape(1, 14, 14))
-        elif self.hook_cfg == 'visformer_small':
-            gf = (self.mid_feats[0] * self.mid_grads).sum(0)
-            gf = resize(gf.unsqueeze(0))
+        gf_cfg = {
+            'vit_base_patch16_224': (
+                lambda: (self.mid_feats[0][1:] * self.mid_grads[0][1:]).sum(-1),
+                (1, 14, 14),
+            ),
+            'pit_b_224': (
+                lambda: (self.mid_feats[0][1:] * self.mid_grads[0][1:]).sum(-1),
+                (1, 8, 8),
+            ),
+            'cait_s24_224': (
+                lambda: (self.mid_feats[0] * self.mid_grads).sum(-1),
+                (1, 14, 14),
+            ),
+            'visformer_small': (
+                lambda: (self.mid_feats[0] * self.mid_grads).sum(0),
+                None,
+            ),
+        }
+        assert self.hook_cfg in gf_cfg
+
+        gf_func, reshape_size = gf_cfg[self.hook_cfg]
+        gf = gf_func()
+        if reshape_size:
+            gf = resize(gf.reshape(*reshape_size))
         else:
-            raise ValueError(f'Unsupported hook config: {self.hook_cfg}')
+            gf = resize(gf.unsqueeze(0))
+
         return gf
 
     def _register_vit_model_hook(self) -> None:
@@ -263,24 +293,14 @@ class ATT(Attack):
                 offset=0.25,
             ),
         }
+        assert self.hook_cfg in hook_params_cfg
 
-        if self.hook_cfg not in hook_params_cfg:
-            from warnings import warn
-
-            warn(
-                f'Hook config specified (`{self.hook_cfg}`) is not supported. '
-                'Falling back to default (`vit_base_patch16_224`). '
-                'This MAY NOT be intended.',
-                stacklevel=2,
-            )
-            self.hook_cfg = 'vit_base_patch16_224'
-
-        cfg = hook_params_cfg[self.hook_cfg]
-        self.back_attn = cfg.back_attn
-        self.truncate_layers = cfg.truncate_layers
-        self.weaken_factor = cfg.weaken_factor
-        self.scale = cfg.scale
-        self.offset = cfg.offset
+        hook_params = hook_params_cfg[self.hook_cfg]
+        self.back_attn = hook_params.back_attn
+        self.truncate_layers = hook_params.truncate_layers
+        self.weaken_factor = hook_params.weaken_factor
+        self.scale = hook_params.scale
+        self.offset = hook_params.offset
 
         def attn_att(module, grad_in, grad_out):
             mask = (
@@ -512,9 +532,8 @@ class ATT(Attack):
         }
         # fmt: on
 
-        # At `hook_params_cfg` check above (start of the function),
-        # we have already ensured that self.hook_cfg is supported.
         assert feature_grad_hook_cfg.keys() == attention_hook_cfg.keys()
+        assert self.hook_cfg in feature_grad_hook_cfg
 
         # Register feature and gradient hooks
         module = rgetattr(self.model, feature_grad_hook_cfg[self.hook_cfg])
@@ -531,4 +550,9 @@ class ATT(Attack):
 if __name__ == '__main__':
     from torchattack.eval import run_attack
 
-    run_attack(ATT, model_name='timm/vit_base_patch16_224', save_adv_batch=6)
+    run_attack(
+        ATT,
+        model_name='timm/vit_base_patch16_224',
+        victim_model_names=['timm/cait_s24_224', 'timm/visformer_small'],
+        save_adv_batch=6,
+    )
