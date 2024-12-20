@@ -1,7 +1,6 @@
 from functools import partial
 from typing import Callable
 
-import numpy as np
 import torch
 import torch.nn as nn
 
@@ -81,7 +80,7 @@ class VDC(Attack):
         self.lossfn = nn.CrossEntropyLoss()
 
         # Global hooks and attack stage state for VDC
-        self.stage: list[np.ndarray] = []
+        self.stage: list[torch.Tensor] = []
         self.hooks: list[torch.utils.hooks.RemovableHandle] = []
 
         assert self.sample_num_batches <= self.max_num_batches
@@ -108,8 +107,8 @@ class VDC(Attack):
             """Gradient recorder for attention and MLP blocks."""
 
             def __init__(self) -> None:
-                self.grad_records: list[np.ndarray] = []
-                self.grad_additions: list[np.ndarray] = []
+                self.grad_records: list[torch.Tensor] = []
+                self.grad_additions: list[torch.Tensor] = []
 
         # Perform VDC
         for _ in range(self.steps):
@@ -193,16 +192,10 @@ class VDC(Attack):
         ) -> tuple[torch.Tensor, ...]:
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
-            # ablation
-            grad_record = (
-                grad_in[0].data.cpu().numpy() * 0.1 * (0.5 ** (self.current_mlp_block))
-            )
-            # grad_record = grad_in[0].data.cpu().numpy()
+            grad_record = grad_in[0].data * 0.1 * (0.5 ** (self.current_mlp_block))
             if self.current_mlp_block == 0:
-                grad_add = np.zeros_like(grad_record)
-                # ablation
+                grad_add = torch.zeros_like(grad_record)
                 grad_add[:, 0, :] = self.norm_list[:, 0, :] * 0.1 * (0.5)
-                # grad_add[:,0,:] = self.norm[:,0,:]
                 self.mlp_recorder.grad_additions.append(grad_add)
                 self.mlp_recorder.grad_records.append(grad_record + grad_add)
             else:
@@ -242,12 +235,9 @@ class VDC(Attack):
         ) -> tuple[torch.Tensor, ...]:
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
-            grad_record = (
-                grad_in[0].data.cpu().numpy() * 0.1 * (0.5 ** (self.current_attn_block))
-            )
-            # grad_record = grad_in[0].data.cpu().numpy()
+            grad_record = grad_in[0].data * 0.1 * (0.5 ** (self.current_attn_block))
             if self.current_attn_block == 0:
-                self.attn_recorder.grad_additions.append(np.zeros_like(grad_record))
+                self.attn_recorder.grad_additions.append(torch.zeros_like(grad_record))
                 self.attn_recorder.grad_records.append(grad_record)
             else:
                 self.attn_recorder.grad_additions.append(
@@ -285,9 +275,7 @@ class VDC(Attack):
             grad_out: tuple[torch.Tensor, ...],
             gamma: float,
         ) -> tuple[torch.Tensor, ...]:
-            grad_record = grad_in[0].data.cpu().numpy()
-            # mask = torch.ones_like(grad_in[0]) * gamma
-            self.norm_list = grad_record
+            self.norm_list = grad_in[0].data
             return grad_in
 
         # pit
@@ -300,7 +288,7 @@ class VDC(Attack):
             grad_add = grad_in[0].data
             b, c, h, w = grad_add.shape
             grad_add = grad_add.reshape((b, c, h * w)).transpose(1, 2)
-            self.stage.append(grad_add.cpu().numpy())
+            self.stage.append(grad_add)
             return grad_in
 
         def mlp_record_pit_stage(
@@ -312,13 +300,9 @@ class VDC(Attack):
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
             if self.current_mlp_block < 4:
-                grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.03
-                    * (0.5 ** (self.current_mlp_block))
-                )
+                grad_record = grad_in[0].data * 0.03 * (0.5 ** (self.current_mlp_block))
                 if self.current_mlp_block == 0:
-                    grad_add = np.zeros_like(grad_record)
+                    grad_add = torch.zeros_like(grad_record)
                     grad_add[:, 0, :] = self.norm_list[:, 0, :] * 0.03 * (0.5)
                     self.mlp_recorder.grad_additions.append(grad_add)
                     self.mlp_recorder.grad_records.append(grad_record + grad_add)
@@ -329,13 +313,9 @@ class VDC(Attack):
                     total_mlp = self.mlp_recorder.grad_records[-1] + grad_record
                     self.mlp_recorder.grad_records.append(total_mlp)
             elif self.current_mlp_block < 10:
-                grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.03
-                    * (0.5 ** (self.current_mlp_block))
-                )
+                grad_record = grad_in[0].data * 0.03 * (0.5 ** (self.current_mlp_block))
                 if self.current_mlp_block == 4:
-                    grad_add = np.zeros_like(grad_record)
+                    grad_add = torch.zeros_like(grad_record)
                     grad_add[:, 1:, :] = self.stage[0] * 0.03 * (0.5)
                     self.mlp_recorder.grad_additions.append(grad_add)
                     self.mlp_recorder.grad_records.append(grad_record + grad_add)
@@ -347,13 +327,9 @@ class VDC(Attack):
                     total_mlp = self.mlp_recorder.grad_records[-1]
                     self.mlp_recorder.grad_records.append(total_mlp)
             else:
-                grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.03
-                    * (0.5 ** (self.current_mlp_block))
-                )
+                grad_record = grad_in[0].data * 0.03 * (0.5 ** (self.current_mlp_block))
                 if self.current_mlp_block == 10:
-                    grad_add = np.zeros_like(grad_record)
+                    grad_add = torch.zeros_like(grad_record)
                     grad_add[:, 1:, :] = self.stage[1] * 0.03 * (0.5)
                     self.mlp_recorder.grad_additions.append(grad_add)
                     self.mlp_recorder.grad_records.append(grad_record + grad_add)
@@ -394,12 +370,12 @@ class VDC(Attack):
             out_grad = mask * grad_in[0][:]
             if self.current_attn_block < 4:
                 grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.03
-                    * (0.5 ** (self.current_attn_block))
+                    grad_in[0].data * 0.03 * (0.5 ** (self.current_attn_block))
                 )
                 if self.current_attn_block == 0:
-                    self.attn_recorder.grad_additions.append(np.zeros_like(grad_record))
+                    self.attn_recorder.grad_additions.append(
+                        torch.zeros_like(grad_record)
+                    )
                     self.attn_recorder.grad_records.append(grad_record)
                 else:
                     self.attn_recorder.grad_additions.append(
@@ -409,12 +385,12 @@ class VDC(Attack):
                     self.attn_recorder.grad_records.append(total_attn)
             elif self.current_attn_block < 10:
                 grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.03
-                    * (0.5 ** (self.current_attn_block))
+                    grad_in[0].data * 0.03 * (0.5 ** (self.current_attn_block))
                 )
                 if self.current_attn_block == 4:
-                    self.attn_recorder.grad_additions.append(np.zeros_like(grad_record))
+                    self.attn_recorder.grad_additions.append(
+                        torch.zeros_like(grad_record)
+                    )
                     self.attn_recorder.grad_records.append(grad_record)
                 else:
                     self.attn_recorder.grad_additions.append(
@@ -425,12 +401,12 @@ class VDC(Attack):
                     self.attn_recorder.grad_records.append(total_attn)
             else:
                 grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.03
-                    * (0.5 ** (self.current_attn_block))
+                    grad_in[0].data * 0.03 * (0.5 ** (self.current_attn_block))
                 )
                 if self.current_attn_block == 10:
-                    self.attn_recorder.grad_additions.append(np.zeros_like(grad_record))
+                    self.attn_recorder.grad_additions.append(
+                        torch.zeros_like(grad_record)
+                    )
                     self.attn_recorder.grad_records.append(grad_record)
                 else:
                     self.attn_recorder.grad_additions.append(
@@ -464,7 +440,7 @@ class VDC(Attack):
             grad_out: tuple[torch.Tensor, ...],
             gamma: float,
         ) -> tuple[torch.Tensor, ...]:
-            grad_record = grad_in[0].data.cpu().numpy()
+            grad_record = grad_in[0].data
             # mask = torch.ones_like(grad_in[0]) * gamma
             self.norm_list = grad_record
             return grad_in
@@ -479,7 +455,7 @@ class VDC(Attack):
             grad_add = grad_in[0].data
             # B,C,H,W = grad_add.shape
             # grad_add = grad_add.reshape((B,C,H*W)).transpose(1,2)
-            self.stage.append(grad_add.cpu().numpy())
+            self.stage.append(grad_add)
             return grad_in
 
         def mlp_record_vis_stage(
@@ -491,13 +467,9 @@ class VDC(Attack):
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
             if self.current_mlp_block < 4:
-                grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.1
-                    * (0.5 ** (self.current_mlp_block))
-                )
+                grad_record = grad_in[0].data * 0.1 * (0.5 ** (self.current_mlp_block))
                 if self.current_mlp_block == 0:
-                    grad_add = np.zeros_like(grad_record)
+                    grad_add = torch.zeros_like(grad_record)
                     grad_add[:, 0, :] = self.norm_list[:, 0, :] * 0.1 * (0.5)
                     self.mlp_recorder.grad_additions.append(grad_add)
                     self.mlp_recorder.grad_records.append(grad_record + grad_add)
@@ -508,13 +480,9 @@ class VDC(Attack):
                     total_mlp = self.mlp_recorder.grad_records[-1] + grad_record
                     self.mlp_recorder.grad_records.append(total_mlp)
             else:
-                grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.1
-                    * (0.5 ** (self.current_mlp_block))
-                )
+                grad_record = grad_in[0].data * 0.1 * (0.5 ** (self.current_mlp_block))
                 if self.current_mlp_block == 4:
-                    grad_add = np.zeros_like(grad_record)
+                    grad_add = torch.zeros_like(grad_record)
                     # grad_add[:,1:,:] = self.stage[0]* 0.1*(0.5)
                     self.mlp_recorder.grad_additions.append(grad_add)
                     self.mlp_recorder.grad_records.append(grad_record + grad_add)
@@ -551,7 +519,7 @@ class VDC(Attack):
             grad_out: tuple[torch.Tensor, ...],
             gamma: float,
         ) -> tuple[torch.Tensor, ...]:
-            grad_record = grad_in[0].data.cpu().numpy()
+            grad_record = grad_in[0].data
             # mask = torch.ones_like(grad_in[0]) * gamma
             self.norm_list = grad_record
             return grad_in
@@ -565,13 +533,11 @@ class VDC(Attack):
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
             if self.current_attn_block < 4:
-                grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.1
-                    * (0.5 ** (self.current_attn_block))
-                )
+                grad_record = grad_in[0].data * 0.1 * (0.5 ** (self.current_attn_block))
                 if self.current_attn_block == 0:
-                    self.attn_recorder.grad_additions.append(np.zeros_like(grad_record))
+                    self.attn_recorder.grad_additions.append(
+                        torch.zeros_like(grad_record)
+                    )
                     self.attn_recorder.grad_records.append(grad_record)
                 else:
                     self.attn_recorder.grad_additions.append(
@@ -580,13 +546,11 @@ class VDC(Attack):
                     total_attn = self.attn_recorder.grad_records[-1] + grad_record
                     self.attn_recorder.grad_records.append(total_attn)
             else:
-                grad_record = (
-                    grad_in[0].data.cpu().numpy()
-                    * 0.1
-                    * (0.5 ** (self.current_attn_block))
-                )
+                grad_record = grad_in[0].data * 0.1 * (0.5 ** (self.current_attn_block))
                 if self.current_attn_block == 4:
-                    self.attn_recorder.grad_additions.append(np.zeros_like(grad_record))
+                    self.attn_recorder.grad_additions.append(
+                        torch.zeros_like(grad_record)
+                    )
                     self.attn_recorder.grad_records.append(grad_record)
                 else:
                     self.attn_recorder.grad_additions.append(
