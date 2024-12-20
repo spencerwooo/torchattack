@@ -1,7 +1,6 @@
 from functools import partial
 from typing import Callable
 
-import numpy as np
 import torch
 import torch.nn as nn
 
@@ -137,13 +136,13 @@ class TGR(Attack):
                 'pit_b_224',
             ]:
                 b, c, h, w = grad_in[0].shape
-                out_grad_cpu = out_grad.data.clone().cpu().numpy().reshape(b, c, h * w)
-                max_all = np.argmax(out_grad_cpu[0, :, :], axis=1)
-                max_all_h = max_all // h
-                max_all_w = max_all % h
-                min_all = np.argmin(out_grad_cpu[0, :, :], axis=1)
-                min_all_h = min_all // h
-                min_all_w = min_all % h
+                out_grad_reshaped = out_grad.view(b, c, h * w)
+                max_all = torch.argmax(out_grad_reshaped[0], dim=1)
+                max_all_h = max_all // w
+                max_all_w = max_all % w
+                min_all = torch.argmin(out_grad_reshaped[0], dim=1)
+                min_all_h = min_all // w
+                min_all_w = min_all % w
                 out_grad[:, range(c), max_all_h, :] = 0.0
                 out_grad[:, range(c), :, max_all_w] = 0.0
                 out_grad[:, range(c), min_all_h, :] = 0.0
@@ -151,13 +150,13 @@ class TGR(Attack):
 
             if self.hook_cfg == 'cait_s24_224':
                 b, h, w, c = grad_in[0].shape
-                out_grad_cpu = out_grad.data.clone().cpu().numpy().reshape(b, h * w, c)
-                max_all = np.argmax(out_grad_cpu[0, :, :], axis=0)
-                max_all_h = max_all // h
-                max_all_w = max_all % h
-                min_all = np.argmin(out_grad_cpu[0, :, :], axis=0)
-                min_all_h = min_all // h
-                min_all_w = min_all % h
+                out_grad_reshaped = out_grad.view(b, h * w, c)
+                max_all = torch.argmax(out_grad_reshaped[0], dim=0)
+                max_all_h = max_all // w
+                max_all_w = max_all % w
+                min_all = torch.argmin(out_grad_reshaped[0], dim=0)
+                min_all_h = min_all // w
+                min_all_w = min_all % w
 
                 out_grad[:, max_all_h, :, range(c)] = 0.0
                 out_grad[:, :, max_all_w, range(c)] = 0.0
@@ -176,9 +175,9 @@ class TGR(Attack):
             out_grad = mask * grad_in[0][:]
 
             b, h, w, c = grad_in[0].shape
-            out_grad_cpu = out_grad.data.clone().cpu().numpy()
-            max_all = np.argmax(out_grad_cpu[0, :, 0, :], axis=0)
-            min_all = np.argmin(out_grad_cpu[0, :, 0, :], axis=0)
+            out_grad_reshaped = out_grad.view(b, h * w, c)
+            max_all = torch.argmax(out_grad_reshaped[0, :, :], dim=0)
+            min_all = torch.argmin(out_grad_reshaped[0, :, :], dim=0)
 
             out_grad[:, max_all, :, range(c)] = 0.0
             out_grad[:, min_all, :, range(c)] = 0.0
@@ -202,18 +201,21 @@ class TGR(Attack):
             grad_out: tuple[torch.Tensor, ...],
             gamma: float,
         ) -> tuple[torch.Tensor, ...]:
-            grad_in = (grad_in[0].unsqueeze(0),) + grad_in[1:]
+            is_dim_extra = False
+            if len(grad_in[0].shape) == 2:
+                is_dim_extra = True
+                grad_in = (grad_in[0].unsqueeze(0),) + grad_in[1:]
 
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
 
             if self.hook_cfg == 'visformer_small':
                 b, c, h, w = grad_in[0].shape
-                out_grad_cpu = out_grad.data.clone().cpu().numpy().reshape(b, c, h * w)
-                max_all = np.argmax(out_grad_cpu[0, :, :], axis=1)
+                out_grad_reshaped = out_grad.view(b, c, -1)
+                max_all = torch.argmax(out_grad_reshaped[0], dim=1)
                 max_all_h = max_all // h
                 max_all_w = max_all % h
-                min_all = np.argmin(out_grad_cpu[0, :, :], axis=1)
+                min_all = torch.argmin(out_grad_reshaped[0], dim=1)
                 min_all_h = min_all // h
                 min_all_w = min_all % h
                 out_grad[:, range(c), max_all_h, max_all_w] = 0.0
@@ -221,14 +223,13 @@ class TGR(Attack):
 
             if self.hook_cfg in ['vit_base_patch16_224', 'pit_b_224', 'cait_s24_224']:
                 c = grad_in[0].shape[2]
-                out_grad_cpu = out_grad.data.clone().cpu().numpy()
-                max_all = np.argmax(out_grad_cpu[0, :, :], axis=0)
-                min_all = np.argmin(out_grad_cpu[0, :, :], axis=0)
-
+                max_all = torch.argmax(out_grad[0], dim=0)
+                min_all = torch.argmin(out_grad[0], dim=0)
                 out_grad[:, max_all, range(c)] = 0.0
                 out_grad[:, min_all, range(c)] = 0.0
 
-            out_grad = out_grad.squeeze(0)
+            if is_dim_extra:
+                out_grad = out_grad.squeeze(0)
 
             # return (out_grad, grad_in[1])
             return (out_grad,) + tuple(grad_in[1:])
@@ -239,17 +240,20 @@ class TGR(Attack):
             grad_out: tuple[torch.Tensor, ...],
             gamma: float,
         ) -> tuple[torch.Tensor, ...]:
-            grad_in = (grad_in[0].unsqueeze(0),) + grad_in[1:]
+            is_dim_extra = False
+            if len(grad_in[0].shape) == 2:
+                is_dim_extra = True
+                grad_in = (grad_in[0].unsqueeze(0),) + grad_in[1:]
 
             mask = torch.ones_like(grad_in[0]) * gamma
             out_grad = mask * grad_in[0][:]
             if self.hook_cfg == 'visformer_small':
                 b, c, h, w = grad_in[0].shape
-                out_grad_cpu = out_grad.data.clone().cpu().numpy().reshape(b, c, h * w)
-                max_all = np.argmax(out_grad_cpu[0, :, :], axis=1)
+                out_grad_reshaped = out_grad.view(b, c, -1)
+                max_all = torch.argmax(out_grad_reshaped[0], dim=1)
                 max_all_h = max_all // h
                 max_all_w = max_all % h
-                min_all = np.argmin(out_grad_cpu[0, :, :], axis=1)
+                min_all = torch.argmin(out_grad_reshaped[0], dim=1)
                 min_all_h = min_all // h
                 min_all_w = min_all % h
                 out_grad[:, range(c), max_all_h, max_all_w] = 0.0
@@ -261,14 +265,13 @@ class TGR(Attack):
                 'resnetv2_101',
             ]:
                 c = grad_in[0].shape[2]
-                out_grad_cpu = out_grad.data.clone().cpu().numpy()
-
-                max_all = np.argmax(out_grad_cpu[0, :, :], axis=0)
-                min_all = np.argmin(out_grad_cpu[0, :, :], axis=0)
+                max_all = torch.argmax(out_grad[0], dim=0)
+                min_all = torch.argmin(out_grad[0], dim=0)
                 out_grad[:, max_all, range(c)] = 0.0
                 out_grad[:, min_all, range(c)] = 0.0
 
-            out_grad = out_grad.squeeze(0)
+            if is_dim_extra:
+                out_grad = out_grad.squeeze(0)
 
             return (out_grad,) + tuple(grad_in[1:])
 
@@ -336,8 +339,21 @@ class TGR(Attack):
 if __name__ == '__main__':
     from torchattack.eval import run_attack
 
-    run_attack(
-        TGR,
-        model_name='timm/vit_base_patch16_224',
-        victim_model_names=['timm/cait_s24_224', 'timm/visformer_small', 'resnet50'],
-    )
+    model_names = [
+        'timm/vit_base_patch16_224',
+        'timm/pit_b_224',
+        'timm/cait_s24_224',
+        'timm/visformer_small',
+    ]
+    for name in model_names:
+        run_attack(
+            TGR,
+            model_name=name,
+            victim_model_names=[
+                'timm/vit_base_patch16_224',
+                'timm/pit_b_224',
+                'timm/cait_s24_224',
+                'timm/visformer_small',
+            ],
+            batch_size=4,
+        )

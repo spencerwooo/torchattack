@@ -81,3 +81,17 @@ def test_vdc_attack_all_supported_models(device, model_name, data):
     model = AttackModel.from_pretrained(model_name, device, from_timm=True)
     x, y = data(model.transform)
     run_attack_test(torchattack.VDC, device, model, x, y)
+
+
+@pytest.mark.parametrize(
+    'model_name',
+    [
+        'pit_b_224',
+        'cait_s24_224',
+        'visformer_small',
+    ],
+)
+def test_att_attack_all_supported_models(device, model_name, data):
+    model = AttackModel.from_pretrained(model_name, device, from_timm=True)
+    x, y = data(model.transform)
+    run_attack_test(torchattack.ATT, device, model, x, y)

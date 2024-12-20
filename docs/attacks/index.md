@@ -134,6 +134,12 @@
       <td><img src="https://img.shields.io/badge/AAAI-2024-C8172C?labelColor=2D3339" alt="AAAI 2024"></td>
       <td><a href="https://ojs.aaai.org/index.php/AAAI/article/view/28541">Improving the Adversarial Transferability of Vision Transformers with Virtual Dense Connection</a></td>
     </tr>
+    <tr>
+      <td><a href="./att">ATT</a></td>
+      <td><code>ATT</code></td>
+      <td><img src="https://img.shields.io/badge/NeurIPS-2024-654287?labelColor=2D3339" alt="NeurIPS 2024"></td>
+      <td><a href="https://openreview.net/forum?id=sNz7tptCH6">Boosting the Transferability of Adversarial Attack on Vision Transformer with Adaptive Token Tuning</a></td>
+    </tr>
     <!-- Generative attacks -->
     <tr>
       <th colspan="4">Generative attacks</th>
