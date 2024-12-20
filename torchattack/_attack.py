@@ -81,8 +81,18 @@ class Attack(ABC):
             ):
                 return False
 
-        return all(
-            getattr(self, attr) == getattr(other, attr)
-            for attr in self.__dict__
-            if attr not in eq_name_attrs
-        )
+        for attr in self.__dict__:
+            if attr in eq_name_attrs:
+                continue
+            self_val = getattr(self, attr)
+            other_val = getattr(other, attr)
+            
+            if isinstance(self_val, torch.Tensor):
+                if not isinstance(other_val, torch.Tensor):
+                    return False
+                if not torch.equal(self_val, other_val):
+                    return False
+            elif self_val != other_val:
+                return False
+                
+        return True

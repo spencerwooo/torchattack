@@ -27,7 +27,8 @@ class ATT(Attack):
         eps: The maximum perturbation. Defaults to 8/255.
         steps: Number of steps. Defaults to 10.
         alpha: Step size, `eps / steps` if None. Defaults to None.
-        decay: Momentum decay factor. Defaults to 1.0.
+        decay: Decay factor for the momentum term. Defaults to 1.0.
+        lambd: Lambda value for the gradient factor. Defaults to 0.01.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
         targeted: Targeted attack if True. Defaults to False.
@@ -43,7 +44,6 @@ class ATT(Attack):
         steps: int = 10,
         alpha: float | None = None,
         decay: float = 1.0,
-        sample_num_batches: int = 130,
         lambd: float = 0.01,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
@@ -65,7 +65,6 @@ class ATT(Attack):
         self.steps = steps
         self.alpha = alpha
         self.decay = decay
-        self.sample_num_batches = sample_num_batches
         self.lambd = lambd
         self.clip_min = clip_min
         self.clip_max = clip_max
@@ -78,10 +77,6 @@ class ATT(Attack):
         self.mid_feats = torch.tensor([])
         self.mid_grads = torch.tensor([])
         self.patch_index = self._patch_index(self.img_size, self.crop_len).to(device)
-
-        self.var_a = torch.tensor(0)
-        self.var_qkv = torch.tensor(0)
-        self.var_mlp = torch.tensor(0)
         self.gamma = torch.tensor(0.5)
 
         if self.hook_cfg not in [
@@ -100,31 +95,10 @@ class ATT(Attack):
             )
             self.hook_cfg = 'vit_base_patch16_224'
 
-        if self.hook_cfg == 'vit_base_patch16_224':
-            self.back_attn = 11
-            self.truncate_layers = self._tr_01_pc(10, 12)
-            self.weaken_factor = [0.45, 0.7, 0.65]
-            self.scale = 0.4
-            self.offset = 0.4
-        elif self.hook_cfg == 'pit_b_224':
-            self.back_attn = 12
-            self.truncate_layers = self._tr_01_pc(9, 13)
-            self.weaken_factor = [0.25, 0.6, 0.65]
-            self.scale = 0.3
-            self.offset = 0.45
-        elif self.hook_cfg == 'cait_s24_224':
-            self.back_attn = 24
-            self.truncate_layers = self._tr_01_pc(4, 25)
-            self.weaken_factor = [0.3, 1.0, 0.6]
-            self.scale = 0.35
-            self.offset = 0.4
-        elif self.hook_cfg == 'visformer_small':
-            self.back_attn = 7
-            self.truncate_layers = self._tr_01_pc(8, 8)
-            self.weaken_factor = [0.4, 0.8, 0.3]
-            self.scale = 0.15
-            self.offset = 0.25
+        # Initialize layer and patch parameters
+        self._init_params()
 
+        # Register hooks for the model
         self._register_vit_model_hook()
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
@@ -145,34 +119,36 @@ class ATT(Attack):
         if self.alpha is None:
             self.alpha = self.eps / self.steps
 
+        # Forward and backward pass with dummy input to init gradient + features
         output = self.model(self.normalize(x))
         output.backward(torch.ones_like(output))
 
         gf = self._get_gf()
 
+        # Normalize and expand gradient features to match the original image size
         gf_patchs_t = self._norm_patchs(
             gf, self.patch_index, self.crop_len, self.scale, self.offset
         )
+
+        # Initialize the starting threshold for gradient features patches
         gf_patchs_start = torch.ones_like(gf_patchs_t) * 0.99
+
+        # Calculate the offset for gradient features patches for each step
         gf_offset = (gf_patchs_start - gf_patchs_t) / self.steps
 
         for i in range(self.steps):
-            self.var_a = torch.tensor(0)
-            self.var_qkv = torch.tensor(0)
-            self.var_mlp = torch.tensor(0)
-            if self.hook_cfg == 'pit_b_224':
-                self.back_attn = 12
-            elif self.hook_cfg == 'vit_base_patch16_224':
-                self.back_attn = 11
-            elif self.hook_cfg == 'visformer_small':
-                self.back_attn = 7
-            elif self.hook_cfg == 'cait_s24_224':
-                self.back_attn = 24
+            self._reset_vars()
 
+            # Init random patch
             random_patch = torch.rand_like(x)
+
+            # Calculate the threshold for gradient features patches for the current step
             gf_patchs_threshold = gf_patchs_start - gf_offset * (i + 1)
+
+            # Create a mask for the gradient features patches based on the threshold
             gf_patchs = torch.where(random_patch > gf_patchs_threshold, 0.0, 1.0)
 
+            # Apply gradient feature patches to the perturbation
             outs = self.model(self.normalize(x + delta * gf_patchs))
             loss = self.lossfn(outs, y)
 
@@ -218,6 +194,48 @@ class ATT(Attack):
             raise ValueError(f'Unsupported hook config: {self.hook_cfg}')
         return gf
 
+    def _init_params(self) -> None:
+        self._reset_vars()
+
+        if self.hook_cfg == 'vit_base_patch16_224':
+            self.truncate_layers = self._tr_01_pc(10, 12)
+            self.weaken_factor = [0.45, 0.7, 0.65]
+            self.scale = 0.4
+            self.offset = 0.4
+        elif self.hook_cfg == 'pit_b_224':
+            self.truncate_layers = self._tr_01_pc(9, 13)
+            self.weaken_factor = [0.25, 0.6, 0.65]
+            self.scale = 0.3
+            self.offset = 0.45
+        elif self.hook_cfg == 'cait_s24_224':
+            self.truncate_layers = self._tr_01_pc(4, 25)
+            self.weaken_factor = [0.3, 1.0, 0.6]
+            self.scale = 0.35
+            self.offset = 0.4
+        elif self.hook_cfg == 'visformer_small':
+            self.truncate_layers = self._tr_01_pc(8, 8)
+            self.weaken_factor = [0.4, 0.8, 0.3]
+            self.scale = 0.15
+            self.offset = 0.25
+        else:
+            raise ValueError(f'Unsupported hook config: {self.hook_cfg}')
+
+    def _reset_vars(self) -> None:
+        self.var_a = torch.tensor(0)
+        self.var_qkv = torch.tensor(0)
+        self.var_mlp = torch.tensor(0)
+
+        if self.hook_cfg == 'vit_base_patch16_224':
+            self.back_attn = 11
+        elif self.hook_cfg == 'pit_b_224':
+            self.back_attn = 12
+        elif self.hook_cfg == 'cait_s24_224':
+            self.back_attn = 24
+        elif self.hook_cfg == 'visformer_small':
+            self.back_attn = 7
+        else:
+            raise ValueError(f'Unsupported hook config: {self.hook_cfg}')
+
     @staticmethod
     def _resize(x: torch.Tensor, img_size: int) -> torch.Tensor:
         """Simplified version of `torchvision.transforms.Resize`."""
@@ -236,10 +254,10 @@ class ATT(Attack):
         return x.squeeze(0) if need_squeeze else x
 
     @staticmethod
-    def _tr_01_pc(num: int, length: int) -> torch.Tensor:
+    def _tr_01_pc(num: int, len: int) -> torch.Tensor:
         """Create a tensor with 1s at the first `num` indices and 0s elsewhere."""
 
-        return torch.cat((torch.ones(num), torch.zeros(length - num)))
+        return torch.cat((torch.ones(num), torch.zeros(len - num)))
 
     @staticmethod
     def _patch_index(img_size: int, crop_len: int) -> torch.Tensor:
@@ -565,21 +583,9 @@ class ATT(Attack):
 if __name__ == '__main__':
     from torchattack.eval import run_attack
 
-    model_names = [
-        'timm/vit_base_patch16_224',
-        'timm/pit_b_224',
-        'timm/cait_s24_224',
-        'timm/visformer_small',
-    ]
-    for name in model_names:
-        run_attack(
-            ATT,
-            model_name=name,
-            victim_model_names=[
-                'timm/vit_base_patch16_224',
-                'timm/pit_b_224',
-                'timm/cait_s24_224',
-                'timm/visformer_small',
-            ],
-            batch_size=4,
-        )
+    run_attack(
+        ATT,
+        model_name='timm/vit_base_patch16_224',
+        victim_model_names=['timm/pit_b_224', 'timm/cait_s24_224'],
+        batch_size=4,
+    )
