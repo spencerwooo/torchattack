@@ -8,6 +8,12 @@ from torchattack.generative.resnet_generator import ResNetGenerator
 
 
 class LTPWeights(GeneratorWeightsEnum):
+    """
+    Pretrained weights for the LTP attack generator are sourced from [the original
+    implementation of the LTP
+    attack](https://github.com/krishnakanthnakka/Transferable_Perturbations#installation).
+    """
+
     DENSENET121_IMAGENET = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/ltp_densenet121_1_net_g.pth'
     )
@@ -48,6 +54,7 @@ class LTP(Attack):
         eps: float = 10 / 255,
         weights: LTPWeights | str | None = LTPWeights.DEFAULT,
         checkpoint_path: str | None = None,
+        inception: bool | None = None,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
@@ -59,21 +66,25 @@ class LTP(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
-        # Initialize the generator and its weights
-        self.generator = ResNetGenerator()
+        self.weights = LTPWeights.verify(weights)
 
-        # Prioritize checkpoint path over provided weights enum
+        # Whether is inception or not (crop layer 3x300x300 to 3x299x299)
+        is_inception = (
+            inception
+            if inception is not None
+            else (self.weights.inception if self.weights is not None else False)
+        )
+
+        # Initialize the generator
+        self.generator = ResNetGenerator(inception=is_inception)
+
+        # Load the weights
         if self.checkpoint_path is not None:
             self.generator.load_state_dict(
                 torch.load(self.checkpoint_path, weights_only=True)
             )
-        else:
-            # Verify and load weights from enum if checkpoint path is not provided
-            self.weights: LTPWeights = LTPWeights.verify(weights)
-            if self.weights is not None:
-                self.generator.load_state_dict(
-                    self.weights.get_state_dict(check_hash=True)
-                )
+        elif self.weights is not None:
+            self.generator.load_state_dict(self.weights.get_state_dict(check_hash=True))
 
         self.generator.eval().to(self.device)
 

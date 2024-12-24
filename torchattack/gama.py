@@ -8,6 +8,13 @@ from torchattack.generative.leaky_relu_resnet_generator import ResNetGenerator
 
 
 class GAMAWeights(GeneratorWeightsEnum):
+    """
+    We provide pretrained weights of the GAMA attack generator with training steps
+    identical to the described settings in the paper and appendix. Specifically, we use
+    ViT-B/16 as the backend of CLIP. Training epochs are set to 5 and 10 for the COCO
+    and VOC datasets, respectively.
+    """
+
     DENSENET169_COCO = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/gama_dense169_coco_w_vitb16_epoch4.pth'
     )
