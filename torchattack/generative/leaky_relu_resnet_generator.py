@@ -1,8 +1,32 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as f
 
 # To control feature map in generator
 ngf = 64
+
+
+def fused_leaky_relu(
+    input: torch.Tensor,
+    bias: torch.Tensor,
+    negative_slope: float = 0.2,
+    scale: float = 2**0.5,
+) -> torch.Tensor:
+    return f.leaky_relu(input + bias, negative_slope) * scale
+
+
+class FusedLeakyReLU(nn.Module):
+    def __init__(
+        self, channel: int, negative_slope: float = 0.2, scale: float = 2**0.5
+    ) -> None:
+        super().__init__()
+        self.bias = nn.Parameter(torch.zeros(1, channel, 1, 1))
+        self.negative_slope = negative_slope
+        self.scale = scale
+
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        out = fused_leaky_relu(input, self.bias, self.negative_slope, self.scale)
+        return out
 
 
 class ResNetGenerator(nn.Module):
@@ -22,21 +46,21 @@ class ResNetGenerator(nn.Module):
             nn.ReflectionPad2d(3),
             nn.Conv2d(3, ngf, kernel_size=7, padding=0, bias=False),
             nn.BatchNorm2d(ngf),
-            nn.ReLU(True),
+            FusedLeakyReLU(ngf),
         )
 
         # Input size = 3, n, n
         self.block2 = nn.Sequential(
             nn.Conv2d(ngf, ngf * 2, kernel_size=3, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(ngf * 2),
-            nn.ReLU(True),
+            FusedLeakyReLU(ngf * 2),
         )
 
         # Input size = 3, n/2, n/2
         self.block3 = nn.Sequential(
             nn.Conv2d(ngf * 2, ngf * 4, kernel_size=3, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(ngf * 4),
-            nn.ReLU(True),
+            FusedLeakyReLU(ngf * 4),
         )
 
         # Input size = 3, n/4, n/4
@@ -60,7 +84,7 @@ class ResNetGenerator(nn.Module):
                 bias=False,
             ),
             nn.BatchNorm2d(ngf * 2),
-            nn.ReLU(True),
+            FusedLeakyReLU(ngf * 2),
         )
 
         # Input size = 3, n/2, n/2
@@ -75,7 +99,7 @@ class ResNetGenerator(nn.Module):
                 bias=False,
             ),
             nn.BatchNorm2d(ngf),
-            nn.ReLU(True),
+            FusedLeakyReLU(ngf),
         )
 
         # Input size = 3, n, n
@@ -117,7 +141,7 @@ class ResidualBlock(nn.Module):
                 bias=False,
             ),
             nn.BatchNorm2d(num_filters),
-            nn.ReLU(True),
+            FusedLeakyReLU(num_filters),
             nn.Dropout(0.5),
             nn.ReflectionPad2d(1),
             nn.Conv2d(

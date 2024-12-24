@@ -249,6 +249,12 @@ Check out [examples/](examples/mifgsm_transfer.py) and [`torchattack.eval.runner
       <td><img src="https://img.shields.io/badge/ICLR-2022-62B959?labelColor=2D3339" alt="ICLR 2022"></td>
       <td><a href="https://arxiv.org/abs/2201.11528">Beyond ImageNet Attack: Towards Crafting Adversarial Examples for Black-box Domains</a></td>
     </tr>
+    <tr>
+      <td>GAMA</td>
+      <td><code>GAMA</code></td>
+      <td><img src="https://img.shields.io/badge/NeurIPS-2022-654287?labelColor=2D3339" alt="NeurIPS 2022"></td>
+      <td><a href="https://arxiv.org/abs/2209.09502">GAMA: Generative Adversarial Multi-Object Scene Attacks</a></td>
+    </tr>
     <!-- Others -->
     <tr>
       <th colspan="4">Others</th>

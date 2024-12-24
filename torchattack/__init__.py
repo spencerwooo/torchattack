@@ -10,6 +10,7 @@ from torchattack.difgsm import DIFGSM
 from torchattack.dr import DR
 from torchattack.fgsm import FGSM
 from torchattack.fia import FIA
+from torchattack.gama import GAMA
 from torchattack.geoda import GeoDA
 from torchattack.ilpd import ILPD
 from torchattack.ltp import LTP
@@ -46,6 +47,7 @@ __all__ = [
     'DR',
     'FGSM',
     'FIA',
+    'GAMA',
     'GeoDA',
     'ILPD',
     'LTP',
@@ -94,6 +96,7 @@ GRADIENT_VIT_ATTACKS = {
 GENERATIVE_ATTACKS = {
     'BIA': BIA,
     'CDA': CDA,
+    'GAMA': GAMA,
     'LTP': LTP,
 }
 NON_EPS_ATTACKS = {
