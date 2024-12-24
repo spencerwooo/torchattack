@@ -8,6 +8,12 @@ from torchattack.generative.resnet_generator import ResNetGenerator
 
 
 class CDAWeights(GeneratorWeightsEnum):
+    """
+    Pretrained weights for the CDA attack generator are sourced from [the original
+    implementation of the CDA
+    attack](https://github.com/Muzammal-Naseer/CDA#Pretrained-Generators).
+    """
+
     RESNET152_IMAGENET = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/cda_res152_imagenet_0_rl.pth',
     )

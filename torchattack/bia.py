@@ -8,6 +8,13 @@ from torchattack.generative.resnet_generator import ResNetGenerator
 
 
 class BIAWeights(GeneratorWeightsEnum):
+    """
+    Pretrained weights for the BIA attack generator are sourced from [the original
+    implementation of the BIA
+    attack](https://github.com/Alibaba-AAIG/Beyond-ImageNet-Attack#pretrained-generators).
+    RN stands for Random Normalization, and DA stands for Domain-Agnostic.
+    """
+
     RESNET152 = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/bia_resnet152_0.pth',
     )
