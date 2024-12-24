@@ -13,6 +13,7 @@ class CDAWeights(GeneratorWeightsEnum):
     )
     INCEPTION_V3_IMAGENET = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/cda_incv3_imagenet_0_rl.pth',
+        inception=True,
     )
     VGG16_IMAGENET = GeneratorWeights(
         url='https://github.com/spencerwooo/torchattack/releases/download/v1.0-weights/cda_vgg16_imagenet_0_rl.pth',
@@ -34,6 +35,7 @@ class CDA(Attack):
         weights: Pretrained weights for the generator. Either import and use the enum,
             or use its name. Defaults to CDAWeights.DEFAULT.
         checkpoint_path: Path to a custom checkpoint. Defaults to None.
+        inception: Whether to use inception (crop layer 3x300x300 to 3x299x299). Defaults to None.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
     """
@@ -44,6 +46,7 @@ class CDA(Attack):
         eps: float = 10 / 255,
         weights: CDAWeights | str | None = CDAWeights.DEFAULT,
         checkpoint_path: str | None = None,
+        inception: bool | None = None,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
@@ -55,21 +58,25 @@ class CDA(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
-        # Initialize the generator and its weights
-        self.generator = ResNetGenerator()
+        self.weights = CDAWeights.verify(weights)
 
-        # Prioritize checkpoint path over provided weights enum
+        # Whether is inception or not (crop layer 3x300x300 to 3x299x299)
+        is_inception = (
+            inception
+            if inception is not None
+            else (self.weights.inception if self.weights is not None else False)
+        )
+
+        # Initialize the generator
+        self.generator = ResNetGenerator(inception=is_inception)
+
+        # Load the weights
         if self.checkpoint_path is not None:
             self.generator.load_state_dict(
                 torch.load(self.checkpoint_path, weights_only=True)
             )
-        else:
-            # Verify and load weights from enum if checkpoint path is not provided
-            self.weights: CDAWeights = CDAWeights.verify(weights)
-            if self.weights is not None:
-                self.generator.load_state_dict(
-                    self.weights.get_state_dict(check_hash=True)
-                )
+        elif self.weights is not None:
+            self.generator.load_state_dict(self.weights.get_state_dict(check_hash=True))
 
         self.generator.eval().to(self.device)
 
@@ -94,7 +101,7 @@ if __name__ == '__main__':
 
     run_attack(
         attack=CDA,
-        attack_args={'eps': 10 / 255, 'weights': 'VGG19_IMAGENET'},
-        model_name='vgg19',
+        attack_args={'eps': 10 / 255, 'weights': 'INCEPTION_V3_IMAGENET'},
+        model_name='inception_v3',
         victim_model_names=['resnet152'],
     )

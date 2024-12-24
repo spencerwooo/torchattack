@@ -8,6 +8,7 @@ from torch.hub import load_state_dict_from_url
 @dataclass
 class GeneratorWeights:
     url: str
+    inception: bool = False
 
 
 class GeneratorWeightsEnum(Enum):
@@ -33,10 +34,17 @@ class GeneratorWeightsEnum(Enum):
         other = self.verify(other)
         return isinstance(other, self.__class__) and self.name == other.name
 
+    def _assert_generator_weights(self) -> GeneratorWeights:
+        if not isinstance(self.value, GeneratorWeights):
+            raise TypeError(
+                f'Expected GeneratorWeights, but got {type(self.value).__name__}'
+            )
+        return self.value
+
     @property
     def url(self) -> str:
-        if isinstance(self.value, GeneratorWeights):
-            return self.value.url
-        raise TypeError(
-            f'Expected GeneratorWeights, but got {type(self.value).__name__}'
-        )
+        return self._assert_generator_weights().url
+
+    @property
+    def inception(self) -> bool:
+        return self._assert_generator_weights().inception
