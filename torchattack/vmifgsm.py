@@ -117,6 +117,9 @@ class VMIFGSM(Attack):
 
                 neighbor_loss.backward()
 
+                if neighbors.grad is None:
+                    continue
+
                 gv_grad += neighbors.grad
 
             # Accumulate gradient variance into v
