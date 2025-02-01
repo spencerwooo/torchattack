@@ -2,6 +2,7 @@ from torchattack.admix import Admix
 from torchattack.att import ATT
 from torchattack.attack_model import AttackModel
 from torchattack.bia import BIA
+from torchattack.bsr import BSR
 from torchattack.cda import CDA
 from torchattack.create_attack import create_attack
 from torchattack.decowa import DeCoWA
@@ -41,6 +42,7 @@ __all__ = [
     'Admix',
     'ATT',
     'BIA',
+    'BSR',
     'CDA',
     'DeCoWA',
     'DeepFool',
@@ -71,6 +73,7 @@ __all__ = [
 
 GRADIENT_NON_VIT_ATTACKS = {
     'Admix': Admix,
+    'BSR': BSR,
     'DeCoWA': DeCoWA,
     'DIFGSM': DIFGSM,
     'DR': DR,
