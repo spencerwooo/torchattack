@@ -60,7 +60,7 @@ class VDC(Attack):
         elif hasattr(model, 'model_name'):
             # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
-            self.hook_cfg = model.model_name
+            self.hook_cfg = model.model_name  # type: ignore
 
         self.eps = eps
         self.steps = steps

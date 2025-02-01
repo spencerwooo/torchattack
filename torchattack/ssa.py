@@ -92,6 +92,9 @@ class SSA(Attack):
                 # Compute gradient
                 loss.backward()
 
+                if delta.grad is None:
+                    continue
+
                 # Accumulate gradient
                 g += delta.grad
 
