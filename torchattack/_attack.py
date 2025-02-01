@@ -71,6 +71,7 @@ class Attack(ABC):
             'perceptual_criteria',  # SSP
             'sub_basis',  # GeoDA
             'generator',  # BIA, CDA
+            'randrot',  # BSR
         ]
         for attr in eq_name_attrs:
             if not (hasattr(self, attr) and hasattr(other, attr)):

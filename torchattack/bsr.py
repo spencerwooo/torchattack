@@ -52,15 +52,19 @@ class BSR(Attack):
         self.steps = steps
         self.alpha = alpha
         self.decay = decay
+
         self.num_scale = num_scale
         self.num_block = num_block
+
+        # Declare random rotation transform
+        self.randrot = t.RandomRotation(
+            degrees=(-24, 24), interpolation=t.InterpolationMode.BILINEAR
+        )
+
         self.clip_min = clip_min
         self.clip_max = clip_max
         self.targeted = targeted
         self.lossfn = nn.CrossEntropyLoss()
-        self.randrot = t.RandomRotation(
-            degrees=(-24, 24), interpolation=t.InterpolationMode.BILINEAR
-        )
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform BSR on a batch of images.
@@ -149,11 +153,6 @@ class BSR(Attack):
         random.shuffle(x_strips)
         return x_strips
 
-    def _image_random_rot(self, x: torch.Tensor) -> torch.Tensor:
-        """Apply a random rotation to the input tensor."""
-
-        return self.randrot(x)
-
     def _bsr_shuffle(self, x: torch.Tensor) -> torch.Tensor:
         """Apply the BSR (Block Shuffle and Rotate) transformation to the input tensor.
 
@@ -177,7 +176,7 @@ class BSR(Attack):
         # For each strip, apply random rotation and then shuffle along the second dim
         rotated_strips = []
         for x_strip in x_strips:
-            rotated = self._image_random_rot(x_strip)
+            rotated = self.randrot(x_strip)
             shuffled = self._shuffle_single_dim(rotated, dim=d2)
             rotated_strips.append(torch.cat(shuffled, dim=d2))
 
