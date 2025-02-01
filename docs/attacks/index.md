@@ -141,6 +141,12 @@
       <td><a href="https://ojs.aaai.org/index.php/AAAI/article/view/28541">Improving the Adversarial Transferability of Vision Transformers with Virtual Dense Connection</a></td>
     </tr>
     <tr>
+      <td><a href="./bsr">BSR</a></td>
+      <td><code>BSR</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2024-1A407F?labelColor=2D3339" alt="CVPR 2024"></td>
+      <td><a href="https://arxiv.org/abs/2308.10299">Boosting Adversarial Transferability by Block Shuffle and Rotation</a></td>
+    </tr>
+    <tr>
       <td><a href="./att">ATT</a></td>
       <td><code>ATT</code></td>
       <td><img src="https://img.shields.io/badge/NeurIPS-2024-654287?labelColor=2D3339" alt="NeurIPS 2024"></td>

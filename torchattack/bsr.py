@@ -14,7 +14,7 @@ class BSR(Attack):
     """The BSR (Block Shuffle and Rotation) attack.
 
     From the paper: [Boosting Adversarial Transferability by Block Shuffle and
-    Rotation](https://https://arxiv.org/abs/2308.10299).
+    Rotation](https://arxiv.org/abs/2308.10299).
 
     Args:
         model: The model to attack.
