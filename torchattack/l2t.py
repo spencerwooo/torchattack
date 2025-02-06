@@ -1,14 +1,19 @@
+import math
+import random
 from typing import Callable
 
+import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as f
+import torchvision.transforms as t
 
 from torchattack._attack import Attack
 from torchattack.attack_model import AttackModel
 
 
 class L2T(Attack):
-    """The L2T (Learning-2-Transform) attack.
+    """The L2T (Learning to Transform) attack.
 
     From the paper: [Learning to Transform Dynamically for Better Adversarial
     Transferability](https://arxiv.org/abs/2405.14077).
@@ -35,6 +40,7 @@ class L2T(Attack):
         steps: int = 10,
         alpha: float | None = None,
         decay: float = 1.0,
+        num_scale: int = 5,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
         targeted: bool = False,
@@ -45,6 +51,7 @@ class L2T(Attack):
         self.steps = steps
         self.alpha = alpha
         self.decay = decay
+        self.num_scale = num_scale
         self.clip_min = clip_min
         self.clip_max = clip_max
         self.targeted = targeted
@@ -64,24 +71,60 @@ class L2T(Attack):
         g = torch.zeros_like(x)
         delta = torch.zeros_like(x, requires_grad=True)
 
+        aug_length = len(ops)
+        ops_num = 2
+        lr = 0.01
+
+        aug_params = torch.nn.Parameter(
+            torch.zeros(aug_length, device=self.device), requires_grad=True
+        )
+
         # If alpha is not given, set to eps / steps
         if self.alpha is None:
             self.alpha = self.eps / self.steps
 
         # Perform L2T
         for _ in range(self.steps):
-            # Compute loss
-            outs = self.model(self.normalize(x + delta))
-            loss = self.lossfn(outs, y)
+            aug_probs = []
+            losses = []
 
-            if self.targeted:
-                loss = -loss
+            for _ in range(self.num_scale):
+                rw_search = RWAugSearch(ops_num, [0, 0])
+
+                aug_type = (ops_num, select_op(aug_params, ops_num))
+                aug_prob = trace_prob(aug_params, aug_type[1])
+
+                rw_search.n = aug_type[0]
+                rw_search.idxs = aug_type[1]
+
+                aug_probs.append(aug_prob)
+
+                # Compute loss
+                outs = self.model(self.normalize(rw_search(x + delta)))
+                num_copies = math.floor((len(outs) + 0.01) / len(y))
+                loss = self.lossfn(outs, y.repeat(num_copies))
+
+                if self.targeted:
+                    loss = -loss
+
+                losses.append(loss.reshape(1))
 
             # Compute gradient
+            loss = torch.sum(torch.cat(losses)) / self.num_scale
             loss.backward()
 
             if delta.grad is None:
                 continue
+
+            aug_losses = torch.cat(
+                [aug_probs[i] * losses[i].reshape(1) for i in range(self.num_scale)]
+            )
+            aug_loss = torch.sum(aug_losses) / self.num_scale
+
+            aug_grad = torch.autograd.grad(
+                aug_loss, aug_params, retain_graph=False, create_graph=False
+            )[0]
+            aug_params = aug_params + lr * aug_grad
 
             # Apply momentum term
             g = self.decay * g + delta.grad / torch.mean(
@@ -100,6 +143,553 @@ class L2T(Attack):
         return x + delta
 
 
+def select_op(op_params, num_ops):
+    prob = f.softmax(op_params, dim=0)
+    op_ids = torch.multinomial(prob, num_ops, replacement=True).tolist()
+    return op_ids
+
+
+def trace_prob(op_params, op_ids):
+    probs = f.softmax(op_params, dim=0)
+    # tp = 1
+    # for idx in op_ids:
+    #     tp = tp * probs[idx]
+    # return tp
+    return torch.prod(probs[op_ids])
+
+
+class RWAugSearch:
+    def __init__(self, n, idxs):
+        self.n = n
+        # idxs is the operation id
+        self.idxs = idxs
+        self.op_list = ops
+
+    def __call__(self, img):
+        assert len(self.idxs) == self.n
+        for idx in self.idxs:
+            img = ops[idx](img)
+        return img
+
+
+def vertical_shift(x):
+    _, _, w, _ = x.shape
+    step = np.random.randint(low=0, high=w, dtype=np.int32)
+    return x.roll(step, dims=2)
+
+
+def horizontal_shift(x):
+    _, _, _, h = x.shape
+    step = np.random.randint(low=0, high=h, dtype=np.int32)
+    return x.roll(step, dims=3)
+
+
+def vertical_flip(x):
+    return x.flip(dims=(2,))
+
+
+def horizontal_flip(x):
+    return x.flip(dims=(3,))
+
+
+def rotate45(x):
+    return t.functional.rotate(img=x, angle=45)
+
+
+def rotate135(x):
+    return t.functional.rotate(img=x, angle=135)
+
+
+def rotate90(x):
+    return x.rot90(k=1, dims=(2, 3))
+
+
+def rotate180(x):
+    return x.rot90(k=2, dims=(2, 3))
+
+
+def add_noise(x):
+    return torch.clip(x + torch.zeros_like(x).uniform_(-16 / 255, 16 / 255), 0, 1)
+
+
+def identity(x):
+    return x
+
+
+class Rotate:
+    def __init__(self, angle, num_scale) -> None:
+        self.num_scale = num_scale
+        self.angle = angle
+
+    def __call__(self, x):
+        return torch.cat(
+            [
+                t.functional.rotate(img=x, angle=(self.angle / (2**i)))
+                for i in range(self.num_scale)
+            ]
+        )
+
+
+def rotate(angle, num_scale):
+    return Rotate(angle, num_scale)
+
+
+class Sim:
+    def __init__(self, num_copy) -> None:
+        self.num_copy = num_copy
+
+    def __call__(self, x):
+        return torch.cat([x / (2**i) for i in range(self.num_copy)])
+
+
+def sim(num_copy):
+    return Sim(num_copy)
+
+
+class Dim:
+    def __init__(self, resize_rate=1.1, diversity_prob=0.5) -> None:
+        self.resize_rate = resize_rate
+        self.diversity_prob = diversity_prob
+
+    def __call__(self, x):
+        img_size = x.shape[-1]
+        img_resize = int(img_size * self.resize_rate)
+
+        # resize the input image to random size
+        rnd = torch.randint(
+            low=min(img_size, img_resize),
+            high=max(img_size, img_resize),
+            size=(1,),
+            dtype=torch.int32,
+        )
+        rescaled = f.interpolate(
+            x, size=[rnd, rnd], mode='bilinear', align_corners=False
+        )
+
+        # randomly add padding
+        h_rem = img_resize - rnd
+        w_rem = img_resize - rnd
+        pad_top = torch.randint(low=0, high=h_rem.item(), size=(1,), dtype=torch.int32)
+        pad_bottom = h_rem - pad_top
+        pad_left = torch.randint(low=0, high=w_rem.item(), size=(1,), dtype=torch.int32)
+        pad_right = w_rem - pad_left
+
+        padded = f.pad(
+            rescaled,
+            [pad_left.item(), pad_right.item(), pad_top.item(), pad_bottom.item()],
+            value=0,
+        )
+
+        # resize the image back to img_size
+        return f.interpolate(
+            padded, size=[img_size, img_size], mode='bilinear', align_corners=False
+        )
+
+
+def dim(resize_rate=1.1, diversity_prob=0.5):
+    return Dim(resize_rate, diversity_prob)
+
+
+class BlockShuffle:
+    def __init__(self, num_block=3, num_scale=10) -> None:
+        self.num_block = num_block
+        self.num_scale = num_scale
+
+    def get_length(self, length):
+        rand = np.random.uniform(size=self.num_block)
+        rand_norm = np.round(rand / rand.sum() * length).astype(np.int32)
+        rand_norm[rand_norm.argmax()] += length - rand_norm.sum()
+        return tuple(rand_norm)
+
+    def shuffle_single_dim(self, x, dim):
+        lengths = self.get_length(x.size(dim))
+        # perm = torch.randperm(self.num_block)
+        x_strips = list(x.split(lengths, dim=dim))
+        random.shuffle(x_strips)
+        return x_strips
+
+    def shuffle(self, x):
+        dims = [2, 3]
+        random.shuffle(dims)
+        x_strips = self.shuffle_single_dim(x, dims[0])
+        return torch.cat(
+            [
+                torch.cat(self.shuffle_single_dim(x_strip, dim=dims[1]), dim=dims[1])
+                for x_strip in x_strips
+            ],
+            dim=dims[0],
+        )
+
+    def __call__(self, x):
+        return torch.cat([self.shuffle(x) for _ in range(self.num_scale)])
+
+
+def blockshuffle(num_block=3, num_scale=10):
+    return BlockShuffle(num_block, num_scale)
+
+
+class Admix:
+    def __init__(self, num_admix=3, admix_strength=0.2, num_scale=3) -> None:
+        self.num_scale = num_scale
+        self.num_admix = num_admix
+        self.admix_strength = admix_strength
+
+    def __call__(self, x):
+        admix_images = torch.concat(
+            [
+                (x + self.admix_strength * x[torch.randperm(x.size(0))].detach())
+                for _ in range(self.num_admix)
+            ],
+            dim=0,
+        )
+        return torch.concat([admix_images / (2**i) for i in range(self.num_scale)])
+
+
+def admix(num_admix=3, admix_strength=0.2, num_scale=3):
+    return Admix(num_admix, admix_strength, num_scale)
+
+
+class Ide:
+    def __init__(self, dropout_prob=None) -> None:
+        if dropout_prob is None:
+            dropout_prob = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+        self.dropout_prob = dropout_prob
+
+    def __call__(self, x):
+        return torch.cat(
+            [nn.Dropout(p=prob)(x) * (1 - prob) for prob in self.dropout_prob]
+        )
+
+
+def ide(dropout_prob):
+    return Ide(dropout_prob)
+
+
+class Masked:
+    def __init__(self, num_block, num_scale=5) -> None:
+        self.num_block = num_block
+        self.num_scale = num_scale
+
+    def blockmask(self, x):
+        _, _, w, h = x.shape
+
+        if w == h:
+            step = w / self.num_block
+            points = [round(step * i) for i in range(self.num_block + 1)]
+
+        x_copy = x.clone()
+        x_block, y_block = (
+            random.randint(0, self.num_block - 1),
+            random.randint(0, self.num_block - 1),
+        )
+        x_copy[
+            :,
+            :,
+            points[x_block] : points[x_block + 1],
+            points[y_block] : points[y_block + 1],
+        ] = 0
+
+        return x_copy
+
+    def __call__(self, x):
+        return torch.cat([self.blockmask(x) for _ in range(self.num_scale)])
+
+
+def masked(num_block, num_scale=5):
+    return Masked(num_block, num_scale)
+
+
+class SSM:
+    def __init__(self, rho=0.5, num_spectrum=10):
+        self.epsilon = 16 / 255
+        self.rho = rho
+        self.num_spectrum = num_spectrum
+
+    def dct(self, x, norm=None):
+        """
+        Discrete Cosine Transform, Type II (a.k.a. the DCT)
+        (This code is copied from https://github.com/yuyang-long/SSA/blob/master/dct.py)
+
+        Arguments:
+            x: the input signal
+            norm: the normalization, None or 'ortho'
+
+        Return:
+            the DCT-II of the signal over the last dimension
+        """
+        x_shape = x.shape
+        n = x_shape[-1]
+        x = x.contiguous().view(-1, n)
+
+        v = torch.cat([x[:, ::2], x[:, 1::2].flip([1])], dim=1)
+
+        mat_vc = torch.fft.fft(v)
+
+        k = -torch.arange(n, dtype=x.dtype, device=x.device)[None, :] * np.pi / (2 * n)
+        mat_wr = torch.cos(k)
+        mat_wi = torch.sin(k)
+
+        # V = Vc[:, :, 0] * W_r - Vc[:, :, 1] * W_i
+        mat_v = mat_vc.real * mat_wr - mat_vc.imag * mat_wi
+        if norm == 'ortho':
+            mat_v[:, 0] /= np.sqrt(n) * 2
+            mat_v[:, 1:] /= np.sqrt(n / 2) * 2
+
+        mat_v = 2 * mat_v.view(*x_shape)
+
+        return mat_v
+
+    def idct(self, mat_x, norm=None):
+        """
+        The inverse to DCT-II, which is a scaled Discrete Cosine Transform, Type III
+        Our definition of idct is that idct(dct(x)) == x
+        (This code is copied from https://github.com/yuyang-long/SSA/blob/master/dct.py)
+
+        Arguments:
+            X: the input signal
+            norm: the normalization, None or 'ortho'
+
+        Return:
+            the inverse DCT-II of the signal over the last dimension
+        """
+
+        x_shape = mat_x.shape
+        n = x_shape[-1]
+
+        mat_xv = mat_x.contiguous().view(-1, x_shape[-1]) / 2
+
+        if norm == 'ortho':
+            mat_xv[:, 0] *= np.sqrt(n) * 2
+            mat_xv[:, 1:] *= np.sqrt(n / 2) * 2
+
+        k = (
+            torch.arange(x_shape[-1], dtype=mat_x.dtype, device=mat_x.device)[None, :]
+            * np.pi
+            / (2 * n)
+        )
+        mat_wr = torch.cos(k)
+        mat_wi = torch.sin(k)
+
+        mat_vtr = mat_xv
+        mat_vti = torch.cat([mat_xv[:, :1] * 0, -mat_xv.flip([1])[:, :-1]], dim=1)
+
+        mat_vr = mat_vtr * mat_wr - mat_vti * mat_wi
+        mat_vi = mat_vtr * mat_wi + mat_vti * mat_wr
+
+        mat_v = torch.cat([mat_vr.unsqueeze(2), mat_vi.unsqueeze(2)], dim=2)
+        tmp = torch.complex(real=mat_v[:, :, 0], imag=mat_v[:, :, 1])
+        v = torch.fft.ifft(tmp)
+
+        x = v.new_zeros(v.shape)
+        x[:, ::2] += v[:, : n - (n // 2)]
+        x[:, 1::2] += v.flip([1])[:, : n // 2]
+
+        return x.view(*x_shape).real
+
+    def dct_2d(self, x, norm=None):
+        """
+        2-dimentional Discrete Cosine Transform, Type II (a.k.a. the DCT)
+        (This code is copied from https://github.com/yuyang-long/SSA/blob/master/dct.py)
+
+        Arguments:
+            x: the input signal
+            norm: the normalization, None or 'ortho'
+
+        Return:
+            the DCT-II of the signal over the last 2 dimensions
+        """
+        x1 = self.dct(x, norm=norm)
+        x2 = self.dct(x1.transpose(-1, -2), norm=norm)
+        return x2.transpose(-1, -2)
+
+    def idct_2d(self, x, norm=None):
+        """
+        The inverse to 2D DCT-II, which is a scaled Discrete Cosine Transform, Type III
+        Our definition of idct is that idct_2d(dct_2d(x)) == x
+        (This code is copied from https://github.com/yuyang-long/SSA/blob/master/dct.py)
+
+        Arguments:
+            X: the input signal
+            norm: the normalization, None or 'ortho'
+
+        Return:
+            the DCT-II of the signal over the last 2 dimensions
+        """
+        x1 = self.idct(x, norm=norm)
+        x2 = self.idct(x1.transpose(-1, -2), norm=norm)
+        return x2.transpose(-1, -2)
+
+    def __call__(self, x):
+        x_idct = []
+
+        for _ in range(self.num_spectrum):
+            gauss = torch.randn(x.size()[0], 3, 224, 224) * self.epsilon
+            gauss = gauss.cuda()
+            x_dct = self.dct_2d(x + gauss).cuda()
+            mask = (torch.rand_like(x) * 2 * self.rho + 1 - self.rho).cuda()
+            x_idct.append(self.idct_2d(x_dct * mask))
+
+        return torch.cat(x_idct)
+
+
+def ssm(rho=0.5, num_spectrum=10):
+    return SSM(rho, num_spectrum)
+
+
+class Crop:
+    def __init__(self, ratio, num_scale=5) -> None:
+        self.num_scale = num_scale
+        self.ratio = ratio
+
+    def crop(self, x, ratio):
+        width = int(x.shape[2] * ratio)
+        height = int(x.shape[3] * ratio)
+
+        left = 0 + (x.shape[2] - width) // 2
+        top = 0 + (x.shape[3] - height) // 2
+        return t.functional.resized_crop(x, top, left, height, width, (224, 224))
+
+    def __call__(self, x):
+        return torch.cat(
+            [
+                self.crop(x, self.ratio + (1 - self.ratio) * (i + 1) / self.num_scale)
+                for i in range(self.num_scale)
+            ]
+        )
+
+
+def crop(ratio, num_scale=5):
+    return Crop(ratio, num_scale)
+
+
+class Affine:
+    def __init__(self, offset, num_scale=5) -> None:
+        self.num_scale = num_scale
+        self.offset = offset
+
+    def __call__(self, x):
+        return torch.cat(
+            [
+                t.functional.affine(
+                    img=x,
+                    angle=0,
+                    translate=[
+                        self.offset * (i + 1) / self.num_scale,
+                        self.offset * (i + 1) / self.num_scale,
+                    ],
+                    scale=1,
+                    shear=0,
+                )
+                for i in range(self.num_scale)
+            ]
+        )
+
+
+def affine(offset, num_scale=5):
+    return Affine(offset, num_scale)
+
+
+ops = [
+    identity,  # 0
+    rotate(30, 5),
+    rotate(60, 5),
+    rotate(90, 5),
+    rotate(120, 5),
+    rotate(150, 5),
+    rotate(180, 5),
+    rotate(210, 5),
+    rotate(240, 5),
+    rotate(270, 5),
+    rotate(300, 5),  # 1-10
+    sim(1),
+    sim(2),
+    sim(3),
+    sim(4),
+    sim(5),
+    sim(6),
+    sim(7),
+    sim(8),
+    sim(9),
+    sim(10),  # 11-20
+    dim(1.1),
+    dim(1.15),
+    dim(1.2),
+    dim(1.25),
+    dim(1.3),
+    dim(1.35),
+    dim(1.4),
+    dim(1.45),
+    dim(1.5),
+    dim(1.55),  # 21-30
+    blockshuffle(3),
+    blockshuffle(4),
+    blockshuffle(5),
+    blockshuffle(6),
+    blockshuffle(7),
+    blockshuffle(8),
+    blockshuffle(9),
+    blockshuffle(10),
+    blockshuffle(11),
+    blockshuffle(12),  # 31-40
+    admix(1, 0.2),
+    admix(2, 0.2),
+    admix(3, 0.2),
+    admix(4, 0.2),
+    admix(5, 0.2),
+    admix(1, 0.4),
+    admix(2, 0.4),
+    admix(3, 0.4),
+    admix(4, 0.4),
+    admix(5, 0.4),  # 41-50
+    ide([0.1]),
+    ide([0.1, 0.2]),
+    ide([0.1, 0.2, 0.3]),
+    ide([0.1, 0.2, 0.3, 0.4]),
+    ide([0.1, 0.2, 0.3, 0.4, 0.5]),
+    ide([0.2, 0.3, 0.4, 0.5]),
+    ide([0.1, 0.3, 0.4, 0.5]),
+    ide([0.1, 0.2, 0.4, 0.5]),
+    ide([0.1, 0.2, 0.3, 0.5]),
+    ide([0.1, 0.2, 0.3, 0.4]),  # 51-60
+    masked(2),
+    masked(4),
+    masked(6),
+    masked(8),
+    masked(10),
+    masked(3),
+    masked(5),
+    masked(7),
+    masked(9),
+    masked(11),  # 61-70
+    ssm(0.2),
+    ssm(0.4),
+    ssm(0.5),
+    ssm(0.6),
+    ssm(0.8),
+    ssm(0.1),
+    ssm(0.3),
+    ssm(0.7),
+    ssm(0.9),  # 71-80
+    crop(0.1),
+    crop(0.2),
+    crop(0.3),
+    crop(0.4),
+    crop(0.5),
+    crop(0.6),
+    crop(0.7),
+    crop(0.8),
+    crop(0.9),  # 81-90
+    affine(0.5),
+    affine(0.55),
+    affine(0.6),
+    affine(0.65),
+    affine(0.7),
+    affine(0.75),
+    affine(0.8),
+    affine(0.85),
+    affine(0.9),  # 91-100
+]
+
 if __name__ == '__main__':
     from torchattack.eval import run_attack
 
@@ -108,4 +698,6 @@ if __name__ == '__main__':
         attack_args={'eps': 8 / 255, 'steps': 10},
         model_name='resnet18',
         victim_model_names=['resnet50', 'vgg13', 'densenet121'],
+        batch_size=2,
+        save_adv_batch=6,
     )

@@ -14,6 +14,7 @@ from torchattack.fia import FIA
 from torchattack.gama import GAMA
 from torchattack.geoda import GeoDA
 from torchattack.ilpd import ILPD
+from torchattack.l2t import L2T
 from torchattack.ltp import LTP
 from torchattack.mifgsm import MIFGSM
 from torchattack.mig import MIG
@@ -53,6 +54,7 @@ __all__ = [
     'GAMA',
     'GeoDA',
     'ILPD',
+    'L2T',
     'LTP',
     'MIFGSM',
     'MIG',
@@ -80,6 +82,7 @@ GRADIENT_NON_VIT_ATTACKS = {
     'FGSM': FGSM,
     'FIA': FIA,
     'ILPD': ILPD,
+    'L2T': L2T,
     'MIFGSM': MIFGSM,
     'MIG': MIG,
     'NAA': NAA,
