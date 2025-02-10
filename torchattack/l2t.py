@@ -79,7 +79,7 @@ class L2T(Attack):
         lr = 0.01
 
         aug_params = torch.nn.Parameter(
-            torch.zeros(len(ops), device=self.device), requires_grad=True
+            torch.zeros(len(OPS), device=self.device), requires_grad=True
         )
 
         # If alpha is not given, set to eps / steps
@@ -127,7 +127,7 @@ class L2T(Attack):
             aug_grad = torch.autograd.grad(
                 aug_loss, aug_params, retain_graph=False, create_graph=False
             )[0]
-            aug_params = aug_params + lr * aug_grad
+            aug_params = aug_params + lr * aug_grad  # type: ignore
 
             # Apply momentum term
             g = self.decay * g + delta.grad / torch.mean(
@@ -166,25 +166,25 @@ class RWAugSearch:
         self.n = n
         # idxs is the operation id
         self.idxs = idxs
-        self.ops = ops
+        self.ops = OPS
 
     def __call__(self, img: torch.Tensor) -> torch.Tensor:
         assert len(self.idxs) == self.n
         for idx in self.idxs:
-            img = ops[idx](img)
+            img = OPS[idx](img)  # type: ignore
         return img
 
 
 def vertical_shift(x: torch.Tensor) -> torch.Tensor:
     _, _, w, _ = x.shape
     step = np.random.randint(low=0, high=w, dtype=np.int32)
-    return x.roll(step, dims=2)
+    return x.roll(step, dims=2)  # type: ignore
 
 
 def horizontal_shift(x: torch.Tensor) -> torch.Tensor:
     _, _, _, h = x.shape
     step = np.random.randint(low=0, high=h, dtype=np.int32)
-    return x.roll(step, dims=3)
+    return x.roll(step, dims=3)  # type: ignore
 
 
 def vertical_flip(x: torch.Tensor) -> torch.Tensor:
@@ -196,11 +196,11 @@ def horizontal_flip(x: torch.Tensor) -> torch.Tensor:
 
 
 def rotate45(x: torch.Tensor) -> torch.Tensor:
-    return t.functional.rotate(img=x, angle=45)
+    return t.functional.rotate(img=x, angle=45)  # type: ignore
 
 
 def rotate135(x: torch.Tensor) -> torch.Tensor:
-    return t.functional.rotate(img=x, angle=135)
+    return t.functional.rotate(img=x, angle=135)  # type: ignore
 
 
 def rotate90(x: torch.Tensor) -> torch.Tensor:
@@ -277,16 +277,14 @@ class Dim:
         pad_left = torch.randint(low=0, high=w_rem.item(), size=(1,), dtype=torch.int32)
         pad_right = w_rem - pad_left
 
-        padded = f.pad(
-            rescaled,
-            [pad_left.item(), pad_right.item(), pad_top.item(), pad_bottom.item()],
-            value=0,
-        )
+        pad = [pad_left.item(), pad_right.item(), pad_top.item(), pad_bottom.item()]
+        padded = f.pad(rescaled, pad=pad, mode='constant', value=0)
 
         # resize the image back to img_size
-        return f.interpolate(
+        dx: torch.Tensor = f.interpolate(
             padded, size=[img_size, img_size], mode='bilinear', align_corners=False
         )
+        return dx
 
 
 def dim(resize_rate: float = 1.1, diversity_prob: float = 0.5) -> Dim:
@@ -431,7 +429,7 @@ class SSM:
 
         mat_v = 2 * mat_v.view(*x_shape)
 
-        return mat_v
+        return mat_v  # type: ignore
 
     def idct(self, mat_x: torch.Tensor, norm: str | None = None) -> torch.Tensor:
         x_shape = mat_x.shape
@@ -465,7 +463,7 @@ class SSM:
         x[:, ::2] += v[:, : n - (n // 2)]
         x[:, 1::2] += v.flip([1])[:, : n // 2]
 
-        return x.view(*x_shape).real
+        return x.view(*x_shape).real  # type: ignore
 
     def dct_2d(self, x: torch.Tensor, norm: str | None = None) -> torch.Tensor:
         x1 = self.dct(x, norm=norm)
@@ -505,7 +503,10 @@ class Crop:
 
         left = 0 + (x.shape[2] - width) // 2
         top = 0 + (x.shape[3] - height) // 2
-        return t.functional.resized_crop(x, top, left, height, width, (224, 224))
+        cx: torch.Tensor = t.functional.resized_crop(
+            x, top, left, height, width, (224, 224)
+        )
+        return cx
 
     def __call__(self, x: torch.Tensor) -> torch.Tensor:
         return torch.cat(
@@ -547,7 +548,7 @@ def affine(offset: float, num_scale: int = 5) -> Affine:
     return Affine(offset, num_scale)
 
 
-ops = [
+OPS = [
     identity,  # 0
     rotate(30, 5),
     rotate(60, 5),
