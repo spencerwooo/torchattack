@@ -10,7 +10,7 @@ from torchattack.attack_model import AttackModel
 class Admix(Attack):
     """The Admix attack.
 
-    From the paper: [Admix: Enhancing the Transferability of Adversarial
+    > From the paper: [Admix: Enhancing the Transferability of Adversarial
     Attacks](https://arxiv.org/abs/2102.00436).
 
     Args:

@@ -12,7 +12,7 @@ from torchattack.attack_model import AttackModel
 class VDC(Attack):
     """VDC (Virtual Dense Connection) attack for ViTs.
 
-    From the paper: [Improving the Adversarial Transferability of Vision Transformers
+    > From the paper: [Improving the Adversarial Transferability of Vision Transformers
     with Virtual Dense Connection](https://ojs.aaai.org/index.php/AAAI/article/view/28541).
 
     Args:
@@ -60,7 +60,7 @@ class VDC(Attack):
         elif hasattr(model, 'model_name'):
             # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
-            self.hook_cfg = model.model_name  # type: ignore
+            self.hook_cfg = model.model_name
 
         self.eps = eps
         self.steps = steps

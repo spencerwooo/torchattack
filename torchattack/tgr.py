@@ -12,7 +12,7 @@ from torchattack.attack_model import AttackModel
 class TGR(Attack):
     """TGR attack for ViTs (Token Gradient Regularization).
 
-    From the paper: [Transferable Adversarial Attacks on Vision Transformers with Token
+    > From the paper: [Transferable Adversarial Attacks on Vision Transformers with Token
     Gradient Regularization](https://arxiv.org/abs/2303.15754).
 
     Args:
@@ -58,7 +58,7 @@ class TGR(Attack):
         elif hasattr(model, 'model_name'):
             # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
-            self.hook_cfg = model.model_name  # type: ignore
+            self.hook_cfg = model.model_name
 
         self.eps = eps
         self.steps = steps

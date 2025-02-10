@@ -10,7 +10,7 @@ from torchattack.attack_model import AttackModel
 class SINIFGSM(Attack):
     """The SI-NI-FGSM (Scale-invariant Nesterov-accelerated Iterative FGSM) attack.
 
-    From the paper: [Nesterov Accelerated Gradient and Scale Invariance for Adversarial
+    > From the paper: [Nesterov Accelerated Gradient and Scale Invariance for Adversarial
     Attacks](https://arxiv.org/abs/1908.06281).
 
     Args:

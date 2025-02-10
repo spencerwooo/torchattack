@@ -10,7 +10,7 @@ from torchattack.attack_model import AttackModel
 class MIG(Attack):
     """The MIG (Momentum Integrated Gradients) attack.
 
-    From the paper: [Transferable Adversarial Attack for Both Vision Transformers and
+    > From the paper: [Transferable Adversarial Attack for Both Vision Transformers and
     Convolutional Networks via Momentum Integrated Gradients](https://openaccess.thecvf.com/content/ICCV2023/html/Ma_Transferable_Adversarial_Attack_for_Both_Vision_Transformers_and_Convolutional_Networks_ICCV_2023_paper.html).
 
     Args:

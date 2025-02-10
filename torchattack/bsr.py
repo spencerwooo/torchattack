@@ -13,8 +13,13 @@ from torchattack.attack_model import AttackModel
 class BSR(Attack):
     """The BSR (Block Shuffle and Rotation) attack.
 
-    From the paper: [Boosting Adversarial Transferability by Block Shuffle and
+    > From the paper: [Boosting Adversarial Transferability by Block Shuffle and
     Rotation](https://arxiv.org/abs/2308.10299).
+
+    Note:
+        The BSR attack requires the `torchvision` package as it uses
+        `torchvision.transforms` for image transformations.
+
 
     Args:
         model: The model to attack.

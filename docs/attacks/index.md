@@ -147,6 +147,12 @@
       <td><a href="https://arxiv.org/abs/2308.10299">Boosting Adversarial Transferability by Block Shuffle and Rotation</a></td>
     </tr>
     <tr>
+      <td><a href="./l2t">L2T</a></td>
+      <td><code>L2T</code></td>
+      <td><img src="https://img.shields.io/badge/CVPR-2024-1A407F?labelColor=2D3339" alt="CVPR 2024"></td>
+      <td><a href="https://arxiv.org/abs/2405.14077">Learning to Transform Dynamically for Better Adversarial Transferability</a></td>
+    </tr>
+    <tr>
       <td><a href="./att">ATT</a></td>
       <td><code>ATT</code></td>
       <td><img src="https://img.shields.io/badge/NeurIPS-2024-654287?labelColor=2D3339" alt="NeurIPS 2024"></td>

@@ -45,7 +45,7 @@ class GAMAWeights(GeneratorWeightsEnum):
 class GAMA(Attack):
     """GAMA - Generative Adversarial Multi-Object Scene Attacks.
 
-    From the paper: [GAMA: Generative Adversarial Multi-Object Scene
+    > From the paper: [GAMA: Generative Adversarial Multi-Object Scene
     Attacks](https://arxiv.org/abs/2209.09502).
 
     Args:

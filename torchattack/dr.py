@@ -11,7 +11,7 @@ from torchattack.attack_model import AttackModel
 class DR(Attack):
     """The DR (Dispersion Reduction) attack.
 
-    From the paper: [Enhancing Cross-Task Black-Box Transferability of Adversarial
+    > From the paper: [Enhancing Cross-Task Black-Box Transferability of Adversarial
     Examples With Dispersion Reduction](https://arxiv.org/abs/1911.11616).
 
     Args:
@@ -57,7 +57,7 @@ class DR(Attack):
         # If model is initialized via `torchattack.AttackModel`, infer its model_name
         # from automatically attached attribute during instantiation.
         if not model_name and hasattr(model, 'model_name'):
-            model_name = model.model_name  # type: ignore
+            model_name = model.model_name
 
         self.eps = eps
         self.steps = steps

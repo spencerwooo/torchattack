@@ -14,7 +14,7 @@ class NIFGSM(Attack):
         This attack does not apply the scale-invariant method. For the original attack
         proposed in the paper (SI-NI-FGSM), see `torchattack.sinifgsm.SINIFGSM`.
 
-    From the paper: [Nesterov Accelerated Gradient and Scale Invariance for Adversarial
+    > From the paper: [Nesterov Accelerated Gradient and Scale Invariance for Adversarial
     Attacks](https://arxiv.org/abs/1908.06281).
 
     Args:

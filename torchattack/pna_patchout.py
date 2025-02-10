@@ -12,7 +12,7 @@ from torchattack.attack_model import AttackModel
 class PNAPatchOut(Attack):
     """PNA-PatchOut attack for ViTs (Pay no attention & PatchOut).
 
-    From the paper: [Towards Transferable Adversarial Attacks on Vision
+    > From the paper: [Towards Transferable Adversarial Attacks on Vision
     Transformers](https://arxiv.org/abs/2109.04176).
 
     Args:
@@ -62,7 +62,7 @@ class PNAPatchOut(Attack):
         elif hasattr(model, 'model_name'):
             # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
-            self.hook_cfg = model.model_name  # type: ignore
+            self.hook_cfg = model.model_name
 
         self.eps = eps
         self.steps = steps
