@@ -57,10 +57,9 @@ class VDC(Attack):
         if hook_cfg:
             # Explicit config name takes precedence over inferred model.model_name
             self.hook_cfg = hook_cfg
-        elif hasattr(model, 'model_name'):
+        elif isinstance(model, AttackModel):
             # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
-            assert isinstance(str, model.model_name)
             self.hook_cfg = model.model_name
 
         self.eps = eps
