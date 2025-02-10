@@ -14,12 +14,10 @@ def device() -> torch.device:
 
 
 @pytest.fixture()
-def data() -> (
-    Callable[
-        [Callable[[Image.Image | torch.Tensor], torch.Tensor]],
-        tuple[torch.Tensor, torch.Tensor],
-    ]
-):
+def data() -> Callable[
+    [Callable[[Image.Image | torch.Tensor], torch.Tensor]],
+    tuple[torch.Tensor, torch.Tensor],
+]:
     def _open_and_transform_image(
         transform: Callable[[Image.Image | torch.Tensor], torch.Tensor],
     ) -> tuple[torch.Tensor, torch.Tensor]:
