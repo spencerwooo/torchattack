@@ -74,13 +74,10 @@ class L2T(Attack):
 
         g = torch.zeros_like(x)
         delta = torch.zeros_like(x, requires_grad=True)
+        aug_params = torch.zeros(len(AUG_OPS), requires_grad=True, device=self.device)
 
         ops_num = 2
         lr = 0.01
-
-        aug_params = torch.nn.Parameter(
-            torch.zeros(len(OPS), device=self.device), requires_grad=True
-        )
 
         # If alpha is not given, set to eps / steps
         if self.alpha is None:
@@ -92,14 +89,19 @@ class L2T(Attack):
             losses = []
 
             for _ in range(self.num_scale):
-                rw_search = RWAugSearch(ops_num, [0, 0])
+                # Create a random aug search instance for the given number of ops
+                rw_search = RWAugSearch(ops_num)
 
-                aug_type = (ops_num, select_op(aug_params, ops_num))
-                aug_prob = trace_prob(aug_params, aug_type[1])
+                # Randomly select ops based on the aug params
+                ops_indices = select_op(aug_params, ops_num)
+                # Compute the joint probs of the selected ops
+                aug_prob = trace_prob(aug_params, ops_indices)
 
-                rw_search.n = aug_type[0]
-                rw_search.idxs = aug_type[1]
+                # Update the aug search with the selected ops
+                rw_search.ops_num = ops_num
+                rw_search.ops_indices = ops_indices
 
+                # Save the computed probs for the current scale to later update the aug params
                 aug_probs.append(aug_prob)
 
                 # Compute loss
@@ -110,26 +112,22 @@ class L2T(Attack):
                 if self.targeted:
                     loss = -loss
 
-                losses.append(loss.reshape(1))
+                losses.append(loss)
 
             # Compute gradient
-            loss = torch.sum(torch.cat(losses)) / self.num_scale
-            loss.backward()
+            loss = torch.stack(losses).mean()
+            delta.grad = torch.autograd.grad(loss, delta)[0]
 
-            if delta.grad is None:
-                continue
+            # Compute gradient for augmentation params
+            aug_loss = (torch.stack(aug_probs) * torch.stack(losses)).mean()
+            aug_params.grad = torch.autograd.grad(aug_loss, aug_params)[0]
 
-            aug_losses = torch.cat(
-                [aug_probs[i] * losses[i].reshape(1) for i in range(self.num_scale)]
-            )
-            aug_loss = torch.sum(aug_losses) / self.num_scale
+            # Update augmentation params
+            aug_params.data = aug_params.data + lr * aug_params.grad
+            aug_params.grad.detach_()
+            aug_params.grad.zero_()
 
-            aug_grad = torch.autograd.grad(
-                aug_loss, aug_params, retain_graph=False, create_graph=False
-            )[0]
-            aug_params = aug_params + lr * aug_grad  # type: ignore
-
-            # Apply momentum term
+            # Apply momentum term and compute delta update
             g = self.decay * g + delta.grad / torch.mean(
                 torch.abs(delta.grad), dim=(1, 2, 3), keepdim=True
             )
@@ -162,16 +160,15 @@ def trace_prob(op_params: torch.Tensor, op_ids: list[int]) -> torch.Tensor:
 
 
 class RWAugSearch:
-    def __init__(self, n: int, idxs: list[int]) -> None:
-        self.n = n
-        # idxs is the operation id
-        self.idxs = idxs
-        self.ops = OPS
+    def __init__(self, ops_num: int) -> None:
+        self.ops_num = ops_num  # total number of ops
+        self.ops_indices = [0, 0]  # initialize selected ops
+        self.ops = AUG_OPS  # list of predefined ops
 
     def __call__(self, img: torch.Tensor) -> torch.Tensor:
-        assert len(self.idxs) == self.n
-        for idx in self.idxs:
-            img = OPS[idx](img)  # type: ignore
+        assert len(self.ops_indices) == self.ops_num
+        for idx in self.ops_indices:
+            img = AUG_OPS[idx](img)  # type: ignore
         return img
 
 
@@ -548,7 +545,7 @@ def affine(offset: float, num_scale: int = 5) -> Affine:
     return Affine(offset, num_scale)
 
 
-OPS = [
+AUG_OPS = [
     identity,  # 0
     rotate(30, 5),
     rotate(60, 5),
