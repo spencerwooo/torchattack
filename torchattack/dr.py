@@ -56,7 +56,7 @@ class DR(Attack):
 
         # If model is initialized via `torchattack.AttackModel`, infer its model_name
         # from automatically attached attribute during instantiation.
-        if not model_name and hasattr(model, 'model_name'):
+        if not model_name and isinstance(model, AttackModel):
             model_name = model.model_name
 
         self.eps = eps
