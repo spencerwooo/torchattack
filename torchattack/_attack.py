@@ -87,7 +87,7 @@ class Attack(ABC):
                 continue
             self_val = getattr(self, attr)
             other_val = getattr(other, attr)
-            
+
             if isinstance(self_val, torch.Tensor):
                 if not isinstance(other_val, torch.Tensor):
                     return False
@@ -95,5 +95,5 @@ class Attack(ABC):
                     return False
             elif self_val != other_val:
                 return False
-                
+
         return True
