@@ -12,7 +12,7 @@ from torchattack.attack_model import AttackModel
 class ATT(Attack):
     """The ATT (Adaptive Token Tuning) attack for ViTs.
 
-    From the paper: [Boosting the Transferability of Adversarial Attack on Vision
+    > From the paper: [Boosting the Transferability of Adversarial Attack on Vision
     Transformer with Adaptive Token Tuning](https://openreview.net/forum?id=sNz7tptCH6).
 
     Args:
@@ -59,7 +59,7 @@ class ATT(Attack):
         elif hasattr(model, 'model_name'):
             # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
-            self.hook_cfg = model.model_name  # type: ignore
+            self.hook_cfg = model.model_name
 
         self.eps = eps
         self.steps = steps

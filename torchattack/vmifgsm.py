@@ -10,7 +10,7 @@ from torchattack.attack_model import AttackModel
 class VMIFGSM(Attack):
     """The VMI-FGSM (Variance-tuned Momentum Iterative FGSM) attack.
 
-    From the paper: [Enhancing the Transferability of Adversarial Attacks through
+    > From the paper: [Enhancing the Transferability of Adversarial Attacks through
     Variance Tuning](https://arxiv.org/abs/2103.15571).
 
     Note:

@@ -34,8 +34,12 @@ class PerceptualCriteria(nn.Module):
 class SSP(Attack):
     """The Self-supervised (SSP) attack.
 
-    From the paper: [A Self-supervised Approach for Adversarial
+    > From the paper: [A Self-supervised Approach for Adversarial
     Robustness](https://arxiv.org/abs/2006.04924).
+
+    Note:
+        The SSP attack requires the `torchvision` package as it uses the pretrained
+        VGG-16 model from `torchvision.models`.
 
     Args:
         model: The model to attack.

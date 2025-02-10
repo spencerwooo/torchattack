@@ -11,7 +11,7 @@ from torchattack.attack_model import AttackModel
 class FIA(Attack):
     """The FIA (Feature Importance-aware) Attack.
 
-    From the paper: [Feature Importance-aware Transferable Adversarial
+    > From the paper: [Feature Importance-aware Transferable Adversarial
     Attacks](https://arxiv.org/abs/2107.14185).
 
     Args:
