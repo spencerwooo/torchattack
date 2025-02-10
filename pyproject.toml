@@ -30,13 +30,13 @@ Repository = "https://github.com/spencerwooo/torchattack"
 Documentation = "https://github.com/spencerwooo/torchattack/blob/main/README.md"
 
 [dependency-groups]
-dev = ["mypy>=1.13.0", "rich>=13.9.4", "timm>=1.0.12"]
+dev = ["mypy>=1.15.0", "rich>=13.9.4", "timm>=1.0.14"]
 test = ["pytest-cov>=6.0.0", "pytest>=8.3.4"]
 docs = [
-    "mkdocs-awesome-pages-plugin>=2.9.3",
+    "mkdocs-awesome-pages-plugin>=2.10.1",
     "mkdocs-gen-files>=0.5.0",
-    "mkdocs-material>=9.5.48",
-    "mkdocstrings[python]>=0.27.0",
+    "mkdocs-material>=9.6.3",
+    "mkdocstrings[python]>=0.28.0",
 ]
 
 [build-system]
