@@ -2,7 +2,7 @@
 name = "torchattack"
 description = "A curated list of adversarial attacks in PyTorch, with a focus on transferable black-box attacks"
 authors = [{ name = "spencerwooo", email = "spencer.woo@outlook.com" }]
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<3.14"
 readme = "README.md"
 license = { file = "LICENSE" }
 classifiers = [
