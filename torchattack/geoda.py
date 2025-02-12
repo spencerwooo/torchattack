@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 
@@ -73,6 +73,7 @@ class SubNoise(nn.Module):
         return sub_noise.view([self.num_noises, 3, self.size, self.size])
 
 
+@register_attack(category='NON_EPS')
 class GeoDA(Attack):
     """The Geometric Decision-based Attack (GeoDA).
 

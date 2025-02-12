@@ -4,10 +4,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 
+@register_attack()
 class SSA(Attack):
     """The SSA - Spectrum Simulation (S^2_I-FGSM) attack.
 

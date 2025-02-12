@@ -1,15 +1,14 @@
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Type, Union
 
 import torch
 import torch.nn as nn
 
-import torchattack
-from torchattack._attack import Attack
+from torchattack._attack import ATTACK_REGISTRY, Attack
 from torchattack.attack_model import AttackModel
 
 
 def create_attack(
-    attack: Union['Attack', str],
+    attack: Union[Type['Attack'], str],
     model: Optional[Union[nn.Module, AttackModel]] = None,
     normalize: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
     device: Optional[torch.device] = None,
@@ -35,13 +34,11 @@ def create_attack(
     """
 
     # Determine attack name and check if it is supported
-    attack_name = attack if isinstance(attack, str) else attack.__name__  # type: ignore[attr-defined]
-    if attack_name not in torchattack.SUPPORTED_ATTACKS:
+    attack_name = attack if isinstance(attack, str) else attack.attack_name
+    if attack_name not in ATTACK_REGISTRY:
         raise ValueError(f"Attack '{attack_name}' is not supported within torchattack.")
     # Get attack class if passed as a string
-    attack_cls = (
-        getattr(torchattack, attack_name) if isinstance(attack, str) else attack
-    )
+    attack_cls = ATTACK_REGISTRY[attack] if isinstance(attack, str) else attack
 
     # `eps` is explicitly set as it is such a common argument
     # All other arguments should be passed as keyword arguments
@@ -51,7 +48,7 @@ def create_attack(
     # Special handling for generative attacks
     attacker: Attack = (
         attack_cls(device=device, **kwargs)
-        if attack_name in torchattack.GENERATIVE_ATTACKS
+        if attack_cls.is_generative()
         else attack_cls(model=model, normalize=normalize, device=device, **kwargs)
     )
     return attacker
@@ -59,7 +56,7 @@ def create_attack(
 
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = AttackModel.from_pretrained('resnet18', device)
+    model = AttackModel.from_pretrained('resnet18').to(device)
     normalize = model.normalize
     print(create_attack('MIFGSM', model, normalize, device, eps=0.1, steps=40))
     print(create_attack('CDA', device=device, weights='VGG19_IMAGENET'))

@@ -8,10 +8,11 @@ import torch.nn as nn
 import torch.nn.functional as f
 import torchvision.transforms as t
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 
+@register_attack()
 class L2T(Attack):
     """The L2T (Learning to Transform) attack.
 

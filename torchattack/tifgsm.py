@@ -5,10 +5,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as f
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 
+@register_attack()
 class TIFGSM(Attack):
     """The TI-FGSM (Translation-invariant Iterative FGSM) attack.
 

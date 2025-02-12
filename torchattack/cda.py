@@ -2,7 +2,7 @@ from typing import Any
 
 import torch
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.generative._weights import GeneratorWeights, GeneratorWeightsEnum
 from torchattack.generative.resnet_generator import ResNetGenerator
 
@@ -30,6 +30,7 @@ class CDAWeights(GeneratorWeightsEnum):
     DEFAULT = RESNET152_IMAGENET
 
 
+@register_attack(category='GENERATIVE')
 class CDA(Attack):
     """Cross-domain Attack (CDA).
 
