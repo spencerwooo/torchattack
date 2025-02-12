@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Mapping
+from typing import Any, Mapping, Union
 
 from torch.hub import load_state_dict_from_url
 
@@ -13,7 +13,9 @@ class GeneratorWeights:
 
 class GeneratorWeightsEnum(Enum):
     @classmethod
-    def verify(cls, obj: Any) -> Any:
+    def verify(
+        cls, obj: Union['GeneratorWeightsEnum', str, None]
+    ) -> Union['GeneratorWeightsEnum', None]:
         if obj is not None:
             if type(obj) is str:
                 obj = cls[obj.replace(cls.__name__ + '.', '')]

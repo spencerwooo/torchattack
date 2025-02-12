@@ -2,7 +2,7 @@ from typing import Any
 
 import torch
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.generative._weights import GeneratorWeights, GeneratorWeightsEnum
 from torchattack.generative.resnet_generator import ResNetGenerator
 
@@ -54,6 +54,7 @@ class BIAWeights(GeneratorWeightsEnum):
     DEFAULT = RESNET152_DA
 
 
+@register_attack(category='GENERATIVE')
 class BIA(Attack):
     """Beyond ImageNet Attack (BIA).
 
@@ -97,7 +98,7 @@ class BIA(Attack):
             )
         else:
             # Verify and load weights from enum if checkpoint path is not provided
-            self.weights: BIAWeights = BIAWeights.verify(weights)
+            self.weights = BIAWeights.verify(weights)
             if self.weights is not None:
                 self.generator.load_state_dict(
                     self.weights.get_state_dict(check_hash=True)

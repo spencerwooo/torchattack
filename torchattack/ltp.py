@@ -2,7 +2,7 @@ from typing import Any
 
 import torch
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.generative._weights import GeneratorWeights, GeneratorWeightsEnum
 from torchattack.generative.resnet_generator import ResNetGenerator
 
@@ -32,6 +32,7 @@ class LTPWeights(GeneratorWeightsEnum):
     DEFAULT = RESNET152_IMAGENET
 
 
+@register_attack(category='GENERATIVE')
 class LTP(Attack):
     """LTP Attack (Learning Transferable Adversarial Perturbations).
 

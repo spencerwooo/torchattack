@@ -3,14 +3,16 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 
+@register_attack()
 class FGSM(Attack):
     """Fast Gradient Sign Method (FGSM).
 
-    > From the paper: [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572).
+    > From the paper: [Explaining and Harnessing Adversarial
+    Examples](https://arxiv.org/abs/1412.6572).
 
     Args:
         model: A torch.nn.Module network model.

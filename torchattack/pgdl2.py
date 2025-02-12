@@ -3,12 +3,13 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 EPS_FOR_DIVISION = 1e-12
 
 
+@register_attack()
 class PGDL2(Attack):
     """The Projected Gradient Descent (PGD) attack, with L2 constraint.
 

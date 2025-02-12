@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable
+from enum import Enum
+from typing import Any, Callable, Type, Union
 
 import torch
 import torch.nn as nn
@@ -7,8 +8,50 @@ import torch.nn as nn
 from torchattack.attack_model import AttackModel
 
 
+class AttackCategory(Enum):
+    COMMON = 'COMMON'  # Common attacks that should work on any model
+    GRADIENT_VIT = 'GRADIENT_VIT'  # Gradient-based attacks that only work on ViTs
+    GENERATIVE = 'GENERATIVE'  # Generative adversarial attacks
+    NON_EPS = 'NON_EPS'  # Attacks that do not accept epsilon as a parameter
+
+    @classmethod
+    def verify(cls, obj: Union[str, 'AttackCategory']) -> 'AttackCategory':
+        if obj is not None:
+            if type(obj) is str:
+                obj = cls[obj.replace(cls.__name__ + '.', '')]
+            elif not isinstance(obj, cls):
+                raise TypeError(
+                    f'Invalid AttackCategory class provided; expected {cls.__name__} '
+                    f'but received {obj.__class__.__name__}.'
+                )
+        return obj
+
+
+ATTACK_REGISTRY: dict[str, Type['Attack']] = {}
+
+
+def register_attack(
+    name: str | None = None, category: str | AttackCategory = AttackCategory.COMMON
+) -> Callable[[Type['Attack']], Type['Attack']]:
+    """Decorator to register an attack class in the attack registry."""
+
+    def wrapper(attack_cls: Type['Attack']) -> Type['Attack']:
+        key = name if name else attack_cls.__name__
+        if key in ATTACK_REGISTRY:
+            return ATTACK_REGISTRY[key]
+        attack_cls.attack_name = key
+        attack_cls.attack_category = AttackCategory.verify(category)
+        ATTACK_REGISTRY[key] = attack_cls
+        return attack_cls
+
+    return wrapper
+
+
 class Attack(ABC):
     """The base class for all attacks."""
+
+    attack_name: str
+    attack_category: AttackCategory
 
     def __init__(
         self,
@@ -97,3 +140,19 @@ class Attack(ABC):
                 return False
 
         return True
+
+    @classmethod
+    def is_common(cls) -> bool:
+        return cls.attack_category is AttackCategory.COMMON
+
+    @classmethod
+    def is_gradient_vit(cls) -> bool:
+        return cls.attack_category is AttackCategory.GRADIENT_VIT
+
+    @classmethod
+    def is_generative(cls) -> bool:
+        return cls.attack_category is AttackCategory.GENERATIVE
+
+    @classmethod
+    def is_non_eps(cls) -> bool:
+        return cls.attack_category is AttackCategory.NON_EPS

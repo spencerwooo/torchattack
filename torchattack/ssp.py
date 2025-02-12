@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torchvision as tv
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 
@@ -31,6 +31,7 @@ class PerceptualCriteria(nn.Module):
         return f'{self.__class__.__name__}(ssp_layer={self.ssp_layer})'
 
 
+@register_attack()
 class SSP(Attack):
     """The Self-supervised (SSP) attack.
 

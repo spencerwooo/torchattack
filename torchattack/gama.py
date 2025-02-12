@@ -2,7 +2,7 @@ from typing import Any
 
 import torch
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.generative._weights import GeneratorWeights, GeneratorWeightsEnum
 from torchattack.generative.leaky_relu_resnet_generator import ResNetGenerator
 
@@ -42,6 +42,7 @@ class GAMAWeights(GeneratorWeightsEnum):
     DEFAULT = VGG19_COCO
 
 
+@register_attack(category='GENERATIVE')
 class GAMA(Attack):
     """GAMA - Generative Adversarial Multi-Object Scene Attacks.
 
@@ -85,7 +86,7 @@ class GAMA(Attack):
             )
         else:
             # Verify and load weights from enum if checkpoint path is not provided
-            self.weights: GAMAWeights = GAMAWeights.verify(weights)
+            self.weights = GAMAWeights.verify(weights)
             if self.weights is not None:
                 self.generator.load_state_dict(
                     self.weights.get_state_dict(check_hash=True)

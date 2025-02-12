@@ -4,11 +4,12 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack._rgetattr import rgetattr
 from torchattack.attack_model import AttackModel
 
 
+@register_attack(category='GRADIENT_VIT')
 class VDC(Attack):
     """VDC (Virtual Dense Connection) attack for ViTs.
 

@@ -6,10 +6,11 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as t
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 
+@register_attack()
 class BSR(Attack):
     """The BSR (Block Shuffle and Rotation) attack.
 

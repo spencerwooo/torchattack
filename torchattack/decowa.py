@@ -3,10 +3,11 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
-from torchattack._attack import Attack
+from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 
+@register_attack()
 class DeCoWA(Attack):
     """The DeCoWA (Deformation-Constrained Warping Attack) attack.
 

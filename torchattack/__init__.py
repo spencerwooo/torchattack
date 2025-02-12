@@ -1,3 +1,4 @@
+from torchattack._attack import ATTACK_REGISTRY, register_attack
 from torchattack.admix import Admix
 from torchattack.att import ATT
 from torchattack.attack_model import AttackModel
@@ -32,11 +33,14 @@ from torchattack.vdc import VDC
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
-__version__ = '1.3.0'
+__version__ = '1.4.0'
 
 __all__ = [
-    # Helper function to create an attack by its name
+    # Helper functions
     'create_attack',
+    'register_attack',
+    # Attack registry and category definition
+    'ATTACK_REGISTRY',
     # Optional but recommended model wrapper
     'AttackModel',
     # All supported attacks
@@ -72,49 +76,3 @@ __all__ = [
     'VMIFGSM',
     'VNIFGSM',
 ]
-
-GRADIENT_NON_VIT_ATTACKS = {
-    'Admix': Admix,
-    'BSR': BSR,
-    'DeCoWA': DeCoWA,
-    'DIFGSM': DIFGSM,
-    'DR': DR,
-    'FGSM': FGSM,
-    'FIA': FIA,
-    'ILPD': ILPD,
-    'L2T': L2T,
-    'MIFGSM': MIFGSM,
-    'MIG': MIG,
-    'NAA': NAA,
-    'NIFGSM': NIFGSM,
-    'PGD': PGD,
-    'PGDL2': PGDL2,
-    'SINIFGSM': SINIFGSM,
-    'SSA': SSA,
-    'SSP': SSP,
-    'TIFGSM': TIFGSM,
-    'VMIFGSM': VMIFGSM,
-    'VNIFGSM': VNIFGSM,
-}
-GRADIENT_VIT_ATTACKS = {
-    'TGR': TGR,
-    'VDC': VDC,
-    'PNAPatchOut': PNAPatchOut,
-    'ATT': ATT,
-}
-GENERATIVE_ATTACKS = {
-    'BIA': BIA,
-    'CDA': CDA,
-    'GAMA': GAMA,
-    'LTP': LTP,
-}
-NON_EPS_ATTACKS = {
-    'GeoDA': GeoDA,
-    'DeepFool': DeepFool,
-}
-SUPPORTED_ATTACKS = (
-    GRADIENT_NON_VIT_ATTACKS
-    | GRADIENT_VIT_ATTACKS
-    | GENERATIVE_ATTACKS
-    | NON_EPS_ATTACKS
-)
