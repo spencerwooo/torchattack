@@ -13,7 +13,7 @@ import torch
 from torchattack import AttackModel, FGSM
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = AttackModel.from_pretrained(model_name='resnet50', device=device)
+model = AttackModel.from_pretrained(model_name='resnet50').to(device)
 transform, normalize = model.transform, model.normalize
 
 attack = FGSM(model, normalize, device)

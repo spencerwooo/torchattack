@@ -1,10 +1,12 @@
 import pytest
 
 import torchattack
+from torchattack import ATTACK_REGISTRY
 from torchattack.attack_model import AttackModel
 
 
 def run_attack_test(attack_cls, device, model, x, y):
+    model = model.to(device)
     normalize = model.normalize
     # attacker = attack_cls(model, normalize, device=device)
     attacker = torchattack.create_attack(attack_cls, model, normalize, device=device)
@@ -18,14 +20,12 @@ def run_attack_test(attack_cls, device, model, x, y):
 @pytest.mark.parametrize(
     'attack_cls',
     [
-        attack
-        for attack in (
-            torchattack.GRADIENT_NON_VIT_ATTACKS | torchattack.NON_EPS_ATTACKS
-        )
-        if attack != 'DR'
+        ac
+        for ac in ATTACK_REGISTRY.values()
+        if ((ac.is_common() or ac.is_non_eps()) and ac.attack_name != 'DR')
     ],
 )
-def test_common_attacks(attack_cls, device, resnet50_model, data):
+def test_common_and_non_eps_attacks(attack_cls, device, resnet50_model, data):
     x, y = data(resnet50_model.transform)
     run_attack_test(attack_cls, device, resnet50_model, x, y)
 
@@ -38,7 +38,7 @@ def test_dr_attack(device, vgg16_model, data):
 
 @pytest.mark.parametrize(
     'attack_cls',
-    torchattack.GRADIENT_VIT_ATTACKS.keys(),
+    [ac for ac in ATTACK_REGISTRY.values() if ac.is_gradient_vit()],
 )
 def test_gradient_vit_attacks(attack_cls, device, vitb16_model, data):
     x, y = data(vitb16_model.transform)
@@ -47,7 +47,7 @@ def test_gradient_vit_attacks(attack_cls, device, vitb16_model, data):
 
 @pytest.mark.parametrize(
     'attack_cls',
-    torchattack.GENERATIVE_ATTACKS.keys(),
+    [ac for ac in ATTACK_REGISTRY.values() if ac.is_generative()],
 )
 def test_generative_attacks(attack_cls, device, resnet50_model, data):
     x, y = data(resnet50_model.transform)
@@ -64,7 +64,7 @@ def test_generative_attacks(attack_cls, device, resnet50_model, data):
     ],
 )
 def test_tgr_attack_all_supported_models(device, model_name, data):
-    model = AttackModel.from_pretrained(model_name, device, from_timm=True)
+    model = AttackModel.from_pretrained(model_name, from_timm=True).to(device)
     x, y = data(model.transform)
     run_attack_test(torchattack.TGR, device, model, x, y)
 
@@ -78,7 +78,7 @@ def test_tgr_attack_all_supported_models(device, model_name, data):
     ],
 )
 def test_vdc_attack_all_supported_models(device, model_name, data):
-    model = AttackModel.from_pretrained(model_name, device, from_timm=True)
+    model = AttackModel.from_pretrained(model_name, from_timm=True).to(device)
     x, y = data(model.transform)
     run_attack_test(torchattack.VDC, device, model, x, y)
 
@@ -92,6 +92,6 @@ def test_vdc_attack_all_supported_models(device, model_name, data):
     ],
 )
 def test_att_attack_all_supported_models(device, model_name, data):
-    model = AttackModel.from_pretrained(model_name, device, from_timm=True)
+    model = AttackModel.from_pretrained(model_name, from_timm=True).to(device)
     x, y = data(model.transform)
     run_attack_test(torchattack.ATT, device, model, x, y)

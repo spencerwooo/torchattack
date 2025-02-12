@@ -26,9 +26,9 @@ class AttackModel:
 
     Example:
         ```pycon
-        >>> model = AttackModel.from_pretrained('resnet50', device='cuda')
+        >>> model = AttackModel.from_pretrained('resnet50')
         >>> model
-        AttackModel(model_name=resnet50, device=cuda, transform=Compose(...), normalize=Normalize(...))
+        AttackModel(model_name=resnet50, transform=Compose(...), normalize=Normalize(...))
         >>> model.transform
         Compose(
             Resize(size=[256], interpolation=bilinear, max_size=None, antialias=True)
@@ -48,13 +48,11 @@ class AttackModel:
     def __init__(
         self,
         model_name: str,
-        device: torch.device,
         model: nn.Module,
         transform: Callable[[Image.Image | torch.Tensor], torch.Tensor],
         normalize: Callable[[torch.Tensor], torch.Tensor],
     ) -> None:
         self.model_name = model_name
-        self.device = device
         self.model = model
         self.transform = transform
         self.normalize = normalize
@@ -63,7 +61,6 @@ class AttackModel:
     def from_pretrained(
         cls,
         model_name: str,
-        device: torch.device,
         from_timm: bool = False,
     ) -> Self:
         """
@@ -94,7 +91,7 @@ class AttackModel:
         if from_timm:
             import timm
 
-            model = timm.create_model(model_name, pretrained=True).eval().to(device)
+            model = timm.create_model(model_name, pretrained=True).eval()
             cfg = timm.data.resolve_data_config(model.pretrained_cfg)
 
             # Construct normalization
@@ -107,7 +104,7 @@ class AttackModel:
                 tr for tr in transform.transforms if not isinstance(tr, t.Normalize)
             ]
 
-            return cls(model_name, device, model, transform, normalize)
+            return cls(model_name, model, transform, normalize)
 
         # If the model is not specified to be load from timm, try loading from
         # `torchvision.models` first, then fall back to timm if the model is not found.
@@ -115,7 +112,7 @@ class AttackModel:
             import torchvision.models as tv_models
             import torchvision.transforms.functional as f
 
-            model = tv_models.get_model(model_name, weights='DEFAULT').eval().to(device)
+            model = tv_models.get_model(model_name, weights='DEFAULT').eval()
 
             # Resolve transforms from vision model weights
             weight_id = str(tv_models.get_model_weights(name=model_name)['DEFAULT'])
@@ -168,7 +165,7 @@ class AttackModel:
             )
             normalize = t.Normalize(mean=cfg.mean, std=cfg.std)
 
-            return cls(model_name, device, model, transform, normalize)
+            return cls(model_name, model, transform, normalize)
 
         except ValueError:
             from warnings import warn
@@ -179,7 +176,21 @@ class AttackModel:
                 category=UserWarning,
                 stacklevel=2,
             )
-            return cls.from_pretrained(model_name, device, from_timm=True)
+            return cls.from_pretrained(model_name, from_timm=True)
+
+    def to(self, device: torch.device) -> Self:
+        """Move the model to the specified device and update the device attribute.
+
+        Args:
+            device: The device to move the model to.
+
+        Returns:
+            AttackModel: The AttackModel instance with the updated device.
+        """
+
+        self.model = self.model.to(device)
+        self.device = device
+        return self
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         outs: torch.Tensor = self.model(x)

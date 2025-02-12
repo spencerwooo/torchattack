@@ -7,7 +7,7 @@ from torchattack.eval import FoolingRateMetric, NIPSLoader
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Initialize the white-box model
-model = AttackModel.from_pretrained(model_name='resnet50', device=device)
+model = AttackModel.from_pretrained(model_name='resnet50').to(device)
 transform, normalize = model.transform, model.normalize
 
 # Initialize the attacker MI-FGSM
@@ -17,7 +17,7 @@ attacker = MIFGSM(model, normalize, device, eps=8 / 255)
 dataloader = NIPSLoader(root='datasets/nips2017', transform=transform, batch_size=16)
 
 # Initialize the black-box victim model (vmodel)
-vmodel = AttackModel.from_pretrained(model_name='vgg19', device=device)
+vmodel = AttackModel.from_pretrained(model_name='vgg19').to(device)
 # Track both white-box and black-box fooling rates
 frm, vfrm = (FoolingRateMetric(), FoolingRateMetric())
 
