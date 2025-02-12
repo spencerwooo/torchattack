@@ -1,4 +1,4 @@
-from torchattack._attack import ATTACK_REGISTRY, register_attack
+from torchattack._attack import ATTACK_REGISTRY, Attack, register_attack
 from torchattack.admix import Admix
 from torchattack.att import ATT
 from torchattack.attack_model import AttackModel
@@ -39,7 +39,8 @@ __all__ = [
     # Helper functions
     'create_attack',
     'register_attack',
-    # Attack registry and category definition
+    # Attack registry and base Attack class
+    'Attack',
     'ATTACK_REGISTRY',
     # Optional but recommended model wrapper
     'AttackModel',
