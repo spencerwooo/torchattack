@@ -44,15 +44,15 @@ Load a pretrained model to attack from either torchvision or timm.
 from torchattack import AttackModel
 
 # Load a model with `AttackModel`
-model = AttackModel.from_pretrained(model_name='resnet50', device=device)
+model = AttackModel.from_pretrained(model_name='resnet50').to(device)
 # `AttackModel` automatically attach the model's `transform` and `normalize` functions
 transform, normalize = model.transform, model.normalize
 
 # Additionally, to explicitly specify where to load the pretrained model from (timm or torchvision),
 # prepend the model name with 'timm/' or 'tv/' respectively, or use the `from_timm` argument, e.g.
-vit_b16 = AttackModel.from_pretrained(model_name='timm/vit_base_patch16_224', device=device)
-inv_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3', device=device)
-pit_b = AttackModel.from_pretrained(model_name='pit_b_224', device=device, from_timm=True)
+vit_b16 = AttackModel.from_pretrained(model_name='timm/vit_base_patch16_224').to(device)
+inv_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3').to(device)
+pit_b = AttackModel.from_pretrained(model_name='pit_b_224', from_timm=True).to(device)
 ```
 
 Initialize an attack by importing its attack class.

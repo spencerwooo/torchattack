@@ -31,15 +31,15 @@ def data() -> Callable[
 
 
 @pytest.fixture()
-def resnet50_model(device: torch.device) -> AttackModel:
-    return AttackModel.from_pretrained('resnet50', device)
+def resnet50_model() -> AttackModel:
+    return AttackModel.from_pretrained('resnet50')
 
 
 @pytest.fixture()
-def vgg16_model(device: torch.device) -> AttackModel:
-    return AttackModel.from_pretrained('vgg16', device)
+def vgg16_model() -> AttackModel:
+    return AttackModel.from_pretrained('vgg16')
 
 
 @pytest.fixture()
-def vitb16_model(device: torch.device) -> AttackModel:
-    return AttackModel.from_pretrained('vit_base_patch16_224', device, from_timm=True)
+def vitb16_model() -> AttackModel:
+    return AttackModel.from_pretrained('vit_base_patch16_224', from_timm=True)

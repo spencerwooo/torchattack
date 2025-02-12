@@ -1,10 +1,10 @@
-from typing import Any
+from typing import Any, Type
 
-import torchattack
+from torchattack._attack import Attack
 
 
 def run_attack(
-    attack: Any,
+    attack: str | Type['Attack'],
     attack_args: dict | None = None,
     model_name: str = 'resnet50',
     victim_model_names: list[str] | None = None,
@@ -54,7 +54,7 @@ def run_attack(
 
     # Setup model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = AttackModel.from_pretrained(model_name, device)
+    model = AttackModel.from_pretrained(model_name).to(device)
     transform, normalize = model.transform, model.normalize
 
     # Set up dataloader
@@ -73,7 +73,7 @@ def run_attack(
 
     # Setup victim models if provided
     if victim_model_names:
-        victims = [AttackModel.from_pretrained(n, device) for n in victim_model_names]
+        victims = [AttackModel.from_pretrained(n).to(device) for n in victim_model_names]
         victim_frms = [FoolingRateMetric() for _ in victim_model_names]
 
     # Run attack over the dataset (100 images by default)
@@ -125,8 +125,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Run an attack on a model.')
     parser.add_argument('--attack', type=str, required=True)
-    parser.add_argument('--eps', type=str, default='16/255')
-    parser.add_argument('--weights', type=str, default='DEFAULT')
+    parser.add_argument('--eps', type=str, default=None)
+    parser.add_argument('--weights', type=str, default=None)
     parser.add_argument('--checkpoint-path', type=str, default=None)
     parser.add_argument('--model-name', type=str, default='resnet50')
     parser.add_argument('--victim-model-names', type=str, nargs='+', default=None)
@@ -136,13 +136,14 @@ if __name__ == '__main__':
     parser.add_argument('--save-adv-batch', type=int, default=-1)
     args = parser.parse_args()
 
-    attack_args = {}
-    args.eps = eval(args.eps)
-    if args.attack not in torchattack.NON_EPS_ATTACKS:  # type: ignore
-        attack_args['eps'] = args.eps
-    if args.attack in torchattack.GENERATIVE_ATTACKS:  # type: ignore
-        attack_args['weights'] = args.weights
-        attack_args['checkpoint_path'] = args.checkpoint_path
+    attack_args: dict[str, Any] = {}
+    if args.eps is not None:
+        args.eps = eval(args.eps)
+    # if args.attack not in torchattack.NON_EPS_ATTACKS:  # type: ignore
+    #     attack_args['eps'] = args.eps
+    # if args.attack in torchattack.GENERATIVE_ATTACKS:  # type: ignore
+    #     attack_args['weights'] = args.weights
+    #     attack_args['checkpoint_path'] = args.checkpoint_path
 
     run_attack(
         attack=args.attack,
