@@ -180,7 +180,7 @@ class VDC(Attack):
         """Register hooks to either record or add gradients during the backward pass.
 
         Args:
-            grad_add_hook: If False, register hooks to record gradients. If True,
+            add_grad_mode: If False, register hooks to record gradients. If True,
                 register hooks to modify the gradients by adding pre-recorded gradients
                 during the backward pass.
         """

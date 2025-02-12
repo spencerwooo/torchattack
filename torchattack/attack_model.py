@@ -19,7 +19,6 @@ class AttackModel:
 
     Args:
         model_name: The name of the model.
-        device: The device on which the model is loaded.
         model: The pretrained model itself.
         transform: The transformation function applied to input images.
         normalize: The normalization function applied to input images.
@@ -70,7 +69,6 @@ class AttackModel:
             model_name: The name of the model to load. Accept specifying the model from
                 `timm` or `torchvision.models` by prefixing the model name with `timm/`
                 or `tv/`. Takes precedence over the `from_timm` flag.
-            device: The device on which to load the model.
             from_timm: Explicitly specifying to load the model from timm or torchvision.
                 Priority lower than argument `model_name`. Defaults to False.
 

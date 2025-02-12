@@ -20,7 +20,7 @@ import mkdocs_gen_files
 import torchattack
 from torchattack import ATTACK_REGISTRY
 
-for attack_name, attack_cls in ATTACK_REGISTRY:
+for attack_name, attack_cls in ATTACK_REGISTRY.items():
     filename = os.path.join('attacks', f'{attack_name.lower()}.md')
     with mkdocs_gen_files.open(filename, 'w') as f:
         if attack_cls.is_generative():

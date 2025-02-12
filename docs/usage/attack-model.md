@@ -22,7 +22,7 @@ Contrary to `torchvision.models`, [`AttackModel`][torchattack.attack_model.Attac
 To load a ResNet-50 model for instance.
 
 ```python
-model = AttackModel.from_pretrained(model_name='resnet50')
+model = AttackModel.from_pretrained(model_name='resnet50').to(device)
 ```
 
 The [`AttackModel.from_pretrained()`][torchattack.attack_model.AttackModel.from_pretrained] method does three things under the hood:
@@ -47,17 +47,17 @@ transform, normalize = model.transform, model.normalize
 For instance, to load the ViT-B/16 model from `timm`.
 
 ```python
-vit_b16 = AttackModel.from_pretrained(model_name='timm/vit_base_patch16_224')
+vit_b16 = AttackModel.from_pretrained(model_name='timm/vit_base_patch16_224').to(device)
 ```
 
 To load the Inception-v3 model from `torchvision`.
 
 ```python
-inv_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3')
+inv_v3 = AttackModel.from_pretrained(model_name='tv/inception_v3').to(device)
 ```
 
 Or, explicitly specify using `timm` as the source with `from_timm=True`.
 
 ```python
-pit_b = AttackModel.from_pretrained(model_name='pit_b_224', from_timm=True)
+pit_b = AttackModel.from_pretrained(model_name='pit_b_224', from_timm=True).to(device)
 ```
