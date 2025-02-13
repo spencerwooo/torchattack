@@ -12,8 +12,15 @@ nav:
       - usage/attack-creation.md
       - usage/attack-evaluation.md
       - usage/putting-it-all-together.md
-      - usage/api-reference.md
   - ...
+  - API:
+      - api/index.md
+      - api/attack-model.md
+      - api/create-attack.md
+      - api/register-attack.md
+      - api/eval-metric.md
+      - api/eval-dataset.md
+      - api/eval-runner.md
   - development.md
 theme:
   name: material
