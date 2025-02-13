@@ -22,7 +22,10 @@ def run_attack_test(attack_cls, device, model, x, y):
     [
         ac
         for ac in ATTACK_REGISTRY.values()
-        if ((ac.is_common() or ac.is_non_eps()) and ac.attack_name != 'DR')
+        if (
+            (ac.is_category('COMMON') or ac.is_category('NON_EPS'))
+            and ac.attack_name != 'DR'
+        )
     ],
 )
 def test_common_and_non_eps_attacks(attack_cls, device, resnet50_model, data):
@@ -38,7 +41,7 @@ def test_dr_attack(device, vgg16_model, data):
 
 @pytest.mark.parametrize(
     'attack_cls',
-    [ac for ac in ATTACK_REGISTRY.values() if ac.is_gradient_vit()],
+    [ac for ac in ATTACK_REGISTRY.values() if ac.is_category('GRADIENT_VIT')],
 )
 def test_gradient_vit_attacks(attack_cls, device, vitb16_model, data):
     x, y = data(vitb16_model.transform)
@@ -47,7 +50,7 @@ def test_gradient_vit_attacks(attack_cls, device, vitb16_model, data):
 
 @pytest.mark.parametrize(
     'attack_cls',
-    [ac for ac in ATTACK_REGISTRY.values() if ac.is_generative()],
+    [ac for ac in ATTACK_REGISTRY.values() if ac.is_category('GENERATIVE')],
 )
 def test_generative_attacks(attack_cls, device, resnet50_model, data):
     x, y = data(resnet50_model.transform)

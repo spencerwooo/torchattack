@@ -79,6 +79,11 @@ class Attack(ABC):
         # If normalize is None, use identity function
         self.normalize = normalize if normalize else lambda x: x
 
+    @classmethod
+    def is_category(cls, category: str | AttackCategory) -> bool:
+        """Check if the attack class belongs to the given category."""
+        return cls.attack_category is AttackCategory.verify(category)
+
     @abstractmethod
     def forward(self, *args: Any, **kwds: Any) -> Any:
         pass
@@ -144,19 +149,3 @@ class Attack(ABC):
                 return False
 
         return True
-
-    @classmethod
-    def is_common(cls) -> bool:
-        return cls.attack_category is AttackCategory.COMMON
-
-    @classmethod
-    def is_gradient_vit(cls) -> bool:
-        return cls.attack_category is AttackCategory.GRADIENT_VIT
-
-    @classmethod
-    def is_generative(cls) -> bool:
-        return cls.attack_category is AttackCategory.GENERATIVE
-
-    @classmethod
-    def is_non_eps(cls) -> bool:
-        return cls.attack_category is AttackCategory.NON_EPS

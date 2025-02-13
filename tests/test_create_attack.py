@@ -6,7 +6,11 @@ from torchattack import ATTACK_REGISTRY, create_attack
 
 @pytest.mark.parametrize(
     ('attack_name', 'expected'),
-    [(an, ac) for an, ac in ATTACK_REGISTRY.items() if ac.is_common() and an != 'DR'],
+    [
+        (an, ac)
+        for an, ac in ATTACK_REGISTRY.items()
+        if ac.is_category('COMMON') and an != 'DR'
+    ],
 )
 def test_create_non_vit_attack_same_as_imported(
     attack_name,
@@ -26,7 +30,7 @@ def test_create_dr_attack_same_as_imported(vgg16_model):
 
 @pytest.mark.parametrize(
     ('attack_name', 'expected'),
-    [(an, ac) for an, ac in ATTACK_REGISTRY.items() if ac.is_gradient_vit()],
+    [(an, ac) for an, ac in ATTACK_REGISTRY.items() if ac.is_category('GRADIENT_VIT')],
 )
 def test_create_vit_attack_same_as_imported(
     attack_name,
@@ -40,7 +44,7 @@ def test_create_vit_attack_same_as_imported(
 
 @pytest.mark.parametrize(
     ('attack_name', 'expected'),
-    [(an, ac) for an, ac in ATTACK_REGISTRY.items() if ac.is_generative()],
+    [(an, ac) for an, ac in ATTACK_REGISTRY.items() if ac.is_category('GENERATIVE')],
 )
 def test_create_generative_attack_same_as_imported(attack_name, expected):
     created_attacker = create_attack(attack_name)

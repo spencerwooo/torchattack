@@ -23,7 +23,7 @@ from torchattack import ATTACK_REGISTRY
 for attack_name, attack_cls in ATTACK_REGISTRY.items():
     filename = os.path.join('attacks', f'{attack_name.lower()}.md')
     with mkdocs_gen_files.open(filename, 'w') as f:
-        if attack_cls.is_generative():
+        if attack_cls.is_category('GENERATIVE'):
             # For generative attacks, we need to document
             # both the attack and its weights enum as well
             attack_mod = getattr(torchattack, attack_name.lower())

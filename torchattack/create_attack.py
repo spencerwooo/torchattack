@@ -48,7 +48,7 @@ def create_attack(
     # Special handling for generative attacks
     attacker: Attack = (
         attack_cls(device=device, **kwargs)
-        if attack_cls.is_generative()
+        if attack_cls.is_category('GENERATIVE')
         else attack_cls(model=model, normalize=normalize, device=device, **kwargs)
     )
     return attacker

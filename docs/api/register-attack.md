@@ -1,3 +1,7 @@
+---
+status: new
+---
+
 # Register attack
 
 `register_attack()` is a decorator that registers an attack to the attack registry. This allows external attacks to be recognized by `create_attack()`.
