@@ -1,4 +1,4 @@
-from typing import Any, Type
+from typing import Type
 
 from torchattack._attack import Attack
 
@@ -73,7 +73,9 @@ def run_attack(
 
     # Setup victim models if provided
     if victim_model_names:
-        victims = [AttackModel.from_pretrained(n).to(device) for n in victim_model_names]
+        victims = [
+            AttackModel.from_pretrained(n).to(device) for n in victim_model_names
+        ]
         victim_frms = [FoolingRateMetric() for _ in victim_model_names]
 
     # Run attack over the dataset (100 images by default)
@@ -136,14 +138,14 @@ if __name__ == '__main__':
     parser.add_argument('--save-adv-batch', type=int, default=-1)
     args = parser.parse_args()
 
-    attack_args: dict[str, Any] = {}
-    if args.eps is not None:
+    attack_args: dict[str, str | int | None] = {}
+    if args.eps:
         args.eps = eval(args.eps)
-    # if args.attack not in torchattack.NON_EPS_ATTACKS:  # type: ignore
-    #     attack_args['eps'] = args.eps
-    # if args.attack in torchattack.GENERATIVE_ATTACKS:  # type: ignore
-    #     attack_args['weights'] = args.weights
-    #     attack_args['checkpoint_path'] = args.checkpoint_path
+        attack_args['eps'] = args.eps
+    if args.weights:
+        attack_args['weights'] = args.weights
+    if args.checkpoint_path:
+        attack_args['checkpoint_path'] = args.checkpoint_path
 
     run_attack(
         attack=args.attack,
