@@ -14,7 +14,7 @@ def test_external_attack_registered():
     assert 'ExternalNewAttack' in ATTACK_REGISTRY
     assert issubclass(ATTACK_REGISTRY['ExternalNewAttack'], Attack)
     assert ATTACK_REGISTRY['ExternalNewAttack'].attack_name == 'ExternalNewAttack'
-    assert ATTACK_REGISTRY['ExternalNewAttack'].is_common()
+    assert ATTACK_REGISTRY['ExternalNewAttack'].is_category('COMMON')
 
 
 def test_external_attack_can_be_created():

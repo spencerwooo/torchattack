@@ -15,12 +15,15 @@ nav:
   - ...
   - API:
       - api/index.md
-      - api/attack-model.md
-      - api/create-attack.md
+      - api/base-attack.md
       - api/register-attack.md
-      - api/eval-metric.md
-      - api/eval-dataset.md
-      - api/eval-runner.md
+      - api/create-attack.md
+      - api/attack-model.md
+      - Eval:
+          - api/eval/index.md
+          - api/eval/eval-metric.md
+          - api/eval/eval-dataset.md
+          - api/eval/eval-runner.md
   - development.md
 theme:
   name: material
