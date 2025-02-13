@@ -36,9 +36,9 @@ The library also provides tools to load pretrained models, set up attacks, and r
 
 To get started, follow the links below:
 
-- [Loading pretrained models and important attributes](./attack-model.md)
-- [Creating and running attacks](./attack-creation.md)
-- [Loading a dataset and running evaluations](./attack-evaluation.md)
-- [A full example to evaluate transferability](./api-reference.md)
+- [Loading pretrained models and important attributes](attack-model.md)
+- [Creating and running attacks](attack-creation.md)
+- [Loading a dataset and running evaluations](attack-evaluation.md)
+- [A full example to evaluate transferability](putting-it-all-together.md)
 
 Or dive straight into [all available attacks](../attacks/index.md).
