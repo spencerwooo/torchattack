@@ -2,7 +2,7 @@ from typing import Any
 
 import torch
 
-from torchattack._attack import Attack, register_attack
+from torchattack.attack import Attack, register_attack
 from torchattack.generative._weights import GeneratorWeights, GeneratorWeightsEnum
 from torchattack.generative.leaky_relu_resnet_generator import ResNetGenerator
 

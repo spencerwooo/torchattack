@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torchvision as tv
 
-from torchattack._attack import Attack, register_attack
+from torchattack.attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 

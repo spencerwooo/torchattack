@@ -3,7 +3,7 @@ from typing import Any, Callable, Optional, Type, Union
 import torch
 import torch.nn as nn
 
-from torchattack._attack import ATTACK_REGISTRY, Attack
+from torchattack.attack import ATTACK_REGISTRY, Attack
 from torchattack.attack_model import AttackModel
 
 

@@ -1,6 +1,6 @@
 from typing import Type
 
-from torchattack._attack import Attack
+from torchattack.attack import Attack
 
 
 def run_attack(

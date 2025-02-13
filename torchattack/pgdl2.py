@@ -3,7 +3,7 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
-from torchattack._attack import Attack, register_attack
+from torchattack.attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
 EPS_FOR_DIVISION = 1e-12

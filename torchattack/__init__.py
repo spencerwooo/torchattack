@@ -1,6 +1,6 @@
-from torchattack._attack import ATTACK_REGISTRY, Attack, register_attack
 from torchattack.admix import Admix
 from torchattack.att import ATT
+from torchattack.attack import ATTACK_REGISTRY, Attack, register_attack
 from torchattack.attack_model import AttackModel
 from torchattack.bia import BIA
 from torchattack.bsr import BSR
