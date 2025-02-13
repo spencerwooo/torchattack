@@ -13,19 +13,16 @@ from torchattack.attack_model import AttackModel
 class TGR(Attack):
     """TGR attack for ViTs (Token Gradient Regularization).
 
-    > From the paper: [Transferable Adversarial Attacks on Vision Transformers with Token
-    Gradient Regularization](https://arxiv.org/abs/2303.15754).
+    > From the paper: [Transferable Adversarial Attacks on Vision Transformers with
+    Token Gradient Regularization](https://arxiv.org/abs/2303.15754).
 
     Args:
         model: The model to attack.
         normalize: A transform to normalize images.
         device: Device to use for tensors. Defaults to cuda if available.
-        hook_cfg: Config used for applying hooks to the model. Supported configs are:
-            * 'vit_base_patch16_224'
-            * 'deit_base_distilled_patch16_224'
-            * 'pit_b_224'
-            * 'cait_s24_224'
-            * 'visformer_small'
+        hook_cfg: Config used for applying hooks to the model. Supported values:
+            `vit_base_patch16_224`, `deit_base_distilled_patch16_224`, `pit_b_224`,
+            `cait_s24_224`, `visformer_small`.
         eps: The maximum perturbation. Defaults to 8/255.
         steps: Number of steps. Defaults to 10.
         alpha: Step size, `eps / steps` if None. Defaults to None.

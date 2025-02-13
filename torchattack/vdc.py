@@ -20,11 +20,9 @@ class VDC(Attack):
         model: The model to attack.
         normalize: A transform to normalize images.
         device: Device to use for tensors. Defaults to cuda if available.
-        hook_cfg: Config used for applying hooks to the model. Supported configs are:
-            * 'vit_base_patch16_224'
-            * 'deit_base_distilled_patch16_224'
-            * 'pit_b_224'
-            * 'visformer_small'
+        hook_cfg: Config used for applying hooks to the model. Supported values:
+            `vit_base_patch16_224`, `deit_base_distilled_patch16_224`, `pit_b_224`,
+            `visformer_small`.
         eps: The maximum perturbation. Defaults to 8/255.
         steps: Number of steps. Defaults to 10.
         alpha: Step size, `eps / steps` if None. Defaults to None.
