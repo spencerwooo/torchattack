@@ -2,7 +2,13 @@ import torch
 
 
 class FoolingRateMetric:
-    """Fooling rate metric tracker."""
+    """Fooling rate metric tracker.
+
+    Attributes:
+        total_count: Total number of samples.
+        clean_count: Number of correctly predicted clean samples.
+        adv_count: Number of correctly predicted adversarial samples.
+    """
 
     def __init__(self) -> None:
         self.total_count = torch.tensor(0)
@@ -31,8 +37,16 @@ class FoolingRateMetric:
             A tuple of torch.Tensors containing the clean accuracy, adversarial
             accuracy, and fooling rate computed, respectively.
         """
+
         return (
             self.clean_count / self.total_count,
             self.adv_count / self.total_count,
             (self.clean_count - self.adv_count) / self.clean_count,
         )
+
+    def reset(self) -> None:
+        """Reset the metric tracker to initial state."""
+
+        self.total_count = torch.tensor(0)
+        self.clean_count = torch.tensor(0)
+        self.adv_count = torch.tensor(0)
