@@ -4,7 +4,7 @@ from typing import Callable
 import numpy as np
 import torch
 import torch.nn as nn
-import torchvision.transforms as t
+from torchvision.transforms import InterpolationMode, RandomRotation
 
 from torchattack._attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
@@ -61,11 +61,6 @@ class BSR(Attack):
 
         self.num_scale = num_scale
         self.num_block = num_block
-
-        # Declare random rotation transform
-        self.randrot = t.RandomRotation(
-            degrees=(-24, 24), interpolation=t.InterpolationMode.BILINEAR
-        )
 
         self.clip_min = clip_min
         self.clip_max = clip_max
@@ -180,9 +175,10 @@ class BSR(Attack):
         x_strips = self._shuffle_single_dim(x, d1)
 
         # For each strip, apply random rotation and then shuffle along the second dim
+        randrot = RandomRotation((-24, 24), interpolation=InterpolationMode.BILINEAR)
         rotated_strips = []
         for x_strip in x_strips:
-            rotated = self.randrot(x_strip)
+            rotated = randrot(x_strip)
             shuffled = self._shuffle_single_dim(rotated, dim=d2)
             rotated_strips.append(torch.cat(shuffled, dim=d2))
 

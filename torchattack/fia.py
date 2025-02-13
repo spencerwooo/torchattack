@@ -56,6 +56,7 @@ class FIA(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
+        self.feature_layer_name = feature_layer_name
         self.feature_module = rgetattr(self.model, feature_layer_name)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:

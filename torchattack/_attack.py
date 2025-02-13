@@ -92,7 +92,13 @@ class Attack(ABC):
         def repr_map(k: str, v: Any) -> str:
             if isinstance(v, float):
                 return f'{k}={v:.3f}'
-            if k in ['model', 'normalize', 'feature_layer', 'hooks', 'generator']:
+            if k in [
+                'model',
+                'normalize',
+                'feature_module',
+                'hooks',
+                'generator',
+            ]:
                 return f'{k}={v.__class__.__name__}'
             if isinstance(v, torch.Tensor):
                 return f'{k}={v.shape}'
@@ -109,12 +115,10 @@ class Attack(ABC):
             'model',
             'normalize',
             'lossfn',
-            'feature_layer',  # FIA
+            'feature_module',  # FIA, ILPD, NAA
             'hooks',  # PNAPatchOut, TGR, VDC
-            'perceptual_criteria',  # SSP
             'sub_basis',  # GeoDA
-            'generator',  # BIA, CDA
-            'randrot',  # BSR
+            'generator',  # BIA, CDA, LTP
         ]
         for attr in eq_name_attrs:
             if not (hasattr(self, attr) and hasattr(other, attr)):

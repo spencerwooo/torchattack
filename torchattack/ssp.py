@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Any, Callable
 
 import torch
 import torch.nn as nn
@@ -29,6 +29,11 @@ class PerceptualCriteria(nn.Module):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(ssp_layer={self.ssp_layer})'
+
+    def __eq__(self, other: Any) -> bool:
+        return (
+            isinstance(other, PerceptualCriteria) and self.ssp_layer == other.ssp_layer
+        )
 
 
 @register_attack()
