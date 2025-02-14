@@ -28,16 +28,22 @@ model = AttackModel.from_pretrained(model_name='resnet50').to(device)
 The [`AttackModel.from_pretrained()`][torchattack.attack_model.AttackModel.from_pretrained] method does three things under the hood:
 
 1. It automatically loads the model from either `torchvision` (by default) or `timm` (if not found in `torchvision`).
-2. It sets the model to evaluation mode by calling `model.eval()`, and moves the model to the specified device.
-3. It resolves the model's `transform` and `normalize` functions associated with its pretrained weights to the [`AttackModel`][torchattack.attack_model.AttackModel] instance, also automatically.
+2. It sets the model to evaluation mode by calling `model.eval()`.
+3. It resolves the model's `transform` and `normalize` functions associated with its pretrained weights to the [`AttackModel`][torchattack.attack_model.AttackModel] instance.
+4. And finally, it populates the resolved transformation attributes to the model's `meta` attribute.
 
-Doing so, we not only get our pretrained model set up, but also its necessary associated, and more importantly, **==_separated_ transform and normalization functions==(1).**
+Doing so, we not only get our pretrained model set up, but also its necessary associated, and more importantly, **_separated_ transform and normalization functions(1).**
 { .annotate }
 
 1. Separating the model's normalize function from its transform is crucial for launching attacks, **as adversarial perturbation is crafted within the original image space — most often within `(0, 1)`.**
 
 ```python
 transform, normalize = model.transform, model.normalize
+```
+
+```pycon
+>>> model.meta 
+AttackModelMeta(resize_size=232, crop_size=224, interpolation=<InterpolationMode.BILINEAR: 'bilinear'>, antialias=True, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ```
 
 ## Specifying the model source

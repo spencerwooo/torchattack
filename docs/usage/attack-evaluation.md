@@ -40,7 +40,7 @@ attack = FGSM(model, normalize, device)
 ```
 
 !!! tip "Only the transform is applied to the dataloader, ==the normalize is left out==."
-    Note that the earlier _separated transform and normalize function_ here. Only the transform function is passed to the dataloader,
+    Note that the earlier _separated transform and normalize function_ here. Only the transform function is passed to the dataloader, the normalize function is left out to be applied manually in the attack loop.
 
 And wrap the dataloader in the progress bar of your choice, [such as rich](https://rich.readthedocs.io/en/stable/progress.html).
 

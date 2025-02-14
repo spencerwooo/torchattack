@@ -28,7 +28,7 @@ torchattack is a library for PyTorch that offers a collection of state-of-the-ar
 
 2. **_Black-box attacks_** are attacks that don't require access to the model's internal parameters. Instead, they rely only on the model's inputs and outputs to launch the attack.
 
-Attacks in torchattack are implemented over a thin layer of abstraction (`torchattack.attack.Attack`), with minimal changes to the original implementation within its research paper, along with comprehensive type hints and explanatory comments, to make it easy for researchers like me and you to use and understand.
+Attacks in torchattack are implemented over a thin layer of abstraction [`torchattack.Attack`][torchattack.Attack], with minimal changes to the original implementation within its research paper, along with comprehensive type hints and explanatory comments, to make it easy for researchers like me and you to use and understand.
 
 The library also provides tools to load pretrained models, set up attacks, and run tests.
 
