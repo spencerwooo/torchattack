@@ -21,6 +21,7 @@ nav:
       - api/attack-model.md
       - Eval:
           - api/eval/index.md
+          - Saving adversarial examples: api/eval/eval-save-image.md
           - api/eval/eval-metric.md
           - api/eval/eval-dataset.md
           - api/eval/eval-runner.md

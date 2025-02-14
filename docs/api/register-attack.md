@@ -5,7 +5,7 @@ status: new
 # Register attack
 
 !!! tip "New in 1.4.0"
-    The `register_attack()` decorator was introduced in [v1.4.0](https://github.com/spencerwooo/torchattack/releases/tag/v1.4.0).
+    The `register_attack()` decorator was first introduced in [v1.4.0](https://github.com/spencerwooo/torchattack/releases/tag/v1.4.0).
 
 `register_attack()` is a decorator that registers an attack to the attack registry. This allows external attacks to be recognized by `create_attack()`.
 

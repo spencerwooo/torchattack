@@ -73,9 +73,7 @@ def run_attack(
 
     # Setup victim models if provided
     if victim_model_names:
-        victims = [
-            AttackModel.from_pretrained(n).to(device) for n in victim_model_names
-        ]
+        victims = [AttackModel.from_pretrained(vn) for vn in victim_model_names]
         victim_frms = [FoolingRateMetric() for _ in victim_model_names]
 
     # Run attack over the dataset (100 images by default)
@@ -92,21 +90,17 @@ def run_attack(
 
         # Save one batch of adversarial examples if requested
         if _i == save_adv_batch:
-            import torchvision as tv
+            from torchattack.eval import save_image_batch
 
-            # make grids as square as possible
-            nrow = int(advs.size(0) ** 0.5)
-
-            # save adversarial examples
-            saved_imgs = advs.detach().cpu().mul(255).to(torch.uint8)
-            img_grid = tv.utils.make_grid(saved_imgs, nrow=nrow)
-            tv.io.write_png(img_grid, f'adv_grid_{save_adv_batch}.png')
+            save_image_batch(advs, f'outputs_{attacker.attack_name}_b{_i}')
 
         # Track transfer fooling rates if victim models are provided
         if victim_model_names:
-            for _, (vmodel, vfrm) in enumerate(zip(victims, victim_frms)):
-                v_cln_outs = vmodel(vmodel.normalize(x))
-                v_adv_outs = vmodel(vmodel.normalize(advs))
+            for _, (v, vfrm) in enumerate(zip(victims, victim_frms)):
+                v.to(device)
+                vtransform = v.create_relative_transform(model)
+                v_cln_outs = v(v.normalize(vtransform(x)))
+                v_adv_outs = v(v.normalize(vtransform(advs)))
                 vfrm.update(y, v_cln_outs, v_adv_outs)
 
     # Print results
@@ -114,10 +108,10 @@ def run_attack(
     print(f'Surrogate ({model_name}): {cln_acc=:.2%}, {adv_acc=:.2%} ({fr=:.2%})')
 
     if victim_model_names:
-        for vmodel, vfrm in zip(victims, victim_frms):
+        for v, vfrm in zip(victims, victim_frms):
             vcln_acc, vadv_acc, vfr = vfrm.compute()
             print(
-                f'Victim ({vmodel.model_name}): cln_acc={vcln_acc:.2%}, '
+                f'Victim ({v.model_name}): cln_acc={vcln_acc:.2%}, '
                 f'adv_acc={vadv_acc:.2%} (fr={vfr:.2%})'
             )
 

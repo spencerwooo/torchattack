@@ -1,5 +1,5 @@
 import csv
-from typing import Any, Callable
+from typing import Callable
 
 import torch
 from PIL import Image
@@ -69,7 +69,7 @@ class NIPSDataset(Dataset):
     def __len__(self) -> int:
         return len(self.labels)
 
-    def __getitem__(self, index: int) -> tuple[Any, int, str]:
+    def __getitem__(self, index: int) -> tuple[Image.Image | torch.Tensor, int, str]:
         name = self.names[index]
         label = int(self.labels[index]) - 1
 
@@ -84,7 +84,7 @@ class NIPSLoader(DataLoader):
     """A custom dataloader for the NIPS 2017 dataset.
 
     Args:
-        root: Path to the root folder containing the images and CSV file.
+        root: Path to the root folder containing the images and CSV file. Defaults to None.
         image_root: Path to the folder containing the images. Defaults to None.
         pairs_path: Path to the csv file containing the image names and labels. Defaults to None.
         transform: An optional transform to apply to the images. Defaults to None.
@@ -102,8 +102,9 @@ class NIPSLoader(DataLoader):
         >>> from torchattack.eval import NIPSLoader
         >>> transform = transforms.Compose([transforms.Resize([224]), transforms.ToTensor()])
         >>> dataloader = NIPSLoader(
-        >>>     path="data/nips2017", transform=transform, batch_size=16, max_samples=100
+        >>>     root="data/nips2017", transform=transform, batch_size=16, max_samples=100
         >>> )
+        >>> x, y, fname = next(iter(dataloader))
         ```
 
         You can specify a custom image root directory and CSV file location by
@@ -113,7 +114,7 @@ class NIPSLoader(DataLoader):
 
     def __init__(
         self,
-        root: str | None,
+        root: str | None = None,
         image_root: str | None = None,
         pairs_path: str | None = None,
         transform: Callable[[torch.Tensor | Image.Image], torch.Tensor] | None = None,
@@ -122,9 +123,12 @@ class NIPSLoader(DataLoader):
         num_workers: int = 4,
         shuffle: bool = False,
     ):
+        assert root is not None or (
+            image_root is not None and pairs_path is not None
+        ), 'Either `root` or both `image_root` and `pairs_path` must be specified'
+
         # Specifing a custom image root directory is useful when evaluating
         # transferability on a generated adversarial examples folder
-
         super().__init__(
             dataset=NIPSDataset(
                 image_root=image_root if image_root else f'{root}/images',

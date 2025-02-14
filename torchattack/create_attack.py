@@ -27,7 +27,7 @@ def create_attack(
         kwargs: Additional config parameters for the attack. Defaults to None.
 
     Returns:
-        Attack: An instance of the specified attack.
+        An instance of the specified attack.
 
     Raises:
         ValueError: If the specified attack name is not supported within torchattack.
