@@ -1,3 +1,18 @@
+#!/usr/bin/env python
+r"""CLI tool for evaluating adversarial attack transferability.
+
+Evaluates the effectiveness of attacks against a surrogate model and optionally 
+measures transfer rates to victim models. Supports all built-in attacks from
+`torchattack` against `torchvision.models` and `timm` models.
+
+Example CLI usage:
+    ```console
+    $ python -m torchattack.eval.runner --attack PGD --eps 16/255 \
+        --model-name resnet18 --victim-model-names vgg11 densenet121 \
+        --dataset-root datasets/nips2017 --max-samples 200
+    ```
+"""
+
 from typing import Type
 
 from torchattack.attack import Attack
@@ -22,23 +37,16 @@ def run_attack(
         >>> run_attack(attack=FGSM, attack_args=args)
         ```
 
-    Note:
-        For generative attacks, the model_name argument that defines the white-box
-        surrogate model is not required. You can, however, manually provide a model name
-        to load according to your designated weight for the generator, to recreate a
-        white-box evaluation scenario, such as using VGG-19 (`model_name='vgg19'`) for
-        BIA's VGG-19 generator weight (`BIAWeights.VGG19`).
-
     Args:
-        attack: The attack class to initialize, either by name or class instance.
-        attack_args: A dict of keyword arguments passed to the attack class.
-        model_name: The surrogate model to attack. Defaults to "resnet50".
-        victim_model_names: A list of the victim black-box models to attack. Defaults to None.
-        dataset_root: Root directory of the dataset. Defaults to "datasets/nips2017".
-        max_samples: Max number of samples to attack. Defaults to 100.
-        batch_size: Batch size for the dataloader. Defaults to 16.
-        save_adv_batch: Save one batch of adversarial examples to visualize (as a grid).
-            If lower than 0, do not save anything. Defaults to -1.
+        attack: The name of the attack to run.
+        attack_args: A dict of keyword arguments to pass to the attack. Defaults to None.
+        model_name: The name of the white-box surrogate model to attack. Defaults to "resnet50".
+        victim_model_names: The names of the black-box victim models to attack. Defaults to None.
+        dataset_root: Root directory of the NIPS2017 dataset. Defaults to "datasets/nips2017".
+        max_samples: Max number of samples used for the evaluation. Defaults to 100.
+        batch_size: Batch size for the dataloader. Defaults to 4.
+        save_adv_batch: Batch index for optionally saving a batch of adversarial examples
+            to visualize. Set to -1 to disable. Defaults to -1.
     """
 
     import torch
@@ -110,26 +118,23 @@ def run_attack(
     if victim_model_names:
         for v, vfrm in zip(victims, victim_frms):
             vcln_acc, vadv_acc, vfr = vfrm.compute()
-            print(
-                f'Victim ({v.model_name}): cln_acc={vcln_acc:.2%}, '
-                f'adv_acc={vadv_acc:.2%} (fr={vfr:.2%})'
-            )
+            print(f'Victim ({v.model_name}): cln_acc={vcln_acc:.2%}, adv_acc={vadv_acc:.2%} (fr={vfr:.2%})')
 
 
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description='Run an attack on a model.')
-    parser.add_argument('--attack', type=str, required=True)
-    parser.add_argument('--eps', type=str, default=None)
-    parser.add_argument('--weights', type=str, default=None)
-    parser.add_argument('--checkpoint-path', type=str, default=None)
-    parser.add_argument('--model-name', type=str, default='resnet50')
-    parser.add_argument('--victim-model-names', type=str, nargs='+', default=None)
-    parser.add_argument('--dataset-root', type=str, default='datasets/nips2017')
-    parser.add_argument('--max-samples', type=int, default=None)
-    parser.add_argument('--batch-size', type=int, default=4)
-    parser.add_argument('--save-adv-batch', type=int, default=-1)
+    parser = argparse.ArgumentParser(description='CLI tool for evaluating adversarial attack transferability.')
+    parser.add_argument('--attack', type=str, required=True, help='The name of the attack to run.')
+    parser.add_argument('--eps', type=str, default=None, help='The epsilon value for the attack. Do not pass for non-epsilon attacks.')
+    parser.add_argument('--weights', type=str, default=None, help='Name of the generator weight. Do not pass for non-generative attacks.')
+    parser.add_argument('--checkpoint-path', type=str, default=None, help='Path to the checkpoint file for the generator. Do not pass for non-generative attacks.')
+    parser.add_argument('--model-name', type=str, default='resnet50', help='The name of the white-box surrogate model to attack.')
+    parser.add_argument('--victim-model-names', type=str, nargs='+', default=None, help='The names of the black-box victim models to attack.')
+    parser.add_argument('--dataset-root', type=str, default='datasets/nips2017', help='Root directory of the NIPS2017 dataset.')
+    parser.add_argument('--max-samples', type=int, default=None, help='Max number of samples used for the evaluation.')
+    parser.add_argument('--batch-size', type=int, default=4, help='Batch size for the dataloader.')
+    parser.add_argument('--save-adv-batch', type=int, default=-1, help='Batch index for optionally saving a batch of adversarial examples to visualize. Set to -1 to disable.')
     args = parser.parse_args()
 
     attack_args: dict[str, str | int | None] = {}

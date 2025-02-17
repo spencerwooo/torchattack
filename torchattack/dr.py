@@ -19,14 +19,14 @@ class DR(Attack):
         model: The model to attack.
         normalize: A transform to normalize images.
         device: Device to use for tensors. Defaults to cuda if available.
-        model_name: The name of the model to attack. Defaults to ''.
+        model_name: The name of the model to attack. Defaults to "".
         eps: The maximum perturbation. Defaults to 8/255.
         steps: Number of steps. Defaults to 100.
         alpha: Step size, `eps / steps` if None. Defaults to None.
         decay: Decay factor for the momentum term. Defaults to 1.0.
         feature_layer_name: Module layer name of the model to extract features from and
             apply dispersion reduction to. If not provided, tries to infer from built-in
-            config based on `model_name`. Defaults to ''.
+            config based on `model_name`. Defaults to "".
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
     """
@@ -44,12 +44,12 @@ class DR(Attack):
         model: nn.Module | AttackModel,
         normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
         device: torch.device | None = None,
-        model_name: str = '',
+        model_name: str | None = None,
         eps: float = 8 / 255,
         steps: int = 100,
         alpha: float | None = None,
         decay: float = 1.0,
-        feature_layer_name: str = '',
+        feature_layer_name: str | None = None,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:

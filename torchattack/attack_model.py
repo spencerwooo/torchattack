@@ -76,6 +76,23 @@ class TvTransform(nn.Module):
 
 @dataclass
 class AttackModelMeta:  # type: ignore[no-any-unimported]
+    """AttackModelMeta class for handling image preprocessing parameters.
+
+    Note:
+        This class is used internally to resolve the image preprocessing parameters
+        from pretrained models in `timm` and `torchvision.models` automatically.
+
+    Attributes:
+        resize_size: The size to resize images to before cropping.
+        crop_size: The final size of the image after cropping.
+        interpolation: Resize interpolation. Defaults to `InterpolationMode.BILINEAR`.
+        antialias: Whether to use antialiasing when resizing images. Defaults to True.
+        mean: Mean values for image normalization across RGB channels. Defaults to
+            ImageNet means (0.485, 0.456, 0.406).
+        std: Standard deviation values for image normalization across RGB channels.
+            Defaults to ImageNet standard deviations (0.229, 0.224, 0.225).
+    """
+
     resize_size: int
     crop_size: int
     interpolation: f.InterpolationMode = f.InterpolationMode.BILINEAR  # type: ignore[no-any-unimported]

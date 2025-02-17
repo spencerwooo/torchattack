@@ -17,7 +17,7 @@ def save_image_batch(
         imgs: The batch of images to save.
         save_dir: The directory to save the images (parent folder).
         filenames: The names of the images without their extensions. Defaults to None.
-        extension: The extension of the images to save as. One of 'png', 'jpeg'. Defaults to 'png'.
+        extension: The extension of the images to save as. One of 'png', 'jpeg'. Defaults to "png".
         kwargs: Additional keyword arguments to pass to the image save function. Defaults to None.
     """
 
