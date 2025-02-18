@@ -125,6 +125,6 @@ class SSP(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.eval import run_attack
+    from torchattack.evaluate import run_attack
 
     run_attack(SSP, attack_args={'eps': 16 / 255, 'ssp_layer': 16})

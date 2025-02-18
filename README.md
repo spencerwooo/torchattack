@@ -83,7 +83,7 @@ attack_args = {'steps': 10, 'decay': 1.0}
 attack = create_attack('MIFGSM', model, normalize, device, eps=0.03, **attack_args)
 ```
 
-Check out [examples/](examples/mifgsm_transfer.py) and [`torchattack.eval.runner`](torchattack/eval/runner.py) for full examples.
+Check out [examples/](examples/mifgsm_transfer.py) and [`torchattack.evaluate.runner`](torchattack/evaluate/runner.py) for full examples.
 
 ## Attacks
 

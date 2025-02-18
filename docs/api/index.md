@@ -6,4 +6,4 @@ torchattack provides, besides [the attacks](../attacks/index.md) themselves, a s
 - [Register attack](register-attack.md)
 - [Create attack](create-attack.md)
 - [Attack model wrapper](attack-model.md)
-- [Evaluation module](eval/index.md)
+- [Evaluation module](evaluate/index.md)

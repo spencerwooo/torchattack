@@ -194,6 +194,6 @@ class PNAPatchOut(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.eval import run_attack
+    from torchattack.evaluate import run_attack
 
     run_attack(PNAPatchOut, model_name='timm/vit_base_patch16_224')

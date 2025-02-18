@@ -157,7 +157,7 @@ class FIA(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.eval import run_attack
+    from torchattack.evaluate import run_attack
 
     run_attack(
         FIA,

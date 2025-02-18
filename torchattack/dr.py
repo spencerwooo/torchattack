@@ -135,6 +135,6 @@ class DR(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.eval.runner import run_attack
+    from torchattack.evaluate.runner import run_attack
 
     run_attack(DR, model_name='vgg16', victim_model_names=['resnet18'])

@@ -3,7 +3,7 @@ import pytest
 import torch
 from PIL import Image
 
-from torchattack.eval import save_image_batch
+from torchattack.evaluate import save_image_batch
 
 
 @pytest.fixture()

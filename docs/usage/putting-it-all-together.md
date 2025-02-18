@@ -30,7 +30,7 @@ Black-box (inception_v3): 92.60% -> 75.80% (FR: 18.14%)
 
 ## Attack Runner
 
-torchattack provides a simple command line runner at `torchattack.eval.runner`, and the function [`run_attack`][torchattack.eval.run_attack], to evaluate the transferability of attacks. The runner itself also acts as a full example to demonstrate how researchers like us can use torchattack to create and evaluate adversarial transferability.
+torchattack provides a simple command line runner at `torchattack.evaluate.runner`, and the function [`run_attack`][torchattack.evaluate.run_attack], to evaluate the transferability of attacks. The runner itself also acts as a full example to demonstrate how researchers like us can use torchattack to create and evaluate adversarial transferability.
 
 An exhaustive example :octicons-arrow-right-24: run the [`PGD`](../attacks/pgd.md) attack,
 
@@ -41,7 +41,7 @@ An exhaustive example :octicons-arrow-right-24: run the [`PGD`](../attacks/pgd.m
 - with a maximum of 200 samples and a batch size of 4,
 
 ```console
-$ python -m torchattack.eval.runner \
+$ python -m torchattack.evaluate.runner \
     --attack PGD \
     --eps 16/255 \
     --model-name resnet18 \

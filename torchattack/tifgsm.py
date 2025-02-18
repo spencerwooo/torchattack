@@ -141,6 +141,6 @@ class TIFGSM(Attack):
 
 
 if __name__ == '__main__':
-    from torchattack.eval import run_attack
+    from torchattack.evaluate import run_attack
 
     run_attack(TIFGSM, {'eps': 8 / 255, 'steps': 10, 'kern_len': 15, 'n_sig': 3})
