@@ -102,6 +102,8 @@ class AttackModelMeta:  # type: ignore[no-any-unimported]
 
     @classmethod
     def from_timm_pretrained_cfg(cls, cfg: dict) -> Self:
+        from timm.data.transforms import str_to_interp_mode
+
         # Reference:
         # create_transform::https://github.com/huggingface/pytorch-image-models/blob/a49b02/timm/data/transforms_factory.py#L334
         # transforms_imagenet_eval::https://github.com/huggingface/pytorch-image-models/blob/a49b02/timm/data/transforms_factory.py#L247
@@ -114,7 +116,7 @@ class AttackModelMeta:  # type: ignore[no-any-unimported]
         return cls(
             resize_size=resize_size,
             crop_size=crop_size,
-            interpolation=cfg['interpolation'],
+            interpolation=str_to_interp_mode(cfg['interpolation']),
             mean=cfg['mean'],
             std=cfg['std'],
         )
