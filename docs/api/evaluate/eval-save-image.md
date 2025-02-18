@@ -16,4 +16,4 @@ As a rule of thumb, we recommend saving images as PNGs, as they better keep the 
 
 A commonly used perturbation magnitude is $\varepsilon = 8 / 255$, for reference.
 
-::: torchattack.eval.save_image_batch
+::: torchattack.evaluate.save_image_batch

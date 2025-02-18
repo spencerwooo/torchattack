@@ -20,11 +20,11 @@ nav:
       - api/create-attack.md
       - api/attack-model.md
       - Eval:
-          - api/eval/index.md
-          - Saving adversarial examples: api/eval/eval-save-image.md
-          - api/eval/eval-metric.md
-          - api/eval/eval-dataset.md
-          - api/eval/eval-runner.md
+          - api/evaluate/index.md
+          - Saving adversarial examples: api/evaluate/eval-save-image.md
+          - api/evaluate/eval-metric.md
+          - api/evaluate/eval-dataset.md
+          - api/evaluate/eval-runner.md
   - development.md
 theme:
   name: material

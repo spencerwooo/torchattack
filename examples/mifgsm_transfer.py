@@ -2,7 +2,7 @@ import torch
 from rich.progress import track
 
 from torchattack import MIFGSM, AttackModel
-from torchattack.eval import FoolingRateMetric, NIPSLoader, save_image_batch
+from torchattack.evaluate import FoolingRateMetric, NIPSLoader, save_image_batch
 
 bs = 16
 eps = 8 / 255

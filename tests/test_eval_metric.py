@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from torchattack.eval import FoolingRateMetric
+from torchattack.evaluate import FoolingRateMetric
 
 
 @pytest.fixture()

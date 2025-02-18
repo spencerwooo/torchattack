@@ -6,7 +6,7 @@ To run an attack on actual images, we would normally use a dataloader, just like
 
 One of the most common datasets used in evaluating adversarial transferability is the [NIPS 2017 Adversarial Learning challenges](https://www.kaggle.com/datasets/google-brain/nips-2017-adversarial-learning-development-set) dataset. The dataset contains 1000 images from the ImageNet validation set and is widely used in current state-of-the-art transferable adversarial attack research.
 
-torchattack provides the [`NIPSLoader`][torchattack.eval.NIPSLoader] to load this dataset.
+torchattack provides the [`NIPSLoader`][torchattack.evaluate.NIPSLoader] to load this dataset.
 
 Provided that we have downloaded the dataset under `datasets/nips2017` with the following file structure.
 
@@ -28,7 +28,7 @@ We can load the dataset like so.
 ```python hl_lines="3 9"
 import torch
 from torchattack import AttackModel, FGSM
-from torchattack.eval import NIPSLoader
+from torchattack.evaluate import NIPSLoader
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = AttackModel.from_pretrained(model_name='resnet50').to(device)
@@ -52,7 +52,7 @@ dataloader = track(dataloader, description='Evaluating attack')
 
 ## Running the attack
 
-When iterated over, the [`NIPSLoader`][torchattack.eval.NIPSLoader] returns a tuple of `(x, y, fname)`, where
+When iterated over, the [`NIPSLoader`][torchattack.evaluate.NIPSLoader] returns a tuple of `(x, y, fname)`, where
 
 - `x` is the batch of images,
 - `y` is the batch of labels,
@@ -70,10 +70,10 @@ for x, y, fname in dataloader:
 
 How would we know if the attack was successful?
 
-We can evaluate the attack's **==fooling rate==**, by comparing the model's accuracy on clean samples and their associated adversarial examples. Fortunately, torchattack also provides a [`FoolingRateMetric`][torchattack.eval.FoolingRateMetric] tracker to do just that.
+We can evaluate the attack's **==fooling rate==**, by comparing the model's accuracy on clean samples and their associated adversarial examples. Fortunately, torchattack also provides a [`FoolingRateMetric`][torchattack.evaluate.FoolingRateMetric] tracker to do just that.
 
 ```python hl_lines="3 8-11"
-from torchattack.eval import FoolingRateMetric
+from torchattack.evaluate import FoolingRateMetric
 
 frm = FoolingRateMetric()
 for x, y, fname in dataloader:
