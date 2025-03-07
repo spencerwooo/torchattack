@@ -32,7 +32,7 @@ from torchattack import create_attack, AttackModel
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = AttackModel.from_pretrained('resnet50').to(device)
-attacker = create_attack('MyNewAttack', model=model, normalize=model.normalize, device=device)
+adversary = create_attack('MyNewAttack', model=model, normalize=model.normalize, device=device)
 ```
 
 ::: torchattack.register_attack

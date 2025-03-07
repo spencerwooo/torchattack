@@ -59,6 +59,7 @@ def run_attack(
 
     if attack_args is None:
         attack_args = {}
+    is_targeted = attack_args.get('targeted', False)
 
     # Setup model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -71,25 +72,30 @@ def run_attack(
         batch_size=batch_size,
         transform=transform,
         max_samples=max_samples,
+        return_target_label=is_targeted,
     )
     dataloader = track(dataloader, description='Attacking')  # type: ignore
 
     # Set up attack and trackers
-    frm = FoolingRateMetric()
-    attacker = create_attack(attack, model, normalize, device, **attack_args)
-    print(attacker)
+    frm = FoolingRateMetric(is_targeted)
+    adversary = create_attack(attack, model, normalize, device, **attack_args)
+    print(adversary)
 
     # Setup victim models if provided
     if victim_model_names:
         victims = [AttackModel.from_pretrained(vn) for vn in victim_model_names]
-        victim_frms = [FoolingRateMetric() for _ in victim_model_names]
+        victim_frms = [FoolingRateMetric(is_targeted) for _ in victim_model_names]
 
-    # Run attack over the dataset (100 images by default)
-    for _i, (x, y, _) in enumerate(dataloader):
-        x, y = x.to(device), y.to(device)
+    # Run attack over the dataset
+    for i, (x, y, _) in enumerate(dataloader):
+        if is_targeted:
+            yl, yt = y  # Unpack target labels from `y` if the attack is targeted
+            x, y = x.to(device), (yl.to(device), yt.to(device))
+        else:
+            x, y = x.to(device), y.to(device)
 
-        # Adversarial images are created here
-        advs = attacker(x, y)
+        # Create adversarial examples. Pass target labels if the attack is targeted
+        advs = adversary(x, y[1]) if is_targeted else adversary(x, y)
 
         # Track accuracy
         cln_outs = model(normalize(x))
@@ -97,10 +103,10 @@ def run_attack(
         frm.update(y, cln_outs, adv_outs)
 
         # Save one batch of adversarial examples if requested
-        if _i == save_adv_batch:
+        if i == save_adv_batch:
             from torchattack.evaluate import save_image_batch
 
-            save_image_batch(advs, f'outputs_{attacker.attack_name}_b{_i}')
+            save_image_batch(advs, f'outputs_{adversary.attack_name}_b{i}')
 
         # Track transfer fooling rates if victim models are provided
         if victim_model_names:
@@ -119,72 +125,29 @@ def run_attack(
         for v, vfrm in zip(victims, victim_frms):
             vcln_acc, vadv_acc, vfr = vfrm.compute()
             print(
-                f'Victim ({v.model_name}): cln_acc={vcln_acc:.2%}, adv_acc={vadv_acc:.2%} (fr={vfr:.2%})'
+                f'Victim ({v.model_name}): cln_acc={vcln_acc:.2%}, '
+                f'adv_acc={vadv_acc:.2%} (fr={vfr:.2%})'
             )
 
 
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description='CLI tool for evaluating adversarial attack transferability.'
-    )
-    parser.add_argument(
-        '--attack', type=str, required=True, help='The name of the attack to run.'
-    )
-    parser.add_argument(
-        '--eps',
-        type=str,
-        default=None,
-        help='The epsilon value for the attack. Do not pass for non-epsilon attacks.',
-    )
-    parser.add_argument(
-        '--weights',
-        type=str,
-        default=None,
-        help='Name of the generator weight. Do not pass for non-generative attacks.',
-    )
-    parser.add_argument(
-        '--checkpoint-path',
-        type=str,
-        default=None,
-        help='Path to the checkpoint file for the generator. Do not pass for non-generative attacks.',
-    )
-    parser.add_argument(
-        '--model-name',
-        type=str,
-        default='resnet50',
-        help='The name of the white-box surrogate model to attack.',
-    )
-    parser.add_argument(
-        '--victim-model-names',
-        type=str,
-        nargs='+',
-        default=None,
-        help='The names of the black-box victim models to attack.',
-    )
-    parser.add_argument(
-        '--dataset-root',
-        type=str,
-        default='datasets/nips2017',
-        help='Root directory of the NIPS2017 dataset.',
-    )
-    parser.add_argument(
-        '--max-samples',
-        type=int,
-        default=None,
-        help='Max number of samples used for the evaluation.',
-    )
-    parser.add_argument(
-        '--batch-size', type=int, default=4, help='Batch size for the dataloader.'
-    )
-    parser.add_argument(
-        '--save-adv-batch',
-        type=int,
-        default=-1,
-        help='Batch index for optionally saving a batch of adversarial examples to visualize. Set to -1 to disable.',
-    )
+    # fmt: off
+    parser = argparse.ArgumentParser(description='CLI tool for evaluating adversarial attack transferability.')
+    parser.add_argument('--attack', type=str, required=True, help='The name of the attack to run.')
+    parser.add_argument('--eps', type=str, default=None, help='The epsilon value for the attack. Do not pass for non-epsilon attacks.')
+    parser.add_argument('--weights', type=str, default=None, help='Name of the generator weight. Do not pass for non-generative attacks.')
+    parser.add_argument('--checkpoint-path', type=str, default=None, help='Path to the checkpoint file for the generator. Do not pass for non-generative attacks.')
+    parser.add_argument('--targeted', action='store_true', help='Whether the attack is targeted.')
+    parser.add_argument('--model-name', type=str, default='resnet50', help='The name of the white-box surrogate model to attack.')
+    parser.add_argument('--victim-model-names', type=str, nargs='+', default=None, help='The names of the black-box victim models to attack.')
+    parser.add_argument('--dataset-root', type=str, default='datasets/nips2017', help='Root directory of the NIPS2017 dataset.')
+    parser.add_argument('--max-samples', type=int, default=None, help='Max number of samples used for the evaluation.')
+    parser.add_argument('--batch-size', type=int, default=4, help='Batch size for the dataloader.')
+    parser.add_argument('--save-adv-batch', type=int, default=-1, help='Batch index for optionally saving a batch of adversarial examples to visualize. Set to -1 to disable.')
     args = parser.parse_args()
+    # fmt: on
 
     attack_args: dict[str, str | int | None] = {}
     if args.eps:
@@ -194,6 +157,8 @@ if __name__ == '__main__':
         attack_args['weights'] = args.weights
     if args.checkpoint_path:
         attack_args['checkpoint_path'] = args.checkpoint_path
+    if args.targeted:
+        attack_args['targeted'] = args.targeted
 
     run_attack(
         attack=args.attack,
