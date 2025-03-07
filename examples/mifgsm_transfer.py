@@ -18,12 +18,12 @@ frm = FoolingRateMetric()
 dataloader = NIPSLoader(root, transform=model.transform, batch_size=bs)
 
 # Initialize the attacker MI-FGSM
-attacker = MIFGSM(model, model.normalize, device, eps)
+adversary = MIFGSM(model, model.normalize, device, eps)
 
 # Attack loop and save generated adversarial examples
 for x, y, fnames in track(dataloader, description=f'Evaluating white-box {model_name}'):
     x, y = x.to(device), y.to(device)
-    x_adv = attacker(x, y)
+    x_adv = adversary(x, y)
 
     # Track fooling rate
     x_outs = model(model.normalize(x))

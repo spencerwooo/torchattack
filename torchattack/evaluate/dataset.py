@@ -1,4 +1,5 @@
 import csv
+import os
 from typing import Callable
 
 import torch
@@ -15,9 +16,10 @@ class NIPSDataset(Dataset):
     def __init__(
         self,
         image_root: str,
-        pairs_path: str,
+        image_csv: str,
         transform: Callable[[torch.Tensor | Image.Image], torch.Tensor] | None = None,
         max_samples: int | None = None,
+        return_target_label: bool = False,
     ) -> None:
         """Initialize the NIPS 2017 Adversarial Learning Challenge dataset.
 
@@ -26,7 +28,7 @@ class NIPSDataset(Dataset):
         ```
         data/nips2017/
         ├── images/            <-- image_root
-        ├── images.csv         <-- pairs_path
+        ├── images.csv         <-- image_csv
         └── categories.csv
         ```
 
@@ -36,7 +38,7 @@ class NIPSDataset(Dataset):
 
         Args:
             image_root: Path to the folder containing the images.
-            pairs_path: Path to the csv file containing the image names and labels.
+            image_csv: Path to the csv file containing the image names and labels.
             transform: An optional transform to apply to the images. Defaults to None.
             max_samples: Maximum number of samples to load. Defaults to None.
         """
@@ -44,40 +46,73 @@ class NIPSDataset(Dataset):
         super().__init__()
 
         self.image_root = image_root
-        self.pairs_path = pairs_path
+        self.image_csv = image_csv
         self.transform = transform
+        self.return_target_label = return_target_label
 
-        image_name, image_label = [], []
+        # Load data from CSV file
+        self.names, self.labels, self.target_labels = self._load_metadata(max_samples)
 
-        with open(self.pairs_path) as pairs_csv:
+    def _load_metadata(
+        self, max_samples: int | None = None
+    ) -> tuple[list[str], list[str], list[str]]:
+        """Load image filenames and labels (ground truth + target labels) from the CSV.
+
+        Args:
+            max_samples: Maximum number of samples to load. Defaults to None.
+
+        Returns:
+            Tuple of (filenames, class_labels, target_labels)
+        """
+
+        names, labels, target_labels = [], [], []
+
+        with open(self.image_csv) as pairs_csv:
             reader = csv.reader(pairs_csv)
+            next(reader)  # Skip header row
 
-            # Skip header
-            _ = next(reader)
+            for i, row in enumerate(reader):
+                if max_samples is not None and i >= max_samples:
+                    break  # Limit dataset size if requested
+                names.append(row[0])
+                labels.append(row[6])
+                target_labels.append(row[7])
 
-            for r in reader:
-                image_name.append(r[0])
-                image_label.append(r[6])
-
-        if max_samples is not None:
-            image_name = image_name[:max_samples]
-            image_label = image_label[:max_samples]
-
-        self.names = image_name
-        self.labels = image_label
+        return names, labels, target_labels
 
     def __len__(self) -> int:
         return len(self.labels)
 
-    def __getitem__(self, index: int) -> tuple[Image.Image | torch.Tensor, int, str]:
-        name = self.names[index]
-        label = int(self.labels[index]) - 1
+    def __getitem__(
+        self, index: int
+    ) -> (
+        tuple[torch.Tensor | Image.Image, int, str]
+        | tuple[torch.Tensor | Image.Image, tuple[int, int], str]
+    ):
+        """Get an item from the dataset by index.
 
-        pil_image = Image.open(f'{self.image_root}/{name}.png').convert('RGB')
-        # np_image = np.array(pil_image, dtype=np.uint8)
-        # image = torch.from_numpy(np_image).permute((2, 0, 1)).contiguous().float().div(255)
+        Args:
+            index: Index of the item to retrieve
+
+        Returns:
+            If return_target_label is False: (image, label, image_name)
+            If return_target_label is True: (image, (label, target_label), image_name)
+        """
+
+        # Get metadata for this sample
+        filename = self.names[index]
+        label = int(self.labels[index]) - 1  # Convert to 0-indexed
+
+        # Load and process the image
+        image_path = os.path.join(self.image_root, f'{filename}.png')
+        pil_image = Image.open(image_path).convert('RGB')
         image = self.transform(pil_image) if self.transform else pil_image
-        return image, label, name
+
+        if self.return_target_label:
+            target_label = int(self.target_labels[index]) - 1  # Convert to 0-indexed
+            return image, (label, target_label), filename
+        else:
+            return image, label, filename
 
 
 class NIPSLoader(DataLoader):
@@ -86,10 +121,11 @@ class NIPSLoader(DataLoader):
     Args:
         root: Path to the root folder containing the images and CSV file. Defaults to None.
         image_root: Path to the folder containing the images. Defaults to None.
-        pairs_path: Path to the csv file containing the image names and labels. Defaults to None.
+        image_csv: Path to the csv file containing the image names and labels. Defaults to None.
         transform: An optional transform to apply to the images. Defaults to None.
         batch_size: Batch size for the dataloader. Defaults to 1.
         max_samples: Maximum number of samples to load. Defaults to None.
+        return_target_label: Whether to return the target label in addition to the label. Defaults to False.
         num_workers: Number of workers for the dataloader. Defaults to 4.
         shuffle: Whether to shuffle the dataset. Defaults to False.
 
@@ -108,7 +144,7 @@ class NIPSLoader(DataLoader):
         ```
 
         You can specify a custom image root directory and CSV file location by
-        specifying `image_root` and `pairs_path`, which is usually used for evaluating
+        specifying `image_root` and `image_csv`, which is usually used for evaluating
         models on a generated adversarial examples directory.
     """
 
@@ -116,25 +152,27 @@ class NIPSLoader(DataLoader):
         self,
         root: str | None = None,
         image_root: str | None = None,
-        pairs_path: str | None = None,
+        image_csv: str | None = None,
         transform: Callable[[torch.Tensor | Image.Image], torch.Tensor] | None = None,
         batch_size: int = 1,
         max_samples: int | None = None,
+        return_target_label: bool = False,
         num_workers: int = 4,
         shuffle: bool = False,
     ):
-        assert root is not None or (
-            image_root is not None and pairs_path is not None
-        ), 'Either `root` or both `image_root` and `pairs_path` must be specified'
+        assert root is not None or (image_root is not None and image_csv is not None), (
+            'Either `root` or both `image_root` and `image_csv` must be specified'
+        )
 
         # Specifing a custom image root directory is useful when evaluating
         # transferability on a generated adversarial examples folder
         super().__init__(
             dataset=NIPSDataset(
-                image_root=image_root if image_root else f'{root}/images',
-                pairs_path=pairs_path if pairs_path else f'{root}/images.csv',
+                image_root=image_root if image_root else os.path.join(root, 'images'),  # type: ignore
+                image_csv=image_csv if image_csv else os.path.join(root, 'images.csv'),  # type: ignore
                 transform=transform,
                 max_samples=max_samples,
+                return_target_label=return_target_label,
             ),
             batch_size=batch_size,
             shuffle=shuffle,

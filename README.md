@@ -61,10 +61,10 @@ Initialize an attack by importing its attack class.
 from torchattack import FGSM, MIFGSM
 
 # Initialize an attack
-attack = FGSM(model, normalize, device)
+adversary = FGSM(model, normalize, device)
 
 # Initialize an attack with extra params
-attack = MIFGSM(model, normalize, device, eps=0.03, steps=10, decay=1.0)
+adversary = MIFGSM(model, normalize, device, eps=0.03, steps=10, decay=1.0)
 ```
 
 Initialize an attack by its name with `create_attack()`.
@@ -73,14 +73,14 @@ Initialize an attack by its name with `create_attack()`.
 from torchattack import create_attack
 
 # Initialize FGSM attack with create_attack
-attack = create_attack('FGSM', model, normalize, device)
+adversary = create_attack('FGSM', model, normalize, device)
 
 # Initialize PGD attack with specific eps with create_attack
-attack = create_attack('PGD', model, normalize, device, eps=0.03)
+adversary = create_attack('PGD', model, normalize, device, eps=0.03)
 
 # Initialize MI-FGSM attack with extra args with create_attack
 attack_args = {'steps': 10, 'decay': 1.0}
-attack = create_attack('MIFGSM', model, normalize, device, eps=0.03, **attack_args)
+adversary = create_attack('MIFGSM', model, normalize, device, eps=0.03, **attack_args)
 ```
 
 Check out [examples/](examples/mifgsm_transfer.py) and [`torchattack.evaluate.runner`](torchattack/evaluate/runner.py) for full examples.
