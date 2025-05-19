@@ -26,6 +26,15 @@ class BFA(Attack):
         decay: Decay factor for the momentum term. Defaults to 1.0.
         eta: The mask gradient's perturbation size. Defaults to 28.
         num_ens: Number of aggregate gradients. Defaults to 30.
+        feature_layer_name: Name of the feature layer to attack. Defaults to None.
+            Some common feature layers used:
+                * inception_v3: `Mixed_5b`
+                * resnet50: `layer2.3` (this is not present in the original paper)
+                * resnet152: `layer2.7`
+                * vgg16: `features.15`
+                * inception_v4: `features.9`
+                * inception_resnet_v2: `conv2d_4a`
+        num_classes: Number of classes. Defaults to 1000.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
         targeted: Targeted attack if True. Defaults to False.
@@ -42,7 +51,7 @@ class BFA(Attack):
         decay: float = 1.0,
         eta: int = 28,
         num_ens: int = 30,
-        feature_layer_name: str = 'layer2.7',
+        feature_layer_name: str = 'layer2.3',
         num_classes: int = 1000,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
@@ -64,7 +73,6 @@ class BFA(Attack):
 
         self.feature_maps = torch.empty(0)  # Init feature maps placeholder
         self.feature_layer_name = feature_layer_name
-        self.feature_module = rgetattr(self.model, feature_layer_name)
 
         self.register_hook()
 
@@ -72,7 +80,8 @@ class BFA(Attack):
         def hook_fn(m: nn.Module, i: torch.Tensor, o: torch.Tensor) -> None:
             self.feature_maps = o
 
-        self.feature_module.register_forward_hook(hook_fn)
+        self.feature_mod = rgetattr(self.model, self.feature_layer_name)
+        self.feature_mod.register_forward_hook(hook_fn)
 
     def get_maskgrad(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         x.requires_grad = True

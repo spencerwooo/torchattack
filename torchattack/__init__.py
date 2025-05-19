@@ -2,6 +2,7 @@ from torchattack.admix import Admix
 from torchattack.att import ATT
 from torchattack.attack import ATTACK_REGISTRY, Attack, register_attack
 from torchattack.attack_model import AttackModel
+from torchattack.bfa import BFA
 from torchattack.bia import BIA
 from torchattack.bsr import BSR
 from torchattack.cda import CDA
@@ -47,6 +48,7 @@ __all__ = [
     # All supported attacks
     'Admix',
     'ATT',
+    'BFA',
     'BIA',
     'BSR',
     'CDA',
