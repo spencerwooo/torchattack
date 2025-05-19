@@ -55,7 +55,7 @@ def run_attack(
 
     from torchattack import AttackModel, create_attack
     from torchattack.evaluate.dataset import NIPSLoader
-    from torchattack.evaluate.metric import FoolingRateMetric
+    from torchattack.evaluate.meter import FoolingRateMeter
 
     if attack_args is None:
         attack_args = {}
@@ -77,14 +77,14 @@ def run_attack(
     dataloader = track(dataloader, description='Attacking')  # type: ignore
 
     # Set up attack and trackers
-    frm = FoolingRateMetric(is_targeted)
+    frm = FoolingRateMeter(is_targeted)
     adversary = create_attack(attack, model, normalize, device, **attack_args)
     print(adversary)
 
     # Setup victim models if provided
     if victim_model_names:
         victims = [AttackModel.from_pretrained(vn) for vn in victim_model_names]
-        victim_frms = [FoolingRateMetric(is_targeted) for _ in victim_model_names]
+        victim_frms = [FoolingRateMeter(is_targeted) for _ in victim_model_names]
 
     # Run attack over the dataset
     for i, (x, y, _) in enumerate(dataloader):

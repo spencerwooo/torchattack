@@ -2,7 +2,7 @@ import torch
 from rich.progress import track
 
 from torchattack import MIFGSM, AttackModel
-from torchattack.evaluate import FoolingRateMetric, NIPSLoader, save_image_batch
+from torchattack.evaluate import FoolingRateMeter, NIPSLoader, save_image_batch
 
 bs = 16
 eps = 8 / 255
@@ -14,7 +14,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Initialize the white-box model, fooling rate metric, and dataloader
 model = AttackModel.from_pretrained(model_name).to(device)
-frm = FoolingRateMetric()
+frm = FoolingRateMeter()
 dataloader = NIPSLoader(root, transform=model.transform, batch_size=bs)
 
 # Initialize the attacker MI-FGSM
@@ -41,7 +41,7 @@ print(f'White-box ({model_name}): {cln_acc:.2%} -> {adv_acc:.2%} (FR: {fr:.2%})'
 for vname in victim_names:
     # Initialize the black-box model, fooling rate metric, and dataloader
     vmodel = AttackModel.from_pretrained(model_name=vname).to(device)
-    vfrm = FoolingRateMetric()
+    vfrm = FoolingRateMeter()
 
     # Create relative transform (relative to the white-box model) to avoid degrading the
     # effectiveness of adversarial examples through image transformations

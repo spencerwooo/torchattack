@@ -21,7 +21,6 @@ class BSR(Attack):
         The BSR attack requires the `torchvision` package as it uses
         `torchvision.transforms` for image transformations.
 
-
     Args:
         model: The model to attack.
         normalize: A transform to normalize images.

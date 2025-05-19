@@ -1,7 +1,7 @@
 import torch
 
 
-class FoolingRateMetric:
+class FoolingRateMeter:
     """Fooling rate metric tracker.
 
     Attributes:

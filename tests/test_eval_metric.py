@@ -1,12 +1,12 @@
 import pytest
 import torch
 
-from torchattack.evaluate import FoolingRateMetric
+from torchattack.evaluate import FoolingRateMeter
 
 
 @pytest.fixture()
 def metric():
-    return FoolingRateMetric()
+    return FoolingRateMeter()
 
 
 @pytest.fixture()

@@ -1,3 +1,3 @@
 # Fooling rate metric
 
-::: torchattack.evaluate.metric
+::: torchattack.evaluate.meter

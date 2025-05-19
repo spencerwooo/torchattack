@@ -70,12 +70,12 @@ for x, y, fname in dataloader:
 
 How would we know if the attack was successful?
 
-We can evaluate the attack's **==fooling rate==**, by comparing the model's accuracy on clean samples and their associated adversarial examples. Fortunately, torchattack also provides a [`FoolingRateMetric`][torchattack.evaluate.FoolingRateMetric] tracker to do just that.
+We can evaluate the attack's **==fooling rate==**, by comparing the model's accuracy on clean samples and their associated adversarial examples. Fortunately, torchattack also provides a [`FoolingRateMeter`][torchattack.evaluate.FoolingRateMeter] tracker to do just that.
 
 ```python hl_lines="3 8-11"
-from torchattack.evaluate import FoolingRateMetric
+from torchattack.evaluate import FoolingRateMeter
 
-frm = FoolingRateMetric()
+frm = FoolingRateMeter()
 for x, y, fname in dataloader:
     x, y = x.to(device), y.to(device)
     x_adv = attack(x, y)
