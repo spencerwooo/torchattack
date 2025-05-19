@@ -158,6 +158,12 @@
       <td><img src="https://img.shields.io/badge/NeurIPS-2024-654287?labelColor=2D3339" alt="NeurIPS 2024"></td>
       <td><a href="https://openreview.net/forum?id=sNz7tptCH6">Boosting the Transferability of Adversarial Attack on Vision Transformer with Adaptive Token Tuning</a></td>
     </tr>
+    <tr>
+      <td><a href="./bfa">BFA</a></td>
+      <td><code>BFA</code></td>
+      <td><img src="https://img.shields.io/badge/Neurocomputing-cfb225" alt="Neurocomputing' 2024"></td>
+      <td><a href="https://www.sciencedirect.com/science/article/pii/S0925231224006349">Improving the transferability of adversarial examples through black-box feature attacks</a></td>
+    </tr>
     <!-- Generative attacks -->
     <tr>
       <th colspan="4">Generative attacks</th>
