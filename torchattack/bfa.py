@@ -62,7 +62,7 @@ class BFA(Attack):
         self.targeted = targeted
         self.lossfn = nn.CrossEntropyLoss()
 
-        self.feature_maps = None  # Init feature maps placeholder
+        self.feature_maps = torch.empty(0)  # Init feature maps placeholder
         self.feature_layer_name = feature_layer_name
         self.feature_module = rgetattr(self.model, feature_layer_name)
 
