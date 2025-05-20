@@ -99,12 +99,8 @@ class DR(Attack):
         # Perform PGD
         for _ in range(self.steps):
             # Compute loss
-            self.model(self.normalize(x + delta))
-
-            if self.features is None:
-                continue
-
-            loss = -1 * self.features.std()
+            _ = self.model(self.normalize(x + delta))
+            loss = -self.features.std()
 
             # Compute gradient
             loss.backward()
