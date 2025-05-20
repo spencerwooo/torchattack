@@ -155,7 +155,7 @@ class MuMoDIG(Attack):
                 random_rotate,
             ]
             choice = torch.randint(len(transforms), (1,)).item()
-            return transforms[choice](img)
+            return transforms[int(choice)](img)
 
         def random_resize_and_pad(img: torch.Tensor, dim: int = 245) -> torch.Tensor:
             """
@@ -168,21 +168,24 @@ class MuMoDIG(Attack):
                 img, size=(target, target), mode='bilinear', align_corners=False
             )
 
-            pad_total = dim - target
-            pad_top = torch.randint(0, pad_total, (1,)).item()  # type: ignore[arg-type]
-            pad_bottom = pad_total - pad_top
-            pad_left = torch.randint(0, pad_total, (1,)).item()  # type: ignore[arg-type]
-            pad_right = pad_total - pad_left
+            pad_total = int(dim - target)
+            pad_top = int(torch.randint(0, pad_total, (1,)).item())
+            pad_bottom = int(pad_total - pad_top)
+            pad_left = int(torch.randint(0, pad_total, (1,)).item())
+            pad_right = int(pad_total - pad_left)
 
-            padded = f.pad(resized, [pad_left, pad_right, pad_top, pad_bottom], value=0)  # type: ignore[list-item]
-            return f.interpolate(
+            padded: torch.Tensor = f.pad(
+                resized, [pad_left, pad_right, pad_top, pad_bottom], value=0
+            )
+            padded = f.interpolate(
                 padded, size=(orig, orig), mode='bilinear', align_corners=False
             )
+            return padded
 
         # Choose one augmentation at random
         transforms = [random_affine, random_resize_and_pad]
         idx = torch.randint(len(transforms), (1,)).item()
-        aug_x: torch.Tensor = transforms[idx](x)
+        aug_x: torch.Tensor = transforms[int(idx)](x)  # type: ignore[operator]
         return aug_x
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
@@ -235,15 +238,7 @@ class LBQ(nn.Module):
     def get_params(
         self, x: torch.Tensor
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """
-        Compute per-channel min, max and number of splits.
-
-        Args:
-            x: Tensor of shape (C,H,W)
-
-        Returns:
-            min_val: (C,), max_val: (C,), counts: (C,) = region_num - 1 splits
-        """
+        """Compute per-channel min, max and number of splits."""
 
         c, _, _ = x.size()
         flat = x.view(c, -1)
@@ -265,7 +260,7 @@ class LBQ(nn.Module):
 
         # sample random percentiles for splits
         total_splits = counts.sum().item()
-        rand_perc = torch.rand(total_splits, device=x.device)
+        rand_perc = torch.rand(int(total_splits), device=x.device)
         splits = rand_perc.view(-1, self.region_num - 1)
 
         # compute split positions: in [min_val, max_val) per channel

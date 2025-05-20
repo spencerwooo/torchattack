@@ -36,7 +36,7 @@ from torchattack.vdc import VDC
 from torchattack.vmifgsm import VMIFGSM
 from torchattack.vnifgsm import VNIFGSM
 
-__version__ = '1.5.1'
+__version__ = '1.6.0'
 
 __all__ = [
     # Helper functions
