@@ -128,8 +128,8 @@ class GRA(Attack):
             avg_grad = self._get_avg_grad(x, y, delta)
 
             # Update similarity (relevance) weighted gradient
-            gradv = grad.view(grad.size(0), -1)
-            avg_gradv = avg_grad.view(avg_grad.size(0), -1)
+            gradv = grad.reshape(grad.size(0), -1)
+            avg_gradv = avg_grad.reshape(avg_grad.size(0), -1)
             s = torch.cosine_similarity(gradv, avg_gradv, dim=1).view(-1, 1, 1, 1)
             cur_grad = grad * s + avg_grad * (1 - s)
 
