@@ -22,21 +22,12 @@ def run_attack_test(attack_cls, device, model, x, y):
     [
         ac
         for ac in ATTACK_REGISTRY.values()
-        if (
-            (ac.is_category('COMMON') or ac.is_category('NON_EPS'))
-            and ac.attack_name != 'DR'
-        )
+        if (ac.is_category('COMMON') or ac.is_category('NON_EPS'))
     ],
 )
 def test_common_and_non_eps_attacks(attack_cls, device, resnet50_model, data):
     x, y = data(resnet50_model.transform)
     run_attack_test(attack_cls, device, resnet50_model, x, y)
-
-
-# DR attack requires a non-ResNet-50 model
-def test_dr_attack(device, vgg16_model, data):
-    x, y = data(vgg16_model.transform)
-    run_attack_test(torchattack.DR, device, vgg16_model, x, y)
 
 
 @pytest.mark.parametrize(

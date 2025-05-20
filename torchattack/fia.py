@@ -24,7 +24,7 @@ class FIA(Attack):
         alpha: Step size, `eps / steps` if None. Defaults to None.
         decay: Decay factor for the momentum term. Defaults to 1.0.
         num_ens: Number of aggregate gradients. Defaults to 30.
-        feature_layer_name: Layer to compute feature importance. Defaults to "layer4".
+        feature_layer_cfg: Layer to compute feature importance. Defaults to "layer4".
         drop_rate: Dropout rate for random pixels. Defaults to 0.3.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
@@ -40,7 +40,7 @@ class FIA(Attack):
         alpha: float | None = None,
         decay: float = 1.0,
         num_ens: int = 30,
-        feature_layer_name: str = 'layer4',
+        feature_layer_cfg: str = 'layer4',
         drop_rate: float = 0.3,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
@@ -56,8 +56,8 @@ class FIA(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
-        self.feature_layer_name = feature_layer_name
-        self.feature_module = rgetattr(self.model, feature_layer_name)
+        self.feature_layer_cfg = feature_layer_cfg
+        self.feature_module = rgetattr(self.model, feature_layer_cfg)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform FIA on a batch of images.
@@ -161,7 +161,7 @@ if __name__ == '__main__':
 
     run_attack(
         FIA,
-        attack_args={'feature_layer_name': 'layer2'},
+        attack_args={'feature_layer_cfg': 'layer2'},
         model_name='resnet50',
         victim_model_names=['resnet18', 'vgg13', 'densenet121'],
     )

@@ -24,7 +24,7 @@ class ILPD(Attack):
         alpha: Step size, `eps / steps` if None. Defaults to None.
         decay: Decay factor for the momentum term. Defaults to 1.0.
         sigma: Standard deviation for noise. Defaults to 0.05.
-        feature_layer_name: The layer to compute feature importance. Defaults to "layer2.3".
+        feature_layer_cfg: The layer to compute feature importance. Defaults to "layer2.3".
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
     """
@@ -40,7 +40,7 @@ class ILPD(Attack):
         decay: float = 1.0,
         sigma: float = 0.05,
         coef: float = 0.1,
-        feature_layer_name: str = 'layer2.3',
+        feature_layer_cfg: str = 'layer2.3',
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
@@ -56,8 +56,8 @@ class ILPD(Attack):
         self.clip_max = clip_max
         self.lossfn = nn.CrossEntropyLoss()
 
-        self.feature_layer_name = feature_layer_name
-        self.feature_module = rgetattr(self.model, feature_layer_name)
+        self.feature_layer_cfg = feature_layer_cfg
+        self.feature_module = rgetattr(self.model, feature_layer_cfg)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform ILPD on a batch of images.
@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
     run_attack(
         ILPD,
-        attack_args={'feature_layer_name': 'layer2.3'},
+        attack_args={'feature_layer_cfg': 'layer2.3'},
         model_name='resnet50',
         victim_model_names=['resnet18', 'vgg13', 'densenet121'],
     )

@@ -101,6 +101,8 @@ class Attack(ABC):
                 'model',
                 'normalize',
                 'feature_module',
+                'feature_maps',
+                'features',
                 'hooks',
                 'generator',
             ]:
@@ -121,6 +123,8 @@ class Attack(ABC):
             'normalize',
             'lossfn',
             'feature_module',  # FIA, ILPD, NAA
+            'feature_maps',
+            'features',
             'hooks',  # PNAPatchOut, TGR, VDC
             'sub_basis',  # GeoDA
             'generator',  # BIA, CDA, LTP

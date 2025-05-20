@@ -25,7 +25,7 @@ class NAA(Attack):
         decay: Decay factor for the momentum term. Defaults to 1.0.
         num_ens: Number of aggregate gradients (NAA use `N` in the original paper
             instead of `num_ens` in FIA). Defaults to 30.
-        feature_layer_name: The layer to compute feature importance. Defaults to "layer4".
+        feature_layer_cfg: The layer to compute feature importance. Defaults to "layer4".
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
     """
@@ -40,7 +40,7 @@ class NAA(Attack):
         alpha: float | None = None,
         decay: float = 1.0,
         num_ens: int = 30,
-        feature_layer_name: str = 'layer4',
+        feature_layer_cfg: str = 'layer4',
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
@@ -54,8 +54,8 @@ class NAA(Attack):
         self.clip_min = clip_min
         self.clip_max = clip_max
 
-        self.feature_layer_name = feature_layer_name
-        self.feature_module = rgetattr(self.model, feature_layer_name)
+        self.feature_layer_cfg = feature_layer_cfg
+        self.feature_module = rgetattr(self.model, feature_layer_cfg)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform NAA on a batch of images.
@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     run_attack(
         NAA,
-        attack_args={'feature_layer_name': 'layer2'},
+        attack_args={'feature_layer_cfg': 'layer2'},
         model_name='resnet50',
         victim_model_names=['resnet18', 'vgg13', 'densenet121'],
     )

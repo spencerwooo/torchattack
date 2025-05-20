@@ -1,16 +1,11 @@
 import pytest
 
-import torchattack
 from torchattack import ATTACK_REGISTRY, create_attack
 
 
 @pytest.mark.parametrize(
     ('attack_name', 'expected'),
-    [
-        (an, ac)
-        for an, ac in ATTACK_REGISTRY.items()
-        if ac.is_category('COMMON') and an != 'DR'
-    ],
+    [(an, ac) for an, ac in ATTACK_REGISTRY.items() if ac.is_category('COMMON')],
 )
 def test_create_non_vit_attack_same_as_imported(
     attack_name,
@@ -19,12 +14,6 @@ def test_create_non_vit_attack_same_as_imported(
 ):
     created_attacker = create_attack(attack_name, resnet50_model)
     expected_attacker = expected(resnet50_model)
-    assert created_attacker == expected_attacker
-
-
-def test_create_dr_attack_same_as_imported(vgg16_model):
-    created_attacker = create_attack('DR', vgg16_model)
-    expected_attacker = torchattack.DR(vgg16_model)
     assert created_attacker == expected_attacker
 
 

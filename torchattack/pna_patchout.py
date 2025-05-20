@@ -50,10 +50,6 @@ class PNAPatchOut(Attack):
         clip_max: float = 1.0,
         targeted: bool = False,
     ):
-        # Surrogate ViT for VDC must be `timm` models or models that have the same
-        # structure and same implementation/definition as `timm` models.
-        super().__init__(model, normalize, device)
-
         if hook_cfg:
             # Explicit config name takes precedence over inferred model.model_name
             self.hook_cfg = hook_cfg
@@ -61,6 +57,11 @@ class PNAPatchOut(Attack):
             # If model is initialized via `torchattack.AttackModel`, the model_name
             # is automatically attached to the model during instantiation.
             self.hook_cfg = model.model_name
+
+        # Surrogate ViT for VDC must be `timm` models or models that have the same
+        # structure and same implementation/definition as `timm` models. Note that we
+        # delay parent init to avoid overriding the model's `model_name` attribute
+        super().__init__(model, normalize, device)
 
         self.eps = eps
         self.steps = steps

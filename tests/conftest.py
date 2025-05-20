@@ -36,10 +36,5 @@ def resnet50_model() -> AttackModel:
 
 
 @pytest.fixture()
-def vgg16_model() -> AttackModel:
-    return AttackModel.from_pretrained('vgg16')
-
-
-@pytest.fixture()
 def vitb16_model() -> AttackModel:
     return AttackModel.from_pretrained('vit_base_patch16_224', from_timm=True)

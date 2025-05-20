@@ -26,19 +26,22 @@ class BFA(Attack):
         decay: Decay factor for the momentum term. Defaults to 1.0.
         eta: The mask gradient's perturbation size. Defaults to 28.
         num_ens: Number of aggregate gradients. Defaults to 30.
-        feature_layer_name: Name of the feature layer to attack. Defaults to None.
-            Some common feature layers used:
-                * inception_v3: `Mixed_5b`
-                * resnet50: `layer2.3` (this is not present in the original paper)
-                * resnet152: `layer2.7`
-                * vgg16: `features.15`
-                * inception_v4: `features.9`
-                * inception_resnet_v2: `conv2d_4a`
+        feature_layer_cfg: Name of the feature layer to attack. If not provided, tries
+            to infer from built-in config based on the model name. Defaults to ""
         num_classes: Number of classes. Defaults to 1000.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
         targeted: Targeted attack if True. Defaults to False.
     """
+
+    _builtin_cfgs = {
+        'inception_v3': 'Mixed_5b',
+        'resnet50': 'layer2.3',  # (not present in the paper)
+        'resnet152': 'layer2.7',
+        'vgg16': 'features.15',
+        'inception_v4': 'features.9',
+        'inception_resnet_v2': 'conv2d_4a',
+    }
 
     def __init__(
         self,
@@ -51,12 +54,18 @@ class BFA(Attack):
         decay: float = 1.0,
         eta: int = 28,
         num_ens: int = 30,
-        feature_layer_name: str = 'layer2.3',
+        feature_layer_cfg: str = '',
         num_classes: int = 1000,
         clip_min: float = 0.0,
         clip_max: float = 1.0,
         targeted: bool = False,
     ) -> None:
+        # If `feature_layer_cfg` is not provided, try to infer used feature layer from
+        # the `model_name` attribute (automatically attached during instantiation)
+        if not feature_layer_cfg and isinstance(model, AttackModel):
+            feature_layer_cfg = self._builtin_cfgs[model.model_name]
+
+        # Delay initialization to avoid overriding the model's `model_name` attribute
         super().__init__(model, normalize, device)
 
         self.eps = eps
@@ -71,17 +80,17 @@ class BFA(Attack):
         self.targeted = targeted
         self.lossfn = nn.CrossEntropyLoss()
 
-        self.feature_maps = torch.empty(0)  # Init feature maps placeholder
-        self.feature_layer_name = feature_layer_name
+        self.feature_maps = torch.empty(0)
+        self.feature_layer_cfg = feature_layer_cfg
 
-        self.register_hook()
+        self._register_hook()
 
-    def register_hook(self) -> None:
+    def _register_hook(self) -> None:
         def hook_fn(m: nn.Module, i: torch.Tensor, o: torch.Tensor) -> None:
             self.feature_maps = o
 
-        self.feature_mod = rgetattr(self.model, self.feature_layer_name)
-        self.feature_mod.register_forward_hook(hook_fn)
+        feature_mod = rgetattr(self.model, self.feature_layer_cfg)
+        feature_mod.register_forward_hook(hook_fn)
 
     def _get_maskgrad(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         x.requires_grad = True
