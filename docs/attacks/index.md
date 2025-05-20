@@ -129,6 +129,12 @@
       <td><a href="https://openaccess.thecvf.com/content/ICCV2023/html/Ma_Transferable_Adversarial_Attack_for_Both_Vision_Transformers_and_Convolutional_Networks_ICCV_2023_paper.html">Transferable Adversarial Attack for Both Vision Transformers and Convolutional Networks via Momentum Integrated Gradients</a></td>
     </tr>
     <tr>
+      <td><a href="./gra">GRA</a></td>
+      <td><code>GRA</code></td>
+      <td><img src="https://img.shields.io/badge/ICCV-2023-5A428D?labelColor=2D3339" alt="ICCV 2023"></td>
+      <td><a href="https://openaccess.thecvf.com/content/ICCV2023/html/Zhu_Boosting_Adversarial_Transferability_via_Gradient_Relevance_Attack_ICCV_2023_paper.html">Boosting Adversarial Transferability via Gradient Relevance Attack</a></td>
+    </tr>
+    <tr>
       <td><a href="./decowa">DeCoWA</a></td>
       <td><code>DeCoWA</code></td>
       <td><img src="https://img.shields.io/badge/AAAI-2024-C8172C?labelColor=2D3339" alt="AAAI 2024"></td>
