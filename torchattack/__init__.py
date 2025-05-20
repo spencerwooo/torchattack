@@ -15,6 +15,7 @@ from torchattack.fgsm import FGSM
 from torchattack.fia import FIA
 from torchattack.gama import GAMA
 from torchattack.geoda import GeoDA
+from torchattack.gra import GRA
 from torchattack.ilpd import ILPD
 from torchattack.l2t import L2T
 from torchattack.ltp import LTP
@@ -60,6 +61,7 @@ __all__ = [
     'FIA',
     'GAMA',
     'GeoDA',
+    'GRA',
     'ILPD',
     'L2T',
     'LTP',
