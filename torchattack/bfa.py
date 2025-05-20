@@ -83,7 +83,7 @@ class BFA(Attack):
         self.feature_mod = rgetattr(self.model, self.feature_layer_name)
         self.feature_mod.register_forward_hook(hook_fn)
 
-    def get_maskgrad(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    def _get_maskgrad(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         x.requires_grad = True
         outs = self.model(self.normalize(x))
         loss = self.lossfn(outs, y)
@@ -93,7 +93,7 @@ class BFA(Attack):
         mg /= torch.sum(torch.square(mg), dim=(1, 2, 3), keepdim=True).sqrt()
         return mg.detach()
 
-    def get_aggregate_grad(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    def _get_aggregate_grad(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         _ = self.model(self.normalize(x))
         x_masked = x.clone().detach()
         aggregate_grad = torch.zeros_like(self.feature_maps)
@@ -103,7 +103,7 @@ class BFA(Attack):
 
         # Get aggregate gradients over ensembles
         for _ in range(self.num_ens):
-            g = self.get_maskgrad(x_masked, y)
+            g = self._get_maskgrad(x_masked, y)
 
             # Get fitted image
             x_masked = x + self.eta * g
@@ -137,7 +137,7 @@ class BFA(Attack):
         if self.alpha is None:
             self.alpha = self.eps / self.steps
 
-        aggregate_grad = self.get_aggregate_grad(x, y)
+        aggregate_grad = self._get_aggregate_grad(x, y)
 
         # Perform BFA
         for _ in range(self.steps):
