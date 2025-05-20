@@ -25,10 +25,19 @@ class NAA(Attack):
         decay: Decay factor for the momentum term. Defaults to 1.0.
         num_ens: Number of aggregate gradients (NAA use `N` in the original paper
             instead of `num_ens` in FIA). Defaults to 30.
-        feature_layer_cfg: The layer to compute feature importance. Defaults to "layer4".
+        feature_layer_cfg: Name of the feature layer to attack. If not provided, tries
+            to infer from built-in config based on the model name. Defaults to ""
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
     """
+
+    _builtin_cfgs = {
+        'inception_v3': 'Mixed_5b',
+        'inception_v4': 'Mixed_5e',
+        'inception_resnet_v2': 'conv2d_4a',
+        'resnet50': 'layer2.3',  # ( not present in the paper)
+        'resnet152': 'layer2.7',
+    }
 
     def __init__(
         self,
@@ -40,10 +49,16 @@ class NAA(Attack):
         alpha: float | None = None,
         decay: float = 1.0,
         num_ens: int = 30,
-        feature_layer_cfg: str = 'layer4',
+        feature_layer_cfg: str = '',
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
+        # If `feature_layer_cfg` is not provided, try to infer used feature layer from
+        # the `model_name` attribute (automatically attached during instantiation)
+        if not feature_layer_cfg and isinstance(model, AttackModel):
+            feature_layer_cfg = self._builtin_cfgs[model.model_name]
+
+        # Delay initialization to avoid overriding the model's `model_name` attribute
         super().__init__(model, normalize, device)
 
         self.eps = eps

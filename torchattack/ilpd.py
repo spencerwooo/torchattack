@@ -24,10 +24,16 @@ class ILPD(Attack):
         alpha: Step size, `eps / steps` if None. Defaults to None.
         decay: Decay factor for the momentum term. Defaults to 1.0.
         sigma: Standard deviation for noise. Defaults to 0.05.
-        feature_layer_cfg: The layer to compute feature importance. Defaults to "layer2.3".
+        feature_layer_cfg: Name of the feature layer to attack. If not provided, tries
+            to infer from built-in config based on the model name. Defaults to ""
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
     """
+
+    _builtin_cfgs = {
+        'vgg19': 'features.27',
+        'resnet50': 'layer2.3',
+    }
 
     def __init__(
         self,
@@ -40,10 +46,16 @@ class ILPD(Attack):
         decay: float = 1.0,
         sigma: float = 0.05,
         coef: float = 0.1,
-        feature_layer_cfg: str = 'layer2.3',
+        feature_layer_cfg: str = '',
         clip_min: float = 0.0,
         clip_max: float = 1.0,
     ) -> None:
+        # If `feature_layer_cfg` is not provided, try to infer used feature layer from
+        # the `model_name` attribute (automatically attached during instantiation)
+        if not feature_layer_cfg and isinstance(model, AttackModel):
+            feature_layer_cfg = self._builtin_cfgs[model.model_name]
+
+        # Delay initialization to avoid overriding the model's `model_name` attribute
         super().__init__(model, normalize, device)
 
         self.eps = eps
