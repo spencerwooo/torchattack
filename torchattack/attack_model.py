@@ -132,6 +132,55 @@ class AttackModelMeta:  # type: ignore[no-any-unimported]
             std=cfg.std,
         )
 
+    @classmethod
+    def from_preprocessings(
+        cls,
+        transform: Callable[[Image.Image | torch.Tensor], torch.Tensor],
+        normalize: Callable[[torch.Tensor], torch.Tensor],
+    ) -> Self:
+        """
+        Create AttackModelMeta from transform and normalize functions. If transform or
+        normalize don't expose the expected attributes, return a default meta with zeros
+        and defaults for interpolation, etc.
+        """
+
+        # early return default meta if we can't inspect the args
+        if not (
+            hasattr(transform, 'transforms')
+            and hasattr(normalize, 'mean')
+            and hasattr(normalize, 'std')
+        ):
+            # resize_size and crop_size default to 0; other fields use their defaults
+            return cls(0, 0)
+
+        crop_size: int | None = None
+        resize_size: int | None = None
+        interpolation = cls.interpolation
+        antialias = cls.antialias
+
+        for tfs in transform.transforms:
+            if isinstance(tfs, t.CenterCrop):
+                cs = tfs.size
+                crop_size = cs[0] if isinstance(cs, (list, tuple)) else cs
+            elif isinstance(tfs, t.Resize):
+                rs = tfs.size
+                resize_size = rs[0] if isinstance(rs, (list, tuple)) else rs
+                interpolation = tfs.interpolation
+                antialias = tfs.antialias
+
+        # Fallback if transform lacked one of the required ops
+        if crop_size is None or resize_size is None:
+            return cls(0, 0)
+
+        return cls(
+            resize_size,
+            crop_size,
+            interpolation=interpolation,
+            antialias=antialias,
+            mean=tuple(normalize.mean),
+            std=tuple(normalize.std),
+        )
+
 
 class AttackModel:
     """A wrapper class for a pretrained model used for adversarial attacks.
@@ -145,7 +194,8 @@ class AttackModel:
         model: The pretrained model itself.
         transform: The transformation function applied to input images.
         normalize: The normalization function applied to input images.
-        meta: Model metadata, including crop and resize size, interpolation, etc.
+        meta: Model transform meta info. If not provided, will be inferred from
+            `transform` and `normalize` functions. Defaults to None.
 
     Example:
         ```pycon
@@ -170,13 +220,13 @@ class AttackModel:
         model: nn.Module,
         transform: Callable[[Image.Image | torch.Tensor], torch.Tensor],
         normalize: Callable[[torch.Tensor], torch.Tensor],
-        meta: AttackModelMeta,
+        meta: AttackModelMeta | None = None,
     ) -> None:
         self.model_name = model_name
         self.model = model
         self.transform = transform
         self.normalize = normalize
-        self.meta = meta
+        self.meta = meta or AttackModelMeta.from_preprocessings(transform, normalize)
 
     @classmethod
     def from_pretrained(
