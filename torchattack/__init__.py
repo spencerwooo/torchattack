@@ -21,6 +21,7 @@ from torchattack.l2t import L2T
 from torchattack.ltp import LTP
 from torchattack.mifgsm import MIFGSM
 from torchattack.mig import MIG
+from torchattack.mumodig import MuMoDIG
 from torchattack.naa import NAA
 from torchattack.nifgsm import NIFGSM
 from torchattack.pgd import PGD
@@ -67,6 +68,7 @@ __all__ = [
     'LTP',
     'MIFGSM',
     'MIG',
+    'MuMoDIG',
     'NAA',
     'NIFGSM',
     'PGD',
