@@ -257,6 +257,12 @@ Check out [examples/](examples/mifgsm_transfer.py) and [`torchattack.evaluate.ru
       <td><img src="https://img.shields.io/badge/Neurocomputing-cfb225" alt="Neurocomputing' 2024"></td>
       <td><a href="https://www.sciencedirect.com/science/article/pii/S0925231224006349">Improving the transferability of adversarial examples through black-box feature attacks</a></td>
     </tr>
+    <tr>
+      <td>MuMoDIG</td>
+      <td><code>MuMoDIG</code></td>
+      <td><img src="https://img.shields.io/badge/AAAI-2025-C8172C?labelColor=2D3339" alt="AAAI 2025"></td>
+      <td><a href="https://www.arxiv.org/abs/2412.18844">Improving Integrated Gradient-based Transferable Adversarial Examples by Refining the Integration Path</a></td>
+    </tr>
     <!-- Generative attacks -->
     <tr>
       <th colspan="4">Generative attacks</th>
