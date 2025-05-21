@@ -8,6 +8,11 @@ import torch.nn.functional as f
 from torchattack.attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
 
+try:
+    import kornia.augmentation as k
+except ImportError as e:
+    raise ImportError('`kornia` is required to run attack "MuMoDIG".') from e
+
 
 @register_attack()
 class MuMoDIG(Attack):
@@ -141,8 +146,6 @@ class MuMoDIG(Attack):
                 return img.flip(dims=(3,))
 
             def random_rotate(img: torch.Tensor) -> torch.Tensor:
-                import kornia.augmentation as k
-
                 rot = k.RandomRotation(degrees=45, p=1.0)
                 rot_img: torch.Tensor = rot(img)
                 return rot_img
