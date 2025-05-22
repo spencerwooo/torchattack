@@ -10,7 +10,7 @@ from torchattack.attack_model import AttackModel
 
 @register_attack()
 class SGM(Attack):
-    """The SGM (Momentum Iterative FGSM) attack.
+    """The SGM (Skip Gradient Method) attack.
 
     > From the paper: [Skip Connections Matter: On the Transferability of Adversarial
     Examples Generated with ResNets](https://arxiv.org/abs/2002.05990).

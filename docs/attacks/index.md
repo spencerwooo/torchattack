@@ -63,6 +63,13 @@
       <td><a href="https://arxiv.org/abs/1908.06281">Nesterov Accelerated Gradient and Scale Invariance for Adversarial Attacks</a></td>
     </tr>
     <tr>
+      <td><a href="./sgm">SGM</a></td>
+      <td><code>SGM</code></td>
+      <td><img src="https://img.shields.io/badge/ICLR-2020-62B959?labelColor=2D3339" alt="ICLR 2020"></td>
+      <td><a href="https://arxiv.org/abs/2002.05990">Skip Connections Matter: On the Transferability of Adversarial Examples Generated with ResNets</a></td>
+    </tr>
+    <tr>
+    <tr>
       <td><a href="./dr">DR</a></td>
       <td><code>DR</code></td>
       <td><img src="https://img.shields.io/badge/CVPR-2020-1A407F?labelColor=2D3339" alt="CVPR 2020"></td>
