@@ -130,6 +130,12 @@
       <td><a href="https://arxiv.org/abs/2304.13410">Improving Adversarial Transferability via Intermediate-level Perturbation Decay</a></td>
     </tr>
     <tr>
+      <td><a href="./bpa">BPA</a></td>
+      <td><code>BPA</code></td>
+      <td><img src="https://img.shields.io/badge/NeurIPS-2023-654287?labelColor=2D3339" alt="NeurIPS 2023"></td>
+      <td><a href="https://arxiv.org/abs/2306.12685">Rethinking the Backward Propagation for Adversarial Transferability</a></td>
+    </tr>
+    <tr>
       <td><a href="./mig">MIG</a></td>
       <td><code>MIG</code></td>
       <td><img src="https://img.shields.io/badge/ICCV-2023-5A428D?labelColor=2D3339" alt="ICCV 2023"></td>

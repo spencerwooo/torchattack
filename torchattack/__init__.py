@@ -4,6 +4,7 @@ from torchattack.attack import ATTACK_REGISTRY, Attack, register_attack
 from torchattack.attack_model import AttackModel
 from torchattack.bfa import BFA
 from torchattack.bia import BIA
+from torchattack.bpa import BPA
 from torchattack.bsr import BSR
 from torchattack.cda import CDA
 from torchattack.create_attack import create_attack
@@ -53,6 +54,7 @@ __all__ = [
     'ATT',
     'BFA',
     'BIA',
+    'BPA',
     'BSR',
     'CDA',
     'DeCoWA',
