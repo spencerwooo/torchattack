@@ -214,6 +214,12 @@ We provide a detailed list of all supported attacks below.
       <td><a href="https://arxiv.org/abs/2102.00436">Admix: Enhancing the Transferability of Adversarial Attacks</a></td>
     </tr>
     <tr>
+      <td><a href="https://docs.swo.moe/torchattack/attacks/ssa">SSA</a></td>
+      <td><code>SSA</code></td>
+      <td><img src="https://img.shields.io/badge/ECCV-2022-E16B4C?labelColor=2D3339" alt="ECCV 2022"></td>
+      <td><a href="https://arxiv.org/abs/2207.05382">Frequency Domain Model Augmentation for Adversarial Attack</a></td>
+    </tr>
+    <tr>
       <td><a href="https://docs.swo.moe/torchattack/attacks/decowa">DeCoWA</a></td>
       <td><code>DeCoWA</code></td>
       <td><img src="https://img.shields.io/badge/AAAI-2024-C8172C?labelColor=2D3339" alt="AAAI 2024"></td>
@@ -252,12 +258,6 @@ We provide a detailed list of all supported attacks below.
       <td><code>NAA</code></td>
       <td><img src="https://img.shields.io/badge/CVPR-2022-1A407F?labelColor=2D3339" alt="CVPR 2022"></td>
       <td><a href="https://arxiv.org/abs/2204.00008">Improving Adversarial Transferability via Neuron Attribution-Based Attacks</a></td>
-    </tr>
-    <tr>
-      <td><a href="https://docs.swo.moe/torchattack/attacks/ssa">SSA</a></td>
-      <td><code>SSA</code></td>
-      <td><img src="https://img.shields.io/badge/ECCV-2022-E16B4C?labelColor=2D3339" alt="ECCV 2022"></td>
-      <td><a href="https://arxiv.org/abs/2207.05382">Frequency Domain Model Augmentation for Adversarial Attack</a></td>
     </tr>
     <tr>
       <td><a href="https://docs.swo.moe/torchattack/attacks/ilpd">ILPD</a></td>
