@@ -71,7 +71,9 @@ class SGM(Attack):
         # Register hooks
         self._register_hooks()
 
-    def _register_hooks(self):
+    def _register_hooks(self) -> None:
+        """Register hooks to the model for SGM."""
+
         is_resnet = 'resnet' in self.hook_cfg
         is_densenet = 'densenet' in self.hook_cfg
 
@@ -162,6 +164,7 @@ class SGM(Attack):
         ) -> tuple[torch.Tensor, ...]:
             if isinstance(module, nn.ReLU):
                 return (gamma * grad_in[0],)
+            return grad_in
 
         return hook
 
