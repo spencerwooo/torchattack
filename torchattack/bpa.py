@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as f
 from torch.autograd import Function
+from torch.autograd.function import FunctionCtx
 
 from torchattack.attack import Attack, register_attack
 from torchattack.attack_model import AttackModel
@@ -69,17 +70,22 @@ class BPA(Attack):
         self._register_hooks()
 
     def _register_hooks(self) -> None:
-        """
-        Modify the model to use custom layers for BPA. Specifically, replaces the
-        maxpool and ReLU layers of ResNets with custom implementations.
-        """
-
+        # replace the model's `maxpool` layer with `MaxPool2dK3S2P1`
         self.model.maxpool = MaxPool2dK3S2P1()
-        for i in range(1, len(self.model.layer3)):
-            self.model.layer3[i].relu = ReLUSiLU()
 
-        for i in range(len(self.model.layer4)):
-            self.model.layer4[i].relu = ReLUSiLU()
+        # replaces the `relu` activation with `ReLUSiLU`
+        layer3 = getattr(self.model, 'layer3', None)
+        layer4 = getattr(self.model, 'layer4', None)
+
+        if isinstance(layer3, (nn.Sequential, list)):
+            for i in range(1, len(layer3)):
+                if hasattr(layer3[i], 'relu'):
+                    layer3[i].relu = ReLUSiLU()
+
+        if isinstance(layer4, (nn.Sequential, list)):
+            for i in range(len(layer4)):
+                if hasattr(layer4[i], 'relu'):
+                    layer4[i].relu = ReLUSiLU()
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Perform BPA on a batch of images.
@@ -135,16 +141,16 @@ class MaxPool2dK3S2P1Function(Function):
     temperature = 10.0
 
     @staticmethod
-    def forward(ctx, i):
+    def forward(ctx: FunctionCtx, i: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
             o = f.max_pool2d(i, 3, 2, 1)
         ctx.save_for_backward(i, o)
         return o.to(i.device)
 
     @staticmethod
-    def backward(ctx, grad_out):
+    def backward(ctx: FunctionCtx, grad_out: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
         with torch.no_grad():
-            i, o = ctx.saved_tensors
+            i, o = ctx.saved_tensors  # type: ignore[attr-defined]
             input_unfold = f.unfold(i, 3, padding=1, stride=2).reshape(
                 (
                     i.shape[0],
@@ -158,53 +164,59 @@ class MaxPool2dK3S2P1Function(Function):
                 MaxPool2dK3S2P1Function.temperature * input_unfold
             ).sum(dim=2, keepdim=True)
 
-            grad_output_unfold = grad_out.reshape(o.shape[0], o.shape[1], 1, -1)
-            grad_output_unfold = grad_output_unfold.repeat(1, 1, 9, 1)
-            grad_input_unfold = (
-                grad_output_unfold
+            grad_out_unfold = grad_out.reshape(o.shape[0], o.shape[1], 1, -1)
+            grad_out_unfold = grad_out_unfold.repeat(1, 1, 9, 1)
+            grad_in_unfold = (
+                grad_out_unfold
                 * torch.exp(MaxPool2dK3S2P1Function.temperature * input_unfold)
                 / output_unfold
             )
-            grad_input_unfold = grad_input_unfold.reshape(
+            grad_in_unfold = grad_in_unfold.reshape(
                 i.shape[0], -1, o.shape[2] * o.shape[3]
             )
-            grad_input = f.fold(grad_input_unfold, i.shape[2:], 3, padding=1, stride=2)
-            return grad_input.to(i.device)
+            grad_in: torch.Tensor = f.fold(
+                grad_in_unfold, i.shape[2:], 3, padding=1, stride=2
+            )
+            return grad_in.to(i.device)
 
 
 class MaxPool2dK3S2P1(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super(MaxPool2dK3S2P1, self).__init__()
 
-    def forward(self, input):
-        return MaxPool2dK3S2P1Function.apply(input)
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        output: torch.Tensor = MaxPool2dK3S2P1Function.apply(input)
+        return output
 
 
 class ReLUSiLUFunction(Function):
     temperature = 1.0
 
     @staticmethod
-    def forward(ctx, i):
+    def forward(ctx: FunctionCtx, i: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
             o = torch.relu(i)
         ctx.save_for_backward(i)
         return o.to(i.device)
 
     @staticmethod
-    def backward(ctx, grad_out):
-        (i,) = ctx.saved_tensors
+    def backward(ctx: FunctionCtx, grad_out: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
+        (i,) = ctx.saved_tensors  # type: ignore[attr-defined]
         with torch.no_grad():
-            grad_in = i * torch.sigmoid(i) * (1 - torch.sigmoid(i)) + torch.sigmoid(i)
+            grad_in: torch.Tensor = i * torch.sigmoid(i) * (
+                1 - torch.sigmoid(i)
+            ) + torch.sigmoid(i)
             grad_in = grad_in * grad_out * ReLUSiLUFunction.temperature
         return grad_in.to(i.device)
 
 
 class ReLUSiLU(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super(ReLUSiLU, self).__init__()
 
-    def forward(self, input):
-        return ReLUSiLUFunction.apply(input)
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        output: torch.Tensor = ReLUSiLUFunction.apply(input)
+        return output
 
 
 if __name__ == '__main__':
