@@ -25,7 +25,7 @@ from torchattack.mig import MIG
 from torchattack.mumodig import MuMoDIG
 from torchattack.naa import NAA
 from torchattack.nifgsm import NIFGSM
-from torchattack.pgd import PGD
+from torchattack.pgd import IFGSM, PGD
 from torchattack.pgdl2 import PGDL2
 from torchattack.pna_patchout import PNAPatchOut
 from torchattack.sgm import SGM
@@ -66,6 +66,7 @@ __all__ = [
     'GAMA',
     'GeoDA',
     'GRA',
+    'IFGSM',
     'ILPD',
     'L2T',
     'LTP',
