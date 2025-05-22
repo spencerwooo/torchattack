@@ -27,6 +27,7 @@ from torchattack.nifgsm import NIFGSM
 from torchattack.pgd import PGD
 from torchattack.pgdl2 import PGDL2
 from torchattack.pna_patchout import PNAPatchOut
+from torchattack.sgm import SGM
 from torchattack.sinifgsm import SINIFGSM
 from torchattack.ssa import SSA
 from torchattack.ssp import SSP
@@ -74,6 +75,7 @@ __all__ = [
     'PGD',
     'PGDL2',
     'PNAPatchOut',
+    'SGM',
     'SINIFGSM',
     'SSA',
     'SSP',
