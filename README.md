@@ -242,6 +242,12 @@ We provide a detailed list of all supported attacks below.
       <th colspan="4">Feature disruption</th>
     </tr>
     <tr>
+      <td><a href="https://docs.swo.moe/torchattack/attacks/fda">FDA</a></td>
+      <td><code>FDA</code></td>
+      <td><img src="https://img.shields.io/badge/ICCV-2019-5A428D?labelColor=2D3339" alt="ICCV 2019"></td>
+      <td><a href="https://arxiv.org/abs/1909.04385">FDA: Feature Disruptive Attack</a></td>
+    </tr>
+    <tr>
       <td><a href="https://docs.swo.moe/torchattack/attacks/dr">DR</a></td>
       <td><code>DR</code></td>
       <td><img src="https://img.shields.io/badge/CVPR-2020-1A407F?labelColor=2D3339" alt="CVPR 2020"></td>
