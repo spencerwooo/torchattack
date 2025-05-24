@@ -50,8 +50,8 @@ class FDA(Attack):
         self.clip_max = clip_max
 
         # Store intermediate features
-        self.features = {}
-        self.hooks = []
+        self.features: dict[str, torch.Tensor] = {}
+        self.hooks: list[torch.utils.hooks.RemovableHandle] = []
         self._register_hooks()
 
     def _register_hooks(self) -> None:
@@ -79,63 +79,6 @@ class FDA(Attack):
                 # Register hooks for pooling layers
                 hook = module.register_forward_hook(hook_fn(name))
                 self.hooks.append(hook)
-
-    def _get_fda_loss(self, batch_size: int) -> torch.Tensor:
-        """Compute FDA loss based on intermediate features.
-
-        Args:
-            batch_size: Size of the original batch (half of total since we concat orig + adv)
-
-        Returns:
-            FDA loss value
-        """
-        loss = torch.tensor(0.0, device=self.device, requires_grad=True)
-        num_layers = 0
-
-        for _, feats in self.features.items():
-            if feats.size(0) < batch_size * 2:
-                continue
-
-            # Split the concatenated batch
-            x_feats = feats[:batch_size]
-            adv_feats = feats[batch_size : batch_size * 2]
-
-            # Compute mean across spatial dimensions but keep channel dimension
-            if len(x_feats.shape) == 4:  # Conv features (B, C, H, W)
-                mean_features = torch.mean(x_feats, dim=(2, 3), keepdim=True)
-                mean_features = mean_features.expand_as(x_feats)
-            elif len(x_feats.shape) == 2:  # FC features (B, C)
-                mean_features = torch.mean(x_feats, dim=1, keepdim=True)
-                mean_features = mean_features.expand_as(x_feats)
-            else:
-                continue
-
-            # Create masks for features below and above mean
-            mask_below = (x_feats < mean_features).float()
-            mask_above = (x_feats >= mean_features).float()
-
-            # Compute weighted features
-            weighted_below = mask_below * adv_feats
-            weighted_above = mask_above * adv_feats
-
-            # Compute L2 norms
-            norm_below = torch.norm(weighted_below) / torch.sqrt(
-                torch.tensor(adv_feats.numel()).float()
-            )
-            norm_above = torch.norm(weighted_above) / torch.sqrt(
-                torch.tensor(adv_feats.numel()).float()
-            )
-
-            # Add epsilon to prevent log(0)
-            eps = 1e-8
-            layer_loss = torch.log(norm_below + eps) - torch.log(norm_above + eps)
-            loss = loss + layer_loss
-            num_layers += 1
-
-        if num_layers > 0:
-            loss = loss / num_layers
-
-        return loss
 
     def forward(self, x: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
         """Perform FDA on a batch of images.
@@ -200,6 +143,63 @@ class FDA(Attack):
             delta.grad.zero_()
 
         return x + delta
+
+    def _get_fda_loss(self, batch_size: int) -> torch.Tensor:
+        """Compute FDA loss based on intermediate features.
+
+        Args:
+            batch_size: Size of the original batch (half of total since we concat orig + adv)
+
+        Returns:
+            FDA loss value
+        """
+        loss = torch.tensor(0.0, device=self.device, requires_grad=True)
+        num_layers = 0
+
+        for _, feats in self.features.items():
+            if feats.size(0) < batch_size * 2:
+                continue
+
+            # Split the concatenated batch
+            x_feats = feats[:batch_size]
+            adv_feats = feats[batch_size : batch_size * 2]
+
+            # Compute mean across spatial dimensions but keep channel dimension
+            if len(x_feats.shape) == 4:  # Conv features (B, C, H, W)
+                mean_features = torch.mean(x_feats, dim=(2, 3), keepdim=True)
+                mean_features = mean_features.expand_as(x_feats)
+            elif len(x_feats.shape) == 2:  # FC features (B, C)
+                mean_features = torch.mean(x_feats, dim=1, keepdim=True)
+                mean_features = mean_features.expand_as(x_feats)
+            else:
+                continue
+
+            # Create masks for features below and above mean
+            mask_below = (x_feats < mean_features).float()
+            mask_above = (x_feats >= mean_features).float()
+
+            # Compute weighted features
+            weighted_below = mask_below * adv_feats
+            weighted_above = mask_above * adv_feats
+
+            # Compute L2 norms
+            norm_below = torch.norm(weighted_below) / torch.sqrt(
+                torch.tensor(adv_feats.numel()).float()
+            )
+            norm_above = torch.norm(weighted_above) / torch.sqrt(
+                torch.tensor(adv_feats.numel()).float()
+            )
+
+            # Add epsilon to prevent log(0)
+            eps = 1e-8
+            layer_loss = torch.log(norm_below + eps) - torch.log(norm_above + eps)
+            loss = loss + layer_loss
+            num_layers += 1
+
+        if num_layers > 0:
+            loss = loss / num_layers
+
+        return loss
 
     def __del__(self) -> None:
         """Clean up hooks when object is destroyed."""
