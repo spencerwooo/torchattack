@@ -12,6 +12,7 @@ from torchattack.decowa import DeCoWA
 from torchattack.deepfool import DeepFool
 from torchattack.difgsm import DIFGSM
 from torchattack.dr import DR
+from torchattack.fda import FDA
 from torchattack.fgsm import FGSM
 from torchattack.fia import FIA
 from torchattack.gama import GAMA
@@ -61,6 +62,7 @@ __all__ = [
     'DeepFool',
     'DIFGSM',
     'DR',
+    'FDA',
     'FGSM',
     'FIA',
     'GAMA',
