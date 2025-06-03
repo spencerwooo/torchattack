@@ -33,6 +33,11 @@ class ILPD(Attack):
     _builtin_cfgs = {
         'vgg19': 'features.27',
         'resnet50': 'layer2.3',
+        # below are configs not present in the paper
+        'inception_v3': 'Mixed_5b',
+        'resnet152': 'layer2.7',
+        'vgg16': 'features.15',
+        'inception_resnet_v2': 'conv2d_4a',
     }
 
     def __init__(
