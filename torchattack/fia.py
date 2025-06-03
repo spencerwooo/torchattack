@@ -105,7 +105,8 @@ class FIA(Attack):
             outs_dropped = self.model(self.normalize(x_dropped))
             outs_dropped = torch.softmax(outs_dropped, dim=1)
 
-            loss = sum(outs_dropped[bi][y[bi]] for bi in range(x.shape[0]))
+            loss = torch.stack([outs_dropped[bi][y[bi]] for bi in range(x.shape[0])])
+            loss = loss.sum()
             loss.backward()
 
             # Accumulate gradients

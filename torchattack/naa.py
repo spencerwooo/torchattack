@@ -105,7 +105,7 @@ class NAA(Attack):
             outs = self.model(self.normalize(xm))
             outs = torch.softmax(outs, 1)
 
-            loss = sum(outs[bi][y[bi]] for bi in range(x.shape[0]))
+            loss = torch.stack([outs[bi][y[bi]] for bi in range(x.shape[0])]).sum()
             loss.backward()
 
             # Accumulate gradients

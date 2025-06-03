@@ -148,7 +148,7 @@ class MaxPool2dK3S2P1Function(Function):
         return o.to(i.device)
 
     @staticmethod
-    def backward(ctx: FunctionCtx, grad_out: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
+    def backward(ctx: FunctionCtx, grad_out: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
             i, o = ctx.saved_tensors  # type: ignore[attr-defined]
             input_unfold = f.unfold(i, 3, padding=1, stride=2).reshape(
@@ -200,7 +200,7 @@ class ReLUSiLUFunction(Function):
         return o.to(i.device)
 
     @staticmethod
-    def backward(ctx: FunctionCtx, grad_out: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
+    def backward(ctx: FunctionCtx, grad_out: torch.Tensor) -> torch.Tensor:
         (i,) = ctx.saved_tensors  # type: ignore[attr-defined]
         with torch.no_grad():
             grad_in: torch.Tensor = i * torch.sigmoid(i) * (
