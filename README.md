@@ -272,6 +272,12 @@ We provide a detailed list of all supported attacks below.
       <td><a href="https://arxiv.org/abs/2304.13410">Improving Adversarial Transferability via Intermediate-level Perturbation Decay</a></td>
     </tr>
     <tr>
+      <td><a href="https://docs.swo.moe/torchattack/attacks/danaa">DANAA</a></td>
+      <td><code>DANAA</code></td>
+      <td><img src="https://img.shields.io/badge/ADMA-2023-005C00?labelColor=2D3339" alt="ADMA 2023"></td>
+      <td><a href="https://arxiv.org/abs/2310.10427">DANAA: Towards transferable attacks with double adversarial neuron attribution</a></td>
+    </tr>
+    <tr>
       <td><a href="https://docs.swo.moe/torchattack/attacks/bfa">BFA</a></td>
       <td><code>BFA</code></td>
       <td><img src="https://img.shields.io/badge/Neurocomputing-cfb225" alt="Neurocomputing' 2024"></td>
