@@ -144,12 +144,8 @@ class AttackModelMeta:  # type: ignore[no-any-unimported]
         and defaults for interpolation, etc.
         """
 
-        # early return default meta if we can't inspect the args
-        if not (
-            hasattr(transform, 'transforms')
-            and hasattr(normalize, 'mean')
-            and hasattr(normalize, 'std')
-        ):
+        # Early return default meta if we can't inspect the args
+        if not hasattr(transform, 'transforms'):
             # resize_size and crop_size default to 0; other fields use their defaults
             return cls(0, 0)
 
@@ -172,14 +168,11 @@ class AttackModelMeta:  # type: ignore[no-any-unimported]
         if crop_size is None or resize_size is None:
             return cls(0, 0)
 
-        return cls(
-            resize_size,
-            crop_size,
-            interpolation=interpolation,
-            antialias=antialias,
-            mean=tuple(normalize.mean),
-            std=tuple(normalize.std),
-        )
+        # Extract mean and std from normalize if available, else use defaults
+        mean = tuple(getattr(normalize, 'mean', (0.0, 0.0, 0.0)))
+        std = tuple(getattr(normalize, 'std', (1.0, 1.0, 1.0)))
+
+        return cls(resize_size, crop_size, interpolation, antialias, mean, std)
 
 
 class AttackModel:
