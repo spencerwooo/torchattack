@@ -8,6 +8,7 @@ from torchattack.bpa import BPA
 from torchattack.bsr import BSR
 from torchattack.cda import CDA
 from torchattack.create_attack import create_attack
+from torchattack.danaa import DANAA
 from torchattack.decowa import DeCoWA
 from torchattack.deepfool import DeepFool
 from torchattack.difgsm import DIFGSM
@@ -58,6 +59,7 @@ __all__ = [
     'BPA',
     'BSR',
     'CDA',
+    'DANAA',
     'DeCoWA',
     'DeepFool',
     'DIFGSM',
