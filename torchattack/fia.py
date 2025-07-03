@@ -96,7 +96,7 @@ class FIA(Attack):
         hb = self.feature_module.register_full_backward_hook(self._backward_hook)
 
         # Gradient aggregation on ensembles
-        agg_grad: torch.Tensor | float = 0.0
+        agg_grad = 0
         for _ in range(self.num_ens):
             # Create variants of input with randomly dropped pixels
             x_dropped = self.drop_pixels(x)
@@ -110,7 +110,7 @@ class FIA(Attack):
             loss.backward()
 
             # Accumulate gradients
-            agg_grad += self.mid_grad[0].detach()
+            agg_grad += self.mid_grad[0].detach()  # type: ignore
 
         # for batch_i in range(x.shape[0]):
         #     agg_grad[batch_i] /= agg_grad[batch_i].norm(p=2)

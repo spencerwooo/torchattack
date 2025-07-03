@@ -104,7 +104,7 @@ class DANAA(Attack):
         x_t = x.clone().detach().requires_grad_(True)
 
         # Gradient aggregation on ensembles
-        agg_grad: torch.Tensor | float = 0.0
+        agg_grad = 0
         for _ in range(self.num_ens):
             # Move along the non-linear path
             x_perturbed = x_t + torch.randn_like(x_t) * self.scale
@@ -122,11 +122,11 @@ class DANAA(Attack):
             x_t = x_t + self.lr * x_grad.sign()
 
             # Aggregate the gradients w.r.t. the intermediate features
-            agg_grad += self.mid_grad[0].detach()
+            agg_grad += self.mid_grad[0].detach()  # type: ignore[assignment]
 
         # Normalize the aggregated gradients
         agg_grad = -agg_grad / torch.sqrt(
-            torch.sum(agg_grad**2, dim=(1, 2, 3), keepdim=True)
+            torch.sum(agg_grad**2, dim=(1, 2, 3), keepdim=True)  # type: ignore[call-overload]
         )
         hb.remove()
 
