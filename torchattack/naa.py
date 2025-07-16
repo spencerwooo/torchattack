@@ -95,7 +95,7 @@ class NAA(Attack):
 
         # NAA's FIA-like gradient aggregation on ensembles
         # Aggregate gradients across multiple samples to estimate neuron importance
-        agg_grad: torch.Tensor | float = 0.0
+        agg_grad = 0
         for i in range(self.num_ens):
             # Create scaled variants of input
             xm = torch.zeros_like(x)
@@ -105,14 +105,14 @@ class NAA(Attack):
             outs = self.model(self.normalize(xm))
             outs = torch.softmax(outs, 1)
 
-            loss = sum(outs[bi][y[bi]] for bi in range(x.shape[0]))
+            loss = torch.stack([outs[bi][y[bi]] for bi in range(x.shape[0])]).sum()
             loss.backward()
 
             # Accumulate gradients
-            agg_grad += self.mid_grad[0].detach()
+            agg_grad += self.mid_grad[0].detach()  # type: ignore[assignment]
 
         # Average the gradients
-        agg_grad /= self.num_ens
+        agg_grad /= self.num_ens  # type: ignore[assignment]
         hb.remove()
 
         # Get initial feature map

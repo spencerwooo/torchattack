@@ -104,6 +104,40 @@ class PGD(Attack):
         return x + delta
 
 
+@register_attack()
+class IFGSM(PGD):
+    """Iterative Fast Gradient Sign Method (I-FGSM) attack.
+
+    > From the paper: [Adversarial Examples in the Physical
+    World](https://arxiv.org/abs/1607.02533).
+    """
+
+    def __init__(
+        self,
+        model: nn.Module | AttackModel,
+        normalize: Callable[[torch.Tensor], torch.Tensor] | None = None,
+        device: torch.device | None = None,
+        eps: float = 8 / 255,
+        steps: int = 10,
+        alpha: float | None = None,
+        clip_min: float = 0.0,
+        clip_max: float = 1.0,
+        targeted: bool = False,
+    ) -> None:
+        super().__init__(
+            model,
+            normalize,
+            device,
+            eps,
+            steps,
+            alpha,
+            random_start=False,  # key difference
+            clip_min=clip_min,
+            clip_max=clip_max,
+            targeted=targeted,
+        )
+
+
 if __name__ == '__main__':
     from torchattack.evaluate import run_attack
 

@@ -4,13 +4,16 @@ from torchattack.attack import ATTACK_REGISTRY, Attack, register_attack
 from torchattack.attack_model import AttackModel
 from torchattack.bfa import BFA
 from torchattack.bia import BIA
+from torchattack.bpa import BPA
 from torchattack.bsr import BSR
 from torchattack.cda import CDA
 from torchattack.create_attack import create_attack
+from torchattack.danaa import DANAA
 from torchattack.decowa import DeCoWA
 from torchattack.deepfool import DeepFool
 from torchattack.difgsm import DIFGSM
 from torchattack.dr import DR
+from torchattack.fda import FDA
 from torchattack.fgsm import FGSM
 from torchattack.fia import FIA
 from torchattack.gama import GAMA
@@ -24,9 +27,10 @@ from torchattack.mig import MIG
 from torchattack.mumodig import MuMoDIG
 from torchattack.naa import NAA
 from torchattack.nifgsm import NIFGSM
-from torchattack.pgd import PGD
+from torchattack.pgd import IFGSM, PGD
 from torchattack.pgdl2 import PGDL2
 from torchattack.pna_patchout import PNAPatchOut
+from torchattack.sgm import SGM
 from torchattack.sinifgsm import SINIFGSM
 from torchattack.ssa import SSA
 from torchattack.ssp import SSP
@@ -52,17 +56,21 @@ __all__ = [
     'ATT',
     'BFA',
     'BIA',
+    'BPA',
     'BSR',
     'CDA',
+    'DANAA',
     'DeCoWA',
     'DeepFool',
     'DIFGSM',
     'DR',
+    'FDA',
     'FGSM',
     'FIA',
     'GAMA',
     'GeoDA',
     'GRA',
+    'IFGSM',
     'ILPD',
     'L2T',
     'LTP',
@@ -74,6 +82,7 @@ __all__ = [
     'PGD',
     'PGDL2',
     'PNAPatchOut',
+    'SGM',
     'SINIFGSM',
     'SSA',
     'SSP',
