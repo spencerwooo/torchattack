@@ -36,7 +36,6 @@ class MuMoDIG(Attack):
         lambd: Weight for the quantization loss. Defaults to 0.65.
         clip_min: Minimum value for clipping. Defaults to 0.0.
         clip_max: Maximum value for clipping. Defaults to 1.0.
-        targeted: Targeted attack if True. Defaults to False.
     """
 
     def __init__(

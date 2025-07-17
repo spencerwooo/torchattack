@@ -1,28 +1,28 @@
 name: pypi-publish
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
+    release:
+        types: [published]
+    workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
+    deploy:
+        runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          python-version: "3.13"
+            - name: Install uv
+              uses: astral-sh/setup-uv@v4
+              with:
+                  python-version: "3.13"
 
-      - name: Install the project with build deps
-        run: uv sync
+            - name: Install the project with build deps
+              run: uv sync
 
-      - name: Build package
-        run: uv build
+            - name: Build package
+              run: uv build
 
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+            - name: Publish package distributions to PyPI
+              uses: pypa/gh-action-pypi-publish@release/v1
