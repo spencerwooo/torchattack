@@ -26,9 +26,11 @@ Repository = "https://github.com/spencerwooo/torchattack"
 Documentation = "https://github.com/spencerwooo/torchattack/blob/main/README.md"
 
 [project.optional-dependencies]
+kornia = ["kornia>=0.8.1"]
+scipy = ["scipy>=1.15.3"]
 full = [
-    "kornia>=0.8.1",
-    "scipy>=1.15.3",
+    "kornia>=0.8.1", # MuMoDIG
+    "scipy>=1.15.3", # TI-FGSM
 ]
 
 [dependency-groups]

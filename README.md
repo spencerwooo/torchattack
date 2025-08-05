@@ -13,7 +13,7 @@
 🛡 **torchattack** - _A curated list of adversarial attacks in PyTorch, with a focus on transferable black-box attacks._
 
 ```shell
-pip install torchattack
+pip install torchattack  # or `torchattack[full]` to install all extra dependencies
 ```
 
 ## Highlights

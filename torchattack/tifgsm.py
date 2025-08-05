@@ -21,6 +21,12 @@ class TIFGSM(Attack):
     > From the paper: [Evading Defenses to Transferable Adversarial Examples by
     Translation-Invariant Attacks](https://arxiv.org/abs/1904.02884).
 
+    This attack additionally requires the extra dependency `scipy`:
+
+    ```shell
+    pip install torchattack[scipy]
+    ```
+
     Note:
         Key parameters include `kernel_len` and `n_sig`, which defines the size and
         the radius of the gaussian kernel. The default values are set to 15 and 3

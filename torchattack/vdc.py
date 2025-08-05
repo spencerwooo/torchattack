@@ -16,6 +16,12 @@ class VDC(Attack):
     > From the paper: [Improving the Adversarial Transferability of Vision Transformers
     with Virtual Dense Connection](https://ojs.aaai.org/index.php/AAAI/article/view/28541).
 
+    Note:
+        `hook_cfg` should match the passed `model` name. If `model` is not initialized
+        via `torchattack.AttackModel`, then `hook_cfg` must be specified explicitly.
+        Supported models include: `vit_base_patch16_224`, `deit_base_distilled_patch16_224`,
+        `pit_b_224`, `visformer_small`.
+
     Args:
         model: The model to attack.
         normalize: A transform to normalize images.

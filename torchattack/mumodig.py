@@ -21,6 +21,12 @@ class MuMoDIG(Attack):
     > From the paper: [Improving Integrated Gradient-based Transferable Adversarial
     Examples by Refining the Integration Path](https://www.arxiv.org/abs/2412.18844).
 
+    This attack additionally requires the extra dependency `kornia`:
+
+    ```shell
+    pip install torchattack[kornia]
+    ```
+
     Args:
         model: The model to attack.
         normalize: A transform to normalize images.

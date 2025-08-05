@@ -15,6 +15,12 @@ class SGM(Attack):
     > From the paper: [Skip Connections Matter: On the Transferability of Adversarial
     Examples Generated with ResNets](https://arxiv.org/abs/2002.05990).
 
+    Note:
+        `hook_cfg` should match the passed `model` name. If `model` is not initialized
+        via `torchattack.AttackModel`, then `hook_cfg` must be specified explicitly.
+        Supported models include: `resnet18`, `resnet34`, `resnet50`, `resnet101`,
+        `resnet152`, `densenet121`, `densenet161`, `densenet169`, `densenet201`.
+
     Args:
         model: The model to attack.
         normalize: A transform to normalize images.

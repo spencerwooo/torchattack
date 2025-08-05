@@ -15,7 +15,6 @@ networkx==3.4.2
 numpy==2.2.0
     # via
     #   torchattack (pyproject.toml)
-    #   scipy
     #   torchvision
 nvidia-cublas-cu12==12.4.5.8
     # via
@@ -53,8 +52,6 @@ nvidia-nvtx-cu12==12.4.127
     # via torch
 pillow==11.0.0
     # via torchvision
-scipy==1.14.1
-    # via torchattack (pyproject.toml)
 setuptools==75.8.0
     # via torch
 sympy==1.13.1

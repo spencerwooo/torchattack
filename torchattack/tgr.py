@@ -16,6 +16,12 @@ class TGR(Attack):
     > From the paper: [Transferable Adversarial Attacks on Vision Transformers with
     Token Gradient Regularization](https://arxiv.org/abs/2303.15754).
 
+    Note:
+        `hook_cfg` should match the passed `model` name. If `model` is not initialized
+        via `torchattack.AttackModel`, then `hook_cfg` must be specified explicitly.
+        Supported models include: `vit_base_patch16_224`, `deit_base_distilled_patch16_224`,
+        `pit_b_224`, `cait_s24_224`, `visformer_small`.
+
     Args:
         model: The model to attack.
         normalize: A transform to normalize images.

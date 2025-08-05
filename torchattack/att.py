@@ -16,6 +16,12 @@ class ATT(Attack):
     > From the paper: [Boosting the Transferability of Adversarial Attack on Vision
     Transformer with Adaptive Token Tuning](https://openreview.net/forum?id=sNz7tptCH6).
 
+    Note:
+        `hook_cfg` should match the passed `model` name. If `model` is not initialized
+        via `torchattack.AttackModel`, then `hook_cfg` must be specified explicitly.
+        Supported models include: `vit_base_patch16_224`, `pit_b_224`, `cait_s24_224`,
+        `visformer_small`.
+
     Args:
         model: The model to attack.
         normalize: A transform to normalize images.

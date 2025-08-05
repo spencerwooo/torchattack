@@ -17,6 +17,12 @@ class BPA(Attack):
     > From the paper: [Rethinking the Backward Propagation for Adversarial
     Transferability](https://arxiv.org/abs/2306.12685).
 
+    Note:
+        `hook_cfg` should match the passed `model` name. If `model` is not initialized
+        via `torchattack.AttackModel`, then `hook_cfg` must be specified explicitly.
+        Supported models include: `resnet18`, `resnet34`, `resnet50`, `resnet101`,
+        `resnet152`.
+
     Args:
         model: The model to attack.
         normalize: A transform to normalize images.
