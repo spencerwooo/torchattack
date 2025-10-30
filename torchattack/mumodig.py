@@ -10,8 +10,8 @@ from torchattack.attack_model import AttackModel
 
 try:
     import kornia.augmentation as k
-except ImportError as e:
-    raise ImportError('`kornia` is required to run attack "MuMoDIG".') from e
+except ImportError:
+    k = None  # type: ignore[assignment]
 
 
 @register_attack()
@@ -62,6 +62,9 @@ class MuMoDIG(Attack):
         clip_max: float = 1.0,
     ) -> None:
         super().__init__(model, normalize, device)
+
+        if k is None:
+            raise ImportError('`kornia` is required to run attack "MuMoDIG".')
 
         self.eps = eps
         self.steps = steps

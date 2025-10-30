@@ -10,8 +10,8 @@ from torchattack.attack_model import AttackModel
 
 try:
     import scipy.stats as st
-except ImportError as e:
-    raise ImportError('`scipy` is required to run attack "TIFGSM".') from e
+except ImportError:
+    st = None  # type: ignore[assignment]
 
 
 @register_attack()
@@ -63,6 +63,9 @@ class TIFGSM(Attack):
         targeted: bool = False,
     ) -> None:
         super().__init__(model, normalize, device)
+
+        if st is None:
+            raise ImportError('`scipy` is required to run attack "TIFGSM".')
 
         self.eps = eps
         self.steps = steps
