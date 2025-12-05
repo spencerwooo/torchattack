@@ -11,7 +11,7 @@ from torchattack.attack_model import AttackModel
 try:
     import kornia.augmentation as k
 except ImportError:
-    k = None  # type: ignore[assignment]
+    k = None
 
 
 @register_attack()

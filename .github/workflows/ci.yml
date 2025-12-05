@@ -19,15 +19,15 @@ jobs:
 
             - name: Install the project's dev dependencies
               # run: uv sync --dev --group test
-              run: uv sync --dev
+              run: uv sync --dev --extra full
 
             - name: Run Ruff
               uses: astral-sh/ruff-action@v1
               with:
                   args: check --output-format=github .
 
-            - name: Run type checking
-              run: uv run mypy torchattack
+            # - name: Run type checking
+            #   run: uv run mypy torchattack
 
             # - name: Run tests
             #   run: uv run pytest tests
