@@ -140,7 +140,7 @@ class DANAA(Attack):
             _ = self.model(self.normalize(x + delta))
 
             # Calculate the loss using DANAA attribution
-            loss = self._get_danaa_loss(self.mid_output, y_base, agg_grad)
+            loss = self._get_danaa_loss(self.mid_output, y_base, agg_grad)  # type: ignore[arg-type]
             loss.backward()
 
             if delta.grad is None:
